@@ -2,18 +2,19 @@
 Automated News Aggregator & Reader (GitHub Native)
 Feeds:
 1. Football: BBC Sport Football (http://feeds.bbci.co.uk/sport/football/rss.xml)
-2. Technology: The Verge & Top Tech (The Verge, TechCrunch, Engadget, Ars Technica)
+2. Technology: The Verge ONLY (https://www.theverge.com/rss/...)
 3. Gaming: Eurogamer, PC Gamer, Gematsu (https://www.eurogamer.net/feed, https://www.pcgamer.com/rss, https://www.gematsu.com/feed)
 
 Features:
 - 30 Fresh Articles PER Category (Total 90 articles in database).
+- Technology: 100% The Verge.
+- Full In-Depth Translation: Captures every single quote, interview, statistic, context, and analysis (5-10+ paragraphs, never truncated).
+- Accurate Screenshots Gallery: Strictly genuine content screenshots, filters out ad widgets, SVGs, and badges.
 - 12-Hour Freshness rule with automatic backfill up to 30 articles per topic.
 - Clean Modern Header: Pure News branding, category filter tabs only, no search input.
 - Mobile History Back: Swiping back on mobile closes modal dialog without exiting the site.
 - High-res HD images (1200px+) from Fastly/CloudFront/BBC/Verge CDNs with no duplicate pictures.
-- Multi-Image Screenshots Gallery inside articles with graceful error handling.
 - Thailand Time (UTC+7) formatting.
-- Smart Deduplication: Skips already-translated links while ensuring untranslated items get re-processed.
 - Gemini Flash-Lite with exponential backoff and rate limit handling.
 """
 import os
@@ -54,7 +55,6 @@ GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite").strip()
 TARGET_PER_CATEGORY = 30
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'}
 
-# Curated high-res unique gaming images for fallback if needed
 CURATED_GAMING_COVERS = [
     "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200&q=80",
     "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&q=80",
@@ -68,14 +68,17 @@ CURATED_GAMING_COVERS = [
     "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=1200&q=80"
 ]
 
-SYSTEM_PROMPT = """คุณคือนักข่าวและบรรณาธิการข่าวมืออาชีพ แปลและสรุปข่าวเป็นภาษาไทยอย่างถูกต้อง สละสลวย และตรงตามข้อเท็จจริง (Fact-based)
-ข้อกำหนด:
-1. ข่าวฟุตบอล: ทับศัพท์เทคนิคและชื่อนักเตะ/สโมสรอย่างถูกต้อง
-2. ข่าวเทคโนโลยี: ทับศัพท์ชื่อระบบ ฮาร์ดแวร์ แบรนด์ โมเดล AI และฟีเจอร์อย่างถูกต้อง
-3. ข่าวเกม (Gaming): ทับศัพท์ชื่อเกม แพลตฟอร์ม (PS5, Xbox Series, Switch 2, PC) และค่ายเกมอย่างถูกต้อง
-4. "bullet_points": สรุปข้อเท็จจริงสำคัญสั้นกระชับ 3-4 ข้อ เป็นภาษาไทย
-5. "full_paragraphs": แปลและเรียบเรียงเนื้อหาข่าวฉบับเต็มอย่างครบถ้วน (3-5 ย่อหน้า) เป็นภาษาไทย ครอบคลุมเหตุการณ์สำคัญ คำสัมภาษณ์ กำหนดการ และตัวเลขสถิติทั้งหมด
-6. "thai_title": ต้องแปลพาดหัวเป็นภาษาไทยที่กระชับ ตรงประเด็น ห้ามคืนค่าเป็นภาษาอังกฤษ
+SYSTEM_PROMPT = """คุณคือนักข่าวและบรรณาธิการข่าวมืออาชีพ แปลและถ่ายทอดเนื้อหาข่าวจากภาษาอังกฤษเป็นภาษาไทยอย่างละเอียด ครบถ้วนสมบูรณ์ทุกมิติ และตรงตามข้อเท็จจริง (Fact-based) 100%
+กฎสำคัญที่สุด:
+1. การแปลเนื้อหาฉบับเต็ม ("full_paragraphs"):
+   - ต้องแปลและถ่ายทอดเนื้อหาข่าวอย่างละเอียด ครบทุกประเด็น ทุกคำสัมภาษณ์ (Direct quotes), ตัวเลขสถิติ, ข้อมูลและบริบทเหตุการณ์, รวมถึงบทวิเคราะห์ทั้งหมดที่ปรากฏในต้นฉบับ
+   - ห้ามตัดทอนคำสัมภาษณ์เด็ดขาด (แปลคำพูดในเครื่องหมายคำพูดอย่างครบถ้วนทุกประโยค)
+   - ห้ามสรุปย่อแบบรวบรัด ให้แบ่งเป็นย่อหน้าตามลำดับเนื้อหาข่าวจริง (ความยาว 5-10 ย่อหน้าขึ้นไปตามความยาวต้นฉบับจริง)
+2. สรุปประเด็นสำคัญ ("bullet_points"):
+   - สรุปสาระสำคัญหลัก 4-6 ข้ออย่างกระชับ ชัดเจน และครอบคลุมเป็นภาษาไทย
+3. พาดหัวข่าว ("thai_title"):
+   - แปลพาดหัวข่าวภาษาไทยให้กระชับ ดึงดูด ตรงประเด็น ทับศัพท์ถูกต้องตาม Fact ห้ามคืนค่าเป็นภาษาอังกฤษ
+4. ทับศัพท์ชื่อเฉพาะ สโมสร นักกีฬา แบรนด์ ฮาร์ดแวร์ โมเดล AI และเกม ให้ถูกต้องตามหลักสากล
 
 กฎแท็ก (Tag): ให้ระบุเป็นหนึ่งในสามหมวดนี้เท่านั้น: "Football", "Technology", "Gaming"
 """
@@ -119,7 +122,7 @@ def make_hd_image_url(url: str) -> str:
     return url
 
 def scrape_article_details(item: dict) -> dict:
-    """Scrape article webpage to extract HD lead image, full paragraphs, and gallery screenshots."""
+    """Scrape article webpage to extract HD lead image, comprehensive paragraphs, and genuine screenshots."""
     link = item["link"]
     cat = item["category_hint"]
     feed_img = item.get("feed_image", "")
@@ -129,43 +132,74 @@ def scrape_article_details(item: dict) -> dict:
 
     try:
         req = urllib.request.Request(link, headers=HEADERS)
-        with urllib.request.urlopen(req, timeout=10) as resp:
+        with urllib.request.urlopen(req, timeout=12) as resp:
             content = resp.read().decode('utf-8', errors='ignore')
 
-        # 1. og:image
-        img_m = re.search(r'property=["\']og:image["\']\s+content=["\']([^"\']+)["\']', content) or \
-                re.search(r'content=["\']([^"\']+)["\']\s+property=["\']og:image["\']', content)
-        if img_m and not lead_img:
-            lead_img = make_hd_image_url(img_m.group(1))
+        # 1. Lead / Cover Image
+        if not lead_img:
+            img_m = re.search(r'property=["\']og:image["\']\s+content=["\']([^"\']+)["\']', content) or \
+                    re.search(r'content=["\']([^"\']+)["\']\s+property=["\']og:image["\']', content)
+            if img_m:
+                lead_img = make_hd_image_url(img_m.group(1))
 
-        # 2. Extract article paragraphs
-        raw_p = re.findall(r'<p[^>]*>(.*?)</p>', content, re.DOTALL)
+        # 2. Extract article body HTML container (prioritizing specific story body)
+        article_html = ""
+        for pat in [
+            r'<div[^>]+id=["\']article-body["\'][^>]*>(.*?)</div>\s*<(?:div|footer|aside|section)',
+            r'<div[^>]+class=["\'][^"\']*(?:article-body|c-entry-content|entry-content|article_body|story-body)[^"\']*["\'][^>]*>(.*?)</div>\s*<(?:div|footer|aside|section)',
+            r'<article[^>]*>(.*?)</article>',
+            r'<main[^>]*>(.*?)</main>'
+        ]:
+            m = re.search(pat, content, re.DOTALL | re.IGNORECASE)
+            if m:
+                article_html = m.group(1)
+                break
+        if not article_html:
+            article_html = content
+
+        # 3. Clean and extract ALL paragraphs
+        raw_p = re.findall(r'<p[^>]*>(.*?)</p>', article_html, re.DOTALL)
+        bad_phrases = [
+            'terms of service', 'privacy policy', 'cookie', 'sign up', 'newsletter',
+            'subscribe', 'all rights reserved', 'follow us', 'comments', 'please login',
+            'image source', 'image caption', 'image copyright', 'published', 'hours ago',
+            'days ago', 'minutes ago', 'read more:', 'also read:', 'related:', 'loading...',
+            'advertisement', 'sponsored', 'listen to the latest', 'watch:', 'quiz:',
+            'bbc homepage', 'skip to content', 'accessibility help', 'welcome to pc gamer club',
+            'membership journey starts here', 'keep exploring and earning', 'free article view'
+        ]
         for p in raw_p:
-            c = clean_text(p)
-            if len(c) > 35 and not any(x in c.lower() for x in ['terms of service', 'privacy policy', 'cookie', 'sign up for', 'posts from this', 'all rights reserved', 'follow us']):
-                clean_paras.append(c)
+            clean = re.sub(r'<[^>]+>', '', p).strip()
+            clean = ' '.join(html.unescape(clean).split())
+            if len(clean) > 25 and not any(bad in clean.lower() for bad in bad_phrases):
+                clean_paras.append(clean)
 
-        # 3. Extract screenshots / gallery images from content
-        img_tags = re.findall(r'<img[^>]+src=["\']([^"\']+)["\']', content)
-        seen_gallery = set()
-        for g_img in img_tags:
-            g_img = g_img.split('?')[0]
-            if any(domain in g_img for domain in ['assetsio.gnwcdn.com', 'cdn.mos.cms.futurecdn.net', 'platform.theverge.com', 'ichef.bbci.co.uk', 'techcrunch.com', 'engadget.com', 'gematsu.com']):
-                if not any(bad in g_img.lower() for bad in ['logo', 'avatar', 'icon', 'author', 'user-', 'badge', 'tracking', 'banner']):
-                    hd_g = make_hd_image_url(g_img)
-                    if hd_g and hd_g not in seen_gallery:
-                        seen_gallery.add(hd_g)
-                        gallery_images.append(hd_g)
+        # 4. Extract genuine screenshots from article body ONLY
+        img_tags = re.findall(r'<img[^>]+src=["\']([^"\']+)["\']', article_html)
+        bad_img_keywords = [
+            'flexiimages', '.svg', 'nosize', 'flags/', 'logo', 'avatar', 'icon', 
+            'user-', 'banner', 'badge', 'tracking', 'sponsored', 'pixel', 'ad-', 
+            'scorecardresearch', 'placeholder', 'author', 'profile', 'button', '1x1'
+        ]
+        seen_g = set()
+        lead_clean = lead_img.split('?')[0] if lead_img else ""
+        for g in img_tags:
+            g_clean = g.split('?')[0]
+            if any(ext in g_clean.lower() for ext in ['.jpg', '.jpeg', '.png', '.webp']):
+                if not any(bad in g.lower() for bad in bad_img_keywords):
+                    if g_clean != lead_clean and g_clean not in seen_g:
+                        seen_g.add(g_clean)
+                        gallery_images.append(make_hd_image_url(g))
 
     except Exception as e:
         logger.debug(f"Direct scrape fallback for {link}: {e}")
 
-    # Fallback to Jina for Gematsu if needed
-    if 'gematsu.com' in link and not clean_paras:
+    # Fallback to Jina if direct failed
+    if not clean_paras:
         try:
             jina_url = f"https://r.jina.ai/{link}"
             req = urllib.request.Request(jina_url, headers=HEADERS)
-            with urllib.request.urlopen(req, timeout=10) as resp:
+            with urllib.request.urlopen(req, timeout=12) as resp:
                 txt = resp.read().decode('utf-8', errors='ignore')
             lines = txt.splitlines()
             start = False
@@ -177,41 +211,50 @@ def scrape_article_details(item: dict) -> dict:
                 line = line.strip()
                 if not line or line.startswith('!') or line.startswith('#'): continue
                 line = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', line)
-                if len(line) > 30: clean_paras.append(line)
+                if len(line) > 30 and not any(bad in line.lower() for bad in ['source:', 'sign up', 'cookie']):
+                    clean_paras.append(line)
         except Exception:
             pass
 
     clean_paras = list(dict.fromkeys(clean_paras))
     item["cover_image_url"] = lead_img
-    item["gallery_images"] = gallery_images[:10]
-    item["raw_paragraphs"] = clean_paras[:12] if clean_paras else [item["description"]]
+    item["gallery_images"] = gallery_images[:8]
+    item["raw_paragraphs"] = clean_paras[:40] if clean_paras else [item["description"]]
     return item
 
 def call_gemini(item_info: dict) -> dict:
-    """Call Gemini for factual summary and multi-paragraph translation with retry & backoff."""
+    """Call Gemini for comprehensive factual summary and multi-paragraph translation."""
     title = item_info["title"]
     category_hint = item_info["category_hint"]
     paras_text = "\n\n".join(item_info["raw_paragraphs"])
 
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
-    user_prompt = f"""หัวข้อข่าว: {title}
+    user_prompt = f"""หัวข้อข่าวต้นฉบับ: {title}
 หมวดหมู่: {category_hint}
-เนื้อหาภาษาอังกฤษ:
+
+เนื้อหาข่าวภาษาอังกฤษฉบับเต็ม:
 {paras_text}
 
-กรุณาแปลและสรุปเป็น JSON ภาษาไทย:
+คำสั่งสำคัญ:
+กรุณาแปลเนื้อหาข่าวนี้เป็นภาษาไทยอย่างละเอียด ครบถ้วนทุกประเด็น รวมถึงคำสัมภาษณ์ทั้งหมด (Direct quotes), ตัวเลข, สถิติ, และบริบทเหตุการณ์ทั้งหมด ห้ามตัดทอนหรือสรุปแบบรวบรัด โดยแปลแยกเป็นย่อหน้าตามลำดับเนื้อหาจริง (5-10 ย่อหน้าขึ้นไป)
+
+ตอบกลับเป็น JSON:
 {{
   "thai_title": "พาดหัวข่าวภาษาไทยที่กระชับ ตรงตาม Fact (ห้ามเป็นภาษาอังกฤษ)",
   "tag": "Football | Technology | Gaming",
   "bullet_points": [
-    "ข้อเท็จจริงสำคัญประเด็นที่ 1 (ภาษาไทย)...",
-    "ข้อเท็จจริงสำคัญประเด็นที่ 2 (ภาษาไทย)...",
-    "ข้อเท็จจริงสำคัญประเด็นที่ 3 (ภาษาไทย)..."
+    "ประเด็นสำคัญที่ 1 (ภาษาไทย)...",
+    "ประเด็นสำคัญที่ 2 (ภาษาไทย)...",
+    "ประเด็นสำคัญที่ 3 (ภาษาไทย)...",
+    "ประเด็นสำคัญที่ 4 (ภาษาไทย)..."
   ],
   "full_paragraphs": [
-    "ย่อหน้าที่ 1 แปลเป็นภาษาไทย...",
-    "ย่อหน้าที่ 2 แปลเป็นภาษาไทย...",
-    "ย่อหน้าที่ 3 แปลเป็นภาษาไทย..."
+    "ย่อหน้าที่ 1 แปลครบถ้วน...",
+    "ย่อหน้าที่ 2 แปลครบถ้วน...",
+    "ย่อหน้าที่ 3 แปลครบถ้วน...",
+    "ย่อหน้าที่ 4 แปลครบถ้วน...",
+    "ย่อหน้าที่ 5 แปลครบถ้วน...",
+    "ย่อหน้าที่ 6 แปลครบถ้วน..."
   ]
 }}"""
 
@@ -225,7 +268,7 @@ def call_gemini(item_info: dict) -> dict:
     
     for attempt in range(4):
         try:
-            with urllib.request.urlopen(req, timeout=35) as resp:
+            with urllib.request.urlopen(req, timeout=40) as resp:
                 data = json.loads(resp.read().decode('utf-8'))
                 raw_text = data["candidates"][0]["content"]["parts"][0]["text"]
                 parsed = json.loads(raw_text)
@@ -254,12 +297,11 @@ def call_gemini(item_info: dict) -> dict:
             logger.warning(f"Gemini attempt {attempt+1} failed: {e}")
             time.sleep(2 * (attempt + 1))
 
-    # Return fallback
     return {
         "thai_title": title,
         "tag": category_hint,
         "bullet_points": [item_info["description"]],
-        "full_paragraphs": item_info["raw_paragraphs"][:4]
+        "full_paragraphs": item_info["raw_paragraphs"][:6]
     }
 
 def update_ui_files(news_list: list[dict]):
@@ -274,7 +316,7 @@ def update_ui_files(news_list: list[dict]):
     readme_lines = [
         "# ⚡ Pure News — Automated News Aggregator (GitHub Native)",
         "",
-        "> **Live Automated News Reader:** Auto-scraped from BBC Sport Football, The Verge/Tech, and Eurogamer/PC Gamer/Gematsu.",
+        "> **Live Automated News Reader:** Auto-scraped from BBC Sport Football, The Verge (100%), and Eurogamer/PC Gamer/Gematsu.",
         f"> *อัปเดตล่าสุด: `{now_th}`* • *รวมทั้งหมด: `{len(news_list)} ข่าว`* (`⚽ Football: {football_count}` | `⚡ Tech: {tech_count}` | `🎮 Gaming: {gaming_count}`)",
         "",
         "### 🌐 [กดที่นี่เพื่อเปิดหน้าเว็บอ่านข่าว (GitHub Pages)](https://puresinghara.github.io/pure-news/)",
@@ -324,7 +366,7 @@ def update_ui_files(news_list: list[dict]):
     <div class="flex items-center gap-2">
       <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
       <span class="text-zinc-200 font-semibold">// LIVE FEED:</span>
-      <span class="hidden sm:inline">BBC FOOTBALL (30) • TECH (30) • GAMING (30)</span>
+      <span class="hidden sm:inline">BBC FOOTBALL (30) • THE VERGE (30) • GAMING (30)</span>
       <span class="text-emerald-400 font-bold px-1.5 py-0.5 bg-emerald-500/10 rounded border border-emerald-500/30">ONLINE</span>
     </div>
     <div class="flex items-center gap-4 text-[11px]">
@@ -685,6 +727,14 @@ def run():
         if not link: continue
         tag = it.get("tag", "")
         if "chelsea" in tag.lower(): it["tag"] = "Football"
+        
+        # Clean up any bad gallery images in cache (flexiimages or SVGs)
+        if it.get("gallery_images"):
+            it["gallery_images"] = [
+                g for g in it["gallery_images"] 
+                if not any(bad in g.lower() for bad in ['flexiimages', '.svg', 'nosize', 'flags/', 'icon', 'badge'])
+            ]
+        
         it["cover_image_url"] = make_hd_image_url(it.get("cover_image_url", ""))
         existing_by_link[link] = it
 
@@ -693,6 +743,7 @@ def run():
     now_utc = datetime.datetime.now(datetime.timezone.utc)
     twelve_hours_ago = now_utc - datetime.timedelta(hours=12)
 
+    # Feeds: Technology is 100% The Verge ONLY
     categories_config = {
         "Football": [
             "http://feeds.bbci.co.uk/sport/football/rss.xml"
@@ -700,9 +751,11 @@ def run():
         "Technology": [
             "https://www.theverge.com/rss/index.xml",
             "https://www.theverge.com/rss/tech/index.xml",
-            "https://techcrunch.com/feed/",
-            "https://www.engadget.com/rss.xml",
-            "https://feeds.arstechnica.com/arstechnica/technology-lab"
+            "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+            "https://www.theverge.com/rss/policy/index.xml",
+            "https://www.theverge.com/rss/reviews/index.xml",
+            "https://www.theverge.com/rss/gadgets/index.xml",
+            "https://www.theverge.com/rss/creators/index.xml"
         ],
         "Gaming": [
             "https://www.eurogamer.net/feed",
@@ -750,22 +803,31 @@ def run():
 
         for item in selected_candidates:
             link = item["link"]
+            
+            # For Technology: ensure link is strictly from The Verge
+            if cat == "Technology" and "theverge.com" not in link:
+                continue
+
             if link in existing_by_link:
                 existing_item = existing_by_link[link]
                 existing_item["tag"] = cat
                 existing_item["cover_image_url"] = make_hd_image_url(existing_item.get("cover_image_url", ""))
                 
-                # Check if it was REALLY translated to Thai
+                # Check if it was REALLY translated to Thai and has full depth (at least 4 paragraphs)
                 thai_t = existing_item.get("thai_title", "")
-                if any('\u0e00' <= c <= '\u0e7f' for c in thai_t):
+                has_thai = any('\u0e00' <= c <= '\u0e7f' for c in thai_t)
+                paragraphs = existing_item.get("full_paragraphs", [])
+                is_thorough = len(paragraphs) >= 4
+
+                if has_thai and is_thorough:
                     final_category_articles.append(existing_item)
                 else:
-                    logger.info(f"[{cat}] Found untranslated article in cache, queuing re-translation: {item['title'][:40]}...")
+                    logger.info(f"[{cat}] Needs thorough re-translation: {item['title'][:40]}...")
                     new_items_to_translate.append(item)
             else:
                 new_items_to_translate.append(item)
 
-        logger.info(f"[{cat}] Reusing {len(final_category_articles)} existing translated articles. Translating {len(new_items_to_translate)} new articles.")
+        logger.info(f"[{cat}] Reusing {len(final_category_articles)} existing thorough articles. Translating {len(new_items_to_translate)} new/upgraded articles.")
 
         # Translate new items (if any) with polite concurrency
         if new_items_to_translate:
@@ -784,7 +846,7 @@ def run():
                     "thai_title": trans.get("thai_title", item["title"]),
                     "tag": cat,
                     "bullet_points": trans.get("bullet_points", []),
-                    "full_paragraphs": trans.get("full_paragraphs", item["raw_paragraphs"][:4]),
+                    "full_paragraphs": trans.get("full_paragraphs", item["raw_paragraphs"][:6]),
                     "link": item["link"],
                     "cover_image_url": item["cover_image_url"],
                     "gallery_images": item.get("gallery_images", []),
@@ -799,7 +861,6 @@ def run():
             img = art.get("cover_image_url", "").strip()
             # If image missing or duplicate in this run
             if not img or img in global_used_images:
-                # Try gallery images
                 found_unique = False
                 for g in art.get("gallery_images", []):
                     if g and g not in global_used_images:
@@ -808,7 +869,6 @@ def run():
                         found_unique = True
                         break
                 if not found_unique:
-                    # Assign a unique curated high-res image
                     fallback_img = CURATED_GAMING_COVERS[idx_art % len(CURATED_GAMING_COVERS)] if cat == "Gaming" else f"https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&q=80&sig={idx_art}"
                     art["cover_image_url"] = fallback_img
                     global_used_images.add(fallback_img)
