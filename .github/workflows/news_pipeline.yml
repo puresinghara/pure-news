@@ -1,0 +1,49 @@
+name: Automated News Pipeline (GitHub Native)
+
+on:
+  # Schedule: Runs automatically every 2 hours
+  schedule:
+    - cron: '0 */2 * * *'
+  
+  # Manual trigger: 1-click test directly from GitHub Actions UI
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scrape-and-update:
+    name: Run Scraper, Gemini AI & GitHub Sync
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Execute News Pipeline
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ secrets.GEMINI_MODEL || 'gemini-3.1-flash-lite' }}
+          MAX_ARTICLES: '30'
+        run: |
+          python pipeline.py
+
+      - name: Commit and Push Updates
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/news.json README.md index.html
+          git diff --staged --quiet || (git commit -m "chore: auto-update news [skip ci]" && git push)

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="th" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>THE VERGE // GITHUB NATIVE LIVE NEWS READER</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Prompt:wght@300;400;500;600&display=swap');
+    body { font-family: 'Prompt', sans-serif; }
+    .verge-title { font-family: 'Chakra Petch', sans-serif; letter-spacing: -0.02em; }
+  </style>
+</head>
+<body class="bg-[#09090b] text-zinc-100 min-h-screen antialiased selection:bg-[#ff3366] selection:text-white">
+
+  <!-- Top Announcement Bar -->
+  <div class="border-b border-zinc-800 bg-zinc-950 px-4 py-2 text-xs font-mono flex items-center justify-between text-zinc-400">
+    <div class="flex items-center gap-2">
+      <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+      <span class="text-zinc-200 font-semibold">// LIVE GITHUB FEED:</span>
+      <span>AUTOMATED 12H WINDOW • ZERO TOKENS WASTED</span>
+    </div>
+    <div class="flex items-center gap-4 text-[11px]">
+      <span class="text-emerald-400 font-bold">ENGINE: GEMINI 3.1 FLASH-LITE</span>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="border-b-2 border-zinc-800 bg-[#0c0c0e] sticky top-0 z-40 backdrop-blur-md bg-opacity-95">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-gradient-to-tr from-[#ff3366] to-[#00e5ff] flex items-center justify-center font-black text-black text-2xl font-mono shadow-[0_0_20px_rgba(255,51,102,0.4)]">
+          V
+        </div>
+        <div>
+          <h1 class="verge-title text-2xl md:text-3xl font-black uppercase text-white flex items-center gap-2">
+            THE VERGE <span class="text-[#ff3366] text-xs font-mono font-bold tracking-widest px-2 py-0.5 border border-[#ff3366]/40 rounded-sm">GITHUB EDITION</span>
+          </h1>
+          <p class="text-[11px] font-mono text-zinc-400 uppercase tracking-widest">Football & Technology • Facts Summarization</p>
+        </div>
+      </div>
+
+      <!-- Tag Filters -->
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="filterTag('ALL')" id="filterALL" class="px-3 py-1 bg-white text-black font-mono font-bold text-xs rounded-sm transition">ALL</button>
+        <button onclick="filterTag('Football')" id="filterFootball" class="px-3 py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-mono text-xs rounded-sm transition">⚽ FOOTBALL</button>
+        <button onclick="filterTag('Technology')" id="filterTechnology" class="px-3 py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-mono text-xs rounded-sm transition">⚡ TECH</button>
+        <button onclick="filterTag('Chelsea FC')" id="filterChelsea" class="px-3 py-1 bg-zinc-900 hover:bg-zinc-800 text-cyan-400 font-mono text-xs rounded-sm transition">🦁 CHELSEA FC</button>
+      </div>
+
+      <!-- Search -->
+      <div>
+        <input id="searchInput" type="text" oninput="handleSearch()" placeholder="ค้นหาข่าว..." class="bg-zinc-900 border border-zinc-800 text-xs px-3 py-1.5 rounded-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-[#ff3366] w-48 font-sans">
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+    <div id="newsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Populated by JS -->
+    </div>
+  </main>
+
+  <!-- Slide-Over Modal -->
+  <div id="modalOverlay" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex justify-end">
+    <div class="w-full max-w-xl bg-zinc-950 border-l border-zinc-800 h-full p-6 md:p-8 overflow-y-auto flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between pb-4 border-b border-zinc-800 mb-6">
+          <span id="modalTag" class="text-xs font-mono font-bold text-[#ff3366] uppercase"></span>
+          <button onclick="closeModal()" class="text-zinc-400 hover:text-white text-3xl font-mono leading-none">&times;</button>
+        </div>
+        <div class="w-full h-64 overflow-hidden rounded-sm mb-6 bg-zinc-900">
+          <img id="modalImg" src="" class="w-full h-full object-cover">
+        </div>
+        <h2 id="modalTitle" class="verge-title text-xl md:text-2xl font-bold text-white mb-4"></h2>
+        <div id="modalDate" class="text-xs font-mono text-zinc-400 mb-6 pb-4 border-b border-zinc-800"></div>
+        <div class="bg-black/60 border-l-2 border-[#ff3366] p-4 mb-6">
+          <div class="text-xs font-mono text-[#ff3366] uppercase font-bold tracking-wider mb-2">📌 สรุปข้อเท็จจริง (KEY FACTS):</div>
+          <ul id="modalBullets" class="space-y-2 text-sm text-zinc-200"></ul>
+        </div>
+      </div>
+      <div class="pt-6 border-t border-zinc-800 flex items-center justify-between">
+        <a id="modalSource" href="#" target="_blank" class="px-4 py-2 bg-zinc-900 border border-zinc-700 text-xs font-mono text-white rounded-sm hover:bg-zinc-800">
+          อ่านต้นฉบับเต็ม →
+        </a>
+        <button onclick="closeModal()" class="px-4 py-2 bg-zinc-800 text-xs font-mono text-zinc-300 rounded-sm">ปิด</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const allNews = [{"id": 1, "original_title": "Nvidia is reportedly preparing to fire Jensen Huang", "thai_title": "วิกฤตความเชื่อมั่น! บอร์ด Nvidia จ่อปลด Jensen Huang เซ่นปมฉาวความสัมพันธ์ซ้อน", "tag": "Technology", "bullet_points": ["บอร์ด Nvidia เตรียมประชุมด่วนเพื่อตัดสินอนาคตของ CEO Jensen Huang หลังมีข่าวอื้อฉาวเรื่องความสัมพันธ์ซ้อน", "ความสัมพันธ์ครั้งที่สองถูกระบุว่าเป็น Kimberly Powell รองประธานฝ่ายดูแลด้านสุขภาพของบริษัท", "ราคาหุ้น Nvidia ร่วงลงกว่า 7% หลังข่าวรายงานออกมา ขณะที่บริษัทกำลังเผชิญกับการตรวจสอบภายในที่เข้มข้น"], "link": "https://www.theverge.com/tech/1031652/jensen-huang-rumor", "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/chorus/uploads/chorus_asset/file/25824934/2192224191.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200", "published_at": "2026-11-11 22:44", "category_hint": "Technology"}, {"id": 2, "original_title": "Hands on with Home Assistant’s new ‘smart home multi-tool’", "thai_title": "รีวิว Home Assistant Connect Aux-2: กุญแจสำคัญสู่บ้านอัจฉริยะที่เชื่อมโยงทุกอุปกรณ์เข้าด้วยกัน", "tag": "Technology", "bullet_points": ["Home Assistant Connect Aux-2 คืออุปกรณ์มัลติฟังก์ชันขนาดเล็กราคา 69 ดอลลาร์ ช่วยเชื่อมต่ออุปกรณ์ Analog และอุปกรณ์ที่ไม่รองรับสมาร์ทโฮมเข้าสู่ระบบ", "รองรับการเชื่อมต่อที่หลากหลาย ทั้ง Bluetooth Proxy, Z-Wave/Zigbee (ผ่าน USB), และ RS-232 Serial", "ติดตั้งง่ายผ่าน ESPHome บนแพลตฟอร์ม Home Assistant ลดความซับซ้อนในการจัดการ Smart Home แบบ DIY"], "link": "https://www.theverge.com/tech/1031601/home-assistant-connect-aux-2-hands-on", "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/11/aux2-hero.jpg?quality=90&strip=all&crop=0%2C10.738824991648%2C100%2C78.522350016704&w=1200", "published_at": "2026-11-11 22:00", "category_hint": "Technology"}, {"id": 3, "original_title": "United won’t let your AI agent book your flight", "thai_title": "United Airlines เบรกเอเจนท์ AI ไม่ให้จองตั๋วเครื่องบินแทนผู้โดยสาร", "tag": "Technology", "bullet_points": ["United Airlines ไม่อนุญาตให้ AI Agents ทำรายการจองตั๋วแทนมนุษย์ เพื่อป้องกันปัญหาความเป็นส่วนตัวและความปลอดภัย", "กังวลเรื่องกฎระเบียบการบินที่ต้องยืนยันข้อมูลสำคัญจากตัวผู้โดยสารโดยตรง (เช่น มาตรการความปลอดภัยเกี่ยวกับสัมภาระ)", "หลายธุรกิจเริ่มตื่นตัวและตั้งกำแพงป้องกัน AI เข้าถึงฐานข้อมูลและทำธุรกรรมโดยไม่ได้รับอนุญาต"], "link": "https://www.theverge.com/ai-artificial-intelligence/1031623/united-unauthorized-ai-agents", "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/chorus/uploads/chorus_asset/file/23176430/1237621702.jpg?quality=90&strip=all&crop=0%2C10.721800295556%2C100%2C78.556399408888&w=1200", "published_at": "2026-11-11 21:54", "category_hint": "Technology"}, {"id": 4, "original_title": "Loot boxes, influencers, and addictive features face an EU crackdown", "thai_title": "สหภาพยุโรปเดินหน้าเข้ม! จ่อออกกฎหมาย Digital Fairness Act คุมเข้มระบบสุ่มของในเกม (Loot boxes) และกลลวงอินฟลูเอนเซอร์", "tag": "Technology", "bullet_points": ["ร่างกฎหมาย Digital Fairness Act (DFA) มุ่งคุมเข้มการทำธุรกิจออนไลน์ที่เอาเปรียบผู้บริโภคในสหภาพยุโรป", "ครอบคลุมตั้งแต่ระบบ Loot boxes ในเกม, อัลกอริทึมโซเชียลมีเดีย, การตลาดอินฟลูเอนเซอร์ ไปจนถึงแอปพลิเคชันที่ออกแบบมาเพื่อสร้างการเสพติด", "หากฝ่าฝืนอาจถูกปรับสูงสุดถึง 6% ของรายได้รวมต่อปีทั่วโลก"], "link": "https://www.theverge.com/policy/1031575/digital-fairness-act-eu-dfa-consumer-protection", "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/chorus/uploads/chorus_asset/file/25319789/STK450_EU_E.jpg?quality=90&strip=all&crop=0%2C9.9676601489831%2C100%2C80.064679702034&w=1200", "published_at": "2026-11-11 18:13", "category_hint": "Technology"}, {"id": 5, "original_title": "Google’s Tabletop AI experiment lets you build custom collaboration apps", "thai_title": "Google เปิดตัว 'Tabletop' เครื่องมือ AI ทดลอง ช่วยเนรมิตพื้นที่ทำงานร่วมกันแบบส่วนตัวสำหรับทุกคน", "tag": "Technology", "bullet_points": ["Tabletop เป็นเครื่องมือ AI ทดลองจาก Google Labs สำหรับสร้างพื้นที่จัดการโปรเจกต์ส่วนตัวที่ทำร่วมกับผู้อื่นได้", "ผู้ใช้สามารถสั่งงาน AI ให้สร้างฟีเจอร์ เช่น ตัวติดตามการออม หรือแผนการเดินทางได้ด้วยการพิมพ์บรรยายความต้องการ", "ใช้งานง่ายเหมือนแอปจัดการงานในออฟฟิศ แต่ปรับแต่งได้ยืดหยุ่นและรองรับการทำงานร่วมกันแบบเรียลไทม์"], "link": "https://www.theverge.com/tech/1031526/google-tabletop-ai-experiment-waitlist-availability", "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/11/Google-Labs-Tabletop.jpg?quality=90&strip=all&crop=0%2C3.4613147178592%2C100%2C93.077370564282&w=1200", "published_at": "2026-11-11 16:00", "category_hint": "Technology"}, {"id": 6, "original_title": "Google’s AlphaGenome 2 zooms in on the cellular roots of disease", "thai_title": "DeepMind เปิดตัว AlphaGenome 2 เจาะลึกถึงรากเหง้าของโรคในระดับเซลล์ ปูทางสู่การรักษาโรคแม่นยำยิ่งขึ้น", "tag": "Technology", "bullet_points": ["AlphaGenome 2 เป็น AI โมเดลรุ่นล่าสุดจาก DeepMind ที่สามารถคาดการณ์ผลกระทบของการกลายพันธุ์ในระดับเซลล์ได้อย่างละเอียด", "ช่วยให้นักวิจัยเข้าใจความเชื่อมโยงระหว่างพันธุกรรมกับพฤติกรรมของเซลล์ ซึ่งเป็นหัวใจสำคัญในการพัฒนายาและการรักษาโรค", "ถูกฝึกฝนด้วยข้อมูลเซลล์กว่า 100 ล้านรายการ ให้ความละเอียดสูงกว่ารุ่นก่อนหน้า และพร้อมให้ใช้งานวิจัยแล้วผ่าน AlphaGenome API"], "link": "https://www.theverge.com/ai-artificial-intelligence/1031524/google-deepmind-alphagenome-2-genetic-ai-model", "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/09/alphagenome-atlas-cover__background.jpg?quality=90&strip=all&crop=0%2C3.4613147178592%2C100%2C93.077370564282&w=1200", "published_at": "2026-11-11 15:00", "category_hint": "Technology"}, {"id": 7, "original_title": "Sony’s latest Pulse wireless headset packs planar magnetic drivers at a good price", "thai_title": "หูฟัง Sony PlayStation Pulse รุ่นใหม่: พลังเสียง Planar Magnetic ในราคาที่เข้าถึงได้จริง", "tag": "Technology", "bullet_points": ["ใช้ไดรเวอร์แบบ Planar Magnetic ให้เสียงละเอียด คมชัด ในราคาเพียง 99 ดอลลาร์", "รองรับการเชื่อมต่อผ่านเทคโนโลยี PlayStation Link และ Bluetooth พร้อมกันได้", "ออกแบบมาให้มีน้ำหนักเบา สวมใส่สบาย และเอียร์คัพหมุนได้ 180 องศา"], "link": "https://www.theverge.com/games/1031291/sony-playstation-pulse-wireless-gaming-headset-hands-on", "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/11/pulseheadset.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200", "published_at": "2026-11-11 14:00", "category_hint": "Technology"}, {"id": 8, "original_title": "Adobe’s AI experiments let you walk around in photos and interview your characters", "thai_title": "Adobe เผยโปรเจกต์ AI สุดล้ำ: ส่องโลก 3 มิติในภาพถ่ายและสัมภาษณ์ตัวละคร AI", "tag": "Technology", "bullet_points": ["Project Screen Test: สร้างและคัดตัวละคร AI ผ่านการพูดคุยโต้ตอบและกำหนดบุคลิกภาพ", "Project Sight Span: แปลงภาพนิ่งเป็นฉาก 3 มิติเพื่อขยับมุมมองและจัดวางตำแหน่งกล้องใหม่", "Project Sound Bender: ผสมเสียงและปรับแต่งเอฟเฟกต์เสียงผ่านอินเทอร์เฟซที่ใช้งานง่ายแบบ Real-time"], "link": "https://www.theverge.com/tech/1031505/adobe-max-2026-sneaks-experiments-ai", "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/11/Adobe-Project-Screen-Test.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200", "published_at": "2026-11-11 14:00", "category_hint": "Technology"}, {"id": 9, "original_title": "Are your TVs spying on you? We asked their makers", "thai_title": "ทีวีของคุณกำลังแอบสอดแนมอยู่หรือไม่? ไขความกระจ่างจากการถามตรงถึง 11 บริษัทผู้ผลิต", "tag": "Technology", "bullet_points": ["บริษัทผู้ผลิตทีวีส่วนใหญ่เก็บข้อมูลผ่านฟีเจอร์ Automatic Content Recognition (ACR) เพื่อประมวลผลพฤติกรรมการรับชม", "แม้ผู้ใช้จะกดเลือกปฏิเสธ (Opt-out) การเก็บข้อมูล แต่บางบริษัท เช่น Vizio หรือ Samsung ยังคงมีการรับส่งข้อมูลบางประเภทอยู่", "คำแนะนำคือควรตรวจสอบการตั้งค่าความเป็นส่วนตัวในสมาร์ททีวีของคุณอย่างละเอียดและปิดฟีเจอร์ที่ไม่จำเป็นเพื่อปกป้องข้อมูลส่วนบุคคล"], "link": "https://www.theverge.com/tech/1012372/tv-privacy-acr-questions", "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/10/268797_What_data_are_your_TVs_collecting_and_is_it_protected__CVirginia.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200", "published_at": "2026-11-11 13:00", "category_hint": "Technology"}, {"id": 10, "original_title": "Not everyone is loving their new iPhone Duo", "thai_title": "ความรักจบลงไว: ทำไมผู้ใช้บางส่วนถึงตัดสินใจคืน iPhone Duo หลังใช้งานได้เพียง 2 สัปดาห์", "tag": "Technology", "bullet_points": ["iPhone Duo เผชิญกับอัตราการคืนเครื่องในช่วง 14 วันแรกจากกลุ่มผู้ใช้ Early Adopters", "ข้อจำกัดด้านไลฟ์สไตล์ เช่น การรวมอุปกรณ์สองประเภทเข้าด้วยกัน กลายเป็นอุปสรรคมากกว่าข้อดีสำหรับบางคน", "ความผูกพันใน Ecosystem ของ Apple ทำให้ผู้ใช้ส่วนใหญ่เลือกกลับไปใช้ iPhone รุ่นมาตรฐานแทนการย้ายไปใช้สมาร์ทโฟนจอพับค่ายอื่น"], "link": "https://www.theverge.com/tech/1030398/iphone-duo-returns-screen-apps", "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/09/268734_iPhone_Duo_handson_ADiBenedetto_0018.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200", "published_at": "2026-11-11 13:00", "category_hint": "Technology"}, {"id": 11, "original_title": "Toyota’s Scion is back, starting with an American-made, 25-mph kei truck", "thai_title": "การกลับมาของ Scion: Toyota เปิดตัวรถกระบะจิ๋ว Kei Truck ผลิตในอเมริกาพร้อมทำตลาดเชิงพาณิชย์", "tag": "Technology", "bullet_points": ["Toyota นำแบรนด์ Scion กลับมาในฐานะแบรนด์ทดลองนวัตกรรมยานยนต์ (Mobility Incubator)", "เปิดตัว KEI-01 รถกระบะ Kei Truck ขนาดจิ๋ว ผลิตในรัฐอินเดียนา สหรัฐอเมริกา", "เน้นการใช้งานเชิงพาณิชย์ (Fleet) ในพื้นที่จำกัด โดยจำกัดความเร็วสูงสุดที่ 25 ไมล์ต่อชั่วโมงตามกฎหมาย LSV"], "link": "https://www.theverge.com/transportation/1031554/oyota-scion-kei-01-truck-revival", "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/11/Scion_Kei_Truck_2027-2.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200", "published_at": "2026-11-11 17:09", "category_hint": "Technology"}, {"id": 12, "original_title": "The best early Black Friday deals you can already shop", "thai_title": "ช้อปก่อนใคร! รวมดีลเด็ดรับเทศกาล Black Friday ที่เริ่มลดราคาแล้วตั้งแต่วันนี้", "tag": "Technology", "bullet_points": ["เทศกาลลดราคาก่อน Black Friday เริ่มต้นแล้ว มีสินค้าตั้งแต่ทีวี, เครื่องพิมพ์ 3D, จนถึงอุปกรณ์อัจฉริยะ", "เน้นย้ำความสำคัญของการตรวจสอบคุณสมบัติและเปรียบเทียบราคาก่อนตัดสินใจซื้อ", "มีสินค้าไฮไลท์ เช่น Hisense CanvasTV, Bambu Lab P2S Combo และนวัตกรรมรักษ์โลกอย่าง Birdfy Smart Bird Feeder"], "link": "https://www.theverge.com/gadgets/1028991/black-friday-best-early-deals-2026", "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/11/268838_BF_CM_EARLY_DEALS_Headers_CVirginia.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200", "published_at": "2026-11-11 15:53", "category_hint": "Technology"}, {"id": 13, "original_title": "Sharge’s eye-catching MacBook charger is over 25 percent off", "thai_title": "Sharge จัดโปรแรงลดราคาที่ชาร์จ MacBook สุดล้ำ ดีไซน์สวยกระแทกตา", "tag": "Technology", "bullet_points": ["ที่ชาร์จ Pixel 140W GaN ลดราคาเหลือ 69.88 ดอลลาร์", "รองรับการชาร์จ MacBook Pro 16 นิ้ว ถึง 50% ใน 25 นาที", "ขนาดเล็กกว่าหัวชาร์จมาตรฐานของ Apple ถึง 47% พร้อมจอแสดงผลพิกเซลบอกค่าวัตต์"], "link": "https://www.theverge.com/gadgets/1031301/sharge-140w-gan-charger-lenovo-yoga-mini-desktop-pc-deal-sale", "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/11/sharge-pixel-140-charger-roundup.png?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200", "published_at": "2026-11-11 15:30", "category_hint": "Technology"}, {"id": 14, "original_title": "Ocarina of Time is even better if you use a smartphone app", "thai_title": "Ocarina of Time จะเล่นสนุกขึ้นอีกระดับ หากคุณใช้งานแอปเสริมตัวนี้", "tag": "Technology", "bullet_points": ["Zelda Notes เป็นแอปเสริมฟรีสำหรับผู้เล่นเกมในเครือ Nintendo", "ช่วยระบุตำแหน่งไอเท็มและเงื่อนไขการไขปริศนาภายในเกม Zelda: Ocarina of Time", "ฟีเจอร์เด่นคือแผนที่ Interactive ที่กรองข้อมูลได้ทั้งช่วงวัยเด็กและผู้ใหญ่ของตัวละคร"], "link": "https://www.theverge.com/games/1031321/the-legend-of-zelda-ocarina-of-time-notes-app-gold-skulltula", "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/11/20261110-01M74FRERRH793DQ734KTJM2FA-061DB0ED-ACA3-47E5-8CA3-6B3B776C2354.jpeg?quality=90&strip=all&crop=0%2C3.4613147178592%2C100%2C93.077370564282&w=1200", "published_at": "2026-11-11 15:00", "category_hint": "Technology"}, {"id": 15, "original_title": "The US is winning the AI race. Jensen Huang could have blown it", "thai_title": "เมื่ออเมริกาครองความได้เปรียบด้าน AI แต่ Jensen Huang อาจเป็นจุดอ่อนที่ทำให้เกมเปลี่ยน", "tag": "Technology", "bullet_points": ["Jensen Huang ถูกเปิดเผยว่ามีความสัมพันธ์กับบุคคลที่ถูกสงสัยว่าเป็นสายลับจีน", "การขาดแคลนชิป Nvidia คือคอขวดสำคัญที่จีนพยายามเจาะทะลวงเพื่อเร่งความเร็วในการพัฒนา AI", "ผู้เชี่ยวชาญเตือนว่าความได้เปรียบทาง AI ของสหรัฐฯ อาจพลิกผันได้หากจีนเข้าถึงเทคโนโลยีชิปชั้นสูงของ Nvidia ได้มากขึ้น"], "link": "https://www.theverge.com/ai-artificial-intelligence/1031063/jensen-huang-ai-race-us-china-spy", "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/09/gettyimages-2285784039.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200", "published_at": "2026-11-10 19:04", "category_hint": "Technology"}, {"id": 1, "original_title": "The chaos that took Carrick from two-year deal to sacked within 15 games", "thai_title": "จากสัญญา 2 ปีสู่การโดนปลด: เปิดเบื้องหลังความวุ่นวายในยุค ไมเคิล คาร์ริก กับแมนเชสเตอร์ ยูไนเต็ด", "tag": "Football", "bullet_points": ["ไมเคิล คาร์ริก เคยได้รับความเชื่อมั่นด้วยสัญญา 2 ปี แต่กลับต้องถูกปลดหลังคุมทีมได้เพียง 15 นัด", "คาร์ริกได้รับการยอมรับในเรื่องสปิริตและความเป็นผู้นำที่ปกป้องลูกทีมจากกระแสกดดันเสมอ", "ความวุ่นวายในสโมสรและผลงานที่ไม่คงเส้นคงวาเป็นปัจจัยสำคัญที่ทำให้สถานการณ์ของคาร์ริกถึงทางตัน"], "link": "https://www.bbc.co.uk/sport/football/articles/cm0rl4kwn8vqo?at_medium=RSS&at_campaign=rss", "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/dfae/live/4d45e2e0-de7d-11f1-b88b-3f1671ea859d.jpg", "published_at": "Thu, 12 Nov 2026 10:21:29 GMT", "category_hint": "Football"}, {"id": 2, "original_title": "Young duo at heart of Nations League's meanest defence", "thai_title": "สองดาวรุ่งหัวใจหลัก! ผู้อยู่เบื้องหลังกำแพงเหล็กไร้พ่ายของไอร์แลนด์เหนือในศึกเนชันส์ลีก", "tag": "Football", "bullet_points": ["ไอร์แลนด์เหนือเป็นทีมเดียวในเนชันส์ลีกที่ยังไม่เสียประตูในรายการนี้", "Ruairi McConville และ Tom Atcheson คือสองดาวรุ่งที่ก้าวขึ้นมาอุดรอยรั่วแทนนักเตะตัวหลักที่บาดเจ็บ", "ไมเคิล โอนีล ยกย่องฟอร์มการเล่นของเหล่าดาวรุ่งว่ามีศักยภาพที่ไร้ขีดจำกัด"], "link": "https://www.bbc.co.uk/sport/articles/cw24epvmq96lo?at_medium=RSS&at_campaign=rss", "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/e1cf/live/ea41ecb0-ddc9-11f1-93e1-3b657b665bcf.png", "published_at": "Thu, 12 Nov 2026 08:17:52 GMT", "category_hint": "Football"}, {"id": 3, "original_title": "'Unfinished business' - Tuchel committed to England", "thai_title": "ภารกิจยังไม่เสร็จสิ้น! 'ทูเคิล' ยืนกรานขอคุมทีมชาติอังกฤษยาวถึงยูโร 2028 ไม่สนข้อเสนอจากสโมสรยักษ์ใหญ่", "tag": "Football", "bullet_points": ["โธมัส ทูเคิล ยืนยันไม่มีแผนลาออกจากทีมชาติอังกฤษก่อนจบศึกยูโร 2028", "สัญญาของทูเคิลไม่มีเงื่อนไขค่าฉีกสัญญา และเจ้าตัวให้ความสำคัญกับ 'ภารกิจที่ยังไม่เสร็จสิ้น' กับทีมชาติ", "ทูเคิลยอมรับว่ายังมีความคิดถึงบรรยากาศการคุมทีมในระดับสโมสรที่จะได้ลงเล่นมากกว่า 50 นัดต่อฤดูกาล"], "link": "https://www.bbc.co.uk/sport/football/articles/cqg7l9x9jnzko?at_medium=RSS&at_campaign=rss", "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/f2bb/live/c56e31c0-de71-11f1-9115-cfe6d179af3a.jpg", "published_at": "Thu, 12 Nov 2026 08:42:47 GMT", "category_hint": "Football"}, {"id": 4, "original_title": "USA withdraw from U17 World Cup", "thai_title": "สหรัฐฯ ประกาศถอนทีมลุยศึกฟุตบอลโลก U17 ที่กาตาร์ หวั่นวิกฤตความขัดแย้งในภูมิภาค", "tag": "Football", "bullet_points": ["สหรัฐฯ ถอนทีมฟุตบอลชาย U17 ออกจากการแข่งขันฟุตบอลโลกที่กาตาร์", "อ้างคำแนะนำจากกระทรวงการต่างประเทศสหรัฐฯ เรื่องความเสี่ยงจากความขัดแย้งด้วยอาวุธ (ระดับการเตือนภัยที่ 3)", "หวั่นผลกระทบจากกลุ่มฮูตีที่โจมตีสนามบินในภูมิภาค ซึ่งอาจบานปลายจนเป็นอันตรายต่อทีมงานและนักกีฬา"], "link": "https://www.bbc.co.uk/sport/football/articles/c6y49yz77pppo?at_medium=RSS&at_campaign=rss", "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/79aa/live/f81c7430-de6a-11f1-9115-cfe6d179af3a.jpg", "published_at": "Thu, 12 Nov 2026 07:44:21 GMT", "category_hint": "Football"}, {"id": 5, "original_title": "Robertson set to make history but his hero Dalglish will always be King", "thai_title": "เตรียมขึ้นแท่นตำนาน! แอนดี้ โรเบิร์ตสัน เตรียมทำลายสถิติสูงสุดตลอดกาลของเคนนี ดัลกลิช", "tag": "Football", "bullet_points": ["แอนดี้ โรเบิร์ตสัน เตรียมทำลายสถิติติดทีมชาติสกอตแลนด์สูงสุดตลอดกาลที่ 103 นัด", "สถิติเดิมของ เคนนี ดัลกลิช ยืนหยัดมายาวนานถึง 40 ปี", "โรเบิร์ตสันเผยว่าตนเองไม่ใช่คนที่มั่นใจในตัวเองสูง แต่เป็นคนที่มักตั้งคำถามกับตัวเองเพื่อพัฒนาอยู่เสมอ"], "link": "https://www.bbc.co.uk/sport/football/articles/cxe89dq16dp2o?at_medium=RSS&at_campaign=rss", "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/e440/live/1b368480-de00-11f1-93e1-3b657b665bcf.jpg", "published_at": "Thu, 12 Nov 2026 07:19:57 GMT", "category_hint": "Football"}, {"id": 6, "original_title": "England's Blues brothers - how the Bellinghams helped save Birmingham", "thai_title": "สองพี่น้องตระกูลเบลลิงแฮม: จากเด็กปั้นเบอร์มิงแฮมสู่หน้าประวัติศาสตร์ทีมชาติอังกฤษ", "tag": "Football", "bullet_points": ["จู๊ดและโจบ เบลลิงแฮม เป็นผลผลิตจากศูนย์ฝึกเยาวชนของเบอร์มิงแฮม ซิตี้ ที่สร้างความประทับใจให้กับแฟนบอลอย่างมากในช่วงที่ทีมประสบปัญหาการเงินและการหนีตกชั้น", "แม้พี่น้องคู่นี้จะผ่านการลงเล่นให้เบอร์มิงแฮมรวมกัน 70 นัด แต่ยังไม่เคยได้ลงสนามพร้อมกันในทีมชุดใหญ่เนื่องจากจู๊ดออกจากสโมสรก่อนโจบจะขึ้นมา", "หากโจบได้รับเลือกให้ลงสนามในเกมพบโครเอเชีย ทั้งคู่จะสร้างประวัติศาสตร์เป็นพี่น้องคู่แรกในรอบ 19 ปีที่ลงเล่นให้ทีมชาติอังกฤษชุดใหญ่ร่วมกัน"], "link": "https://www.bbc.co.uk/sport/football/articles/cm1j3j20r2rzo?at_medium=RSS&at_campaign=rss", "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/c945/live/c3116c40-dce0-11f1-a8e1-e3454837ffc6.png", "published_at": "Thu, 12 Nov 2026 07:12:41 GMT", "category_hint": "Football"}, {"id": 7, "original_title": "How 'Barca way' continues despite big-name exits", "thai_title": "วิถีแห่งบาร์ซ่าไม่เคยจางหาย: เจาะลึกเหตุผลที่บาร์เซโลนาคงความแข็งแกร่งแม้เสียสตาร์ดัง", "tag": "Football", "bullet_points": ["บาร์เซโลนาคว้าชัย 3 นัดรวดในรอบแบ่งกลุ่ม ยิงรวม 19 ประตู", "อาร์เซนอลประสบปัญหาฟอร์มตกในลีก แต่ยังมีลุ้นในเวทียุโรปหลังเก็บได้ 7 คะแนน", "บาร์ซ่ายังคงรักษามาตรฐานแชมป์ไว้ได้แม้เสียสตาร์ดังอย่าง อเล็กเซีย ปูเตยาส และ ซัลมา ปารายูเอโล"], "link": "https://www.bbc.co.uk/sport/football/articles/c5vg23nmgp2yo?at_medium=RSS&at_campaign=rss", "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/64ad/live/0b486200-dddd-11f1-b465-b9821c2582d4.jpg", "published_at": "Thu, 12 Nov 2026 06:41:09 GMT", "category_hint": "Football"}, {"id": 8, "original_title": "Kane's top 10 England moments - which was your favourite?", "thai_title": "ย้อนรอย 10 โมเมนต์ประวัติศาสตร์ของ แฮร์รี่ เคน ในสีเสื้อ 'สิงโตคำราม' ก่อนก้าวขึ้นเป็นนักเตะที่ติดทีมชาติมากที่สุด", "tag": "Football", "bullet_points": ["แฮร์รี่ เคน เตรียมสร้างสถิติลงสนามให้ทีมชาติอังกฤษมากที่สุดตลอดกาล (126 นัด)", "เจ้าของสถิติดาวยิงสูงสุดทีมชาติอังกฤษ 91 ประตู จากการลงเล่น 125 นัด", "เริ่มต้นการติดทีมชาติอย่างน่าประทับใจด้วยการทำประตูได้ใน 79 วินาทีแรกที่ลงสนาม"], "link": "https://www.bbc.co.uk/sport/football/articles/c64g12w5zpjpo?at_medium=RSS&at_campaign=rss", "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/134b/live/944d3be0-c3e6-11f1-badc-154546719036.jpg", "published_at": "Thu, 12 Nov 2026 06:25:26 GMT", "category_hint": "Football"}, {"id": 9, "original_title": "Wales' James warns of Norwegian revenge in Oslo", "thai_title": "แดน เจมส์ เตือนทัพมังกรแดง เตรียมรับมือความแค้นจากนอร์เวย์ในออสโล", "tag": "Football", "bullet_points": ["แดน เจมส์ เตือนเวลส์ให้ระวังการแก้แค้นจากนอร์เวย์หลังเคยบุกไปชนะมาได้", "ชัยชนะที่คาร์ดิฟฟ์ช่วยลดความกดดันให้กุนซือ เคร็ก เบลลามี", "เวลส์ต้องการชัยชนะในออสโลเพื่ออันดับที่ดีขึ้นในรอบคัดเลือกยูโร 2028"], "link": "https://www.bbc.co.uk/sport/football/articles/c623jl1kenvyo?at_medium=RSS&at_campaign=rss", "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/cc28/live/64a5da40-ddeb-11f1-9204-cdcddf7d901c.jpg", "published_at": "Thu, 12 Nov 2026 04:32:42 GMT", "category_hint": "Football"}, {"id": 10, "original_title": "Pochettino a decade in Man Utd's making - but Carrick deserves better", "thai_title": "ทศวรรษแห่งความสัมพันธ์ที่รอคอย: เมาริซิโอ โปเช็ตติโน่ กับภารกิจกอบกู้อาณาจักรปีศาจแดง", "tag": "Football", "bullet_points": ["โปเช็ตติโน่จ่อรับตำแหน่งกุนซือแมนฯ ยูไนเต็ด หลังมีข่าวเชื่อมโยงกันมานาน 10 ปี", "สถานการณ์ทีมปัจจุบันย่ำแย่จากการบริหารงานที่ผิดพลาดสะสมมานาน", "การจัดการเรื่องการปลดคาร์ริคของบอร์ดบริหารถูกวิจารณ์ว่าขาดความเป็นมืออาชีพ"], "link": "https://www.bbc.co.uk/sport/football/articles/cwzd9pvjy426o?at_medium=RSS&at_campaign=rss", "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/7299/live/2b5bc490-ddcb-11f1-9053-236ccb99630c.jpg", "published_at": "Wed, 11 Nov 2026 12:58:17 GMT", "category_hint": "Football"}, {"id": 11, "original_title": "Pochettino ready to accept Man Utd offer to replace Carrick", "thai_title": "ดีลใกล้ปิด! โปเช็ตติโน่พร้อมตอบรับคุมทัพปีศาจแดงแทนคาร์ริค", "tag": "Football", "bullet_points": ["โปเช็ตติโน่เตรียมรับงานคุมแมนฯ ยูไนเต็ด", "ยูไนเต็ดต้องจ่ายค่าฉีกสัญญา 10 ล้านดอลลาร์ให้ US Soccer", "การประชุมตัดสินอนาคตของคาร์ริคมีกำหนดจัดขึ้นที่โมนาโกวันพุธนี้"], "link": "https://www.bbc.co.uk/sport/football/articles/cqvg25pj36mvo?at_medium=RSS&at_campaign=rss", "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/6766/live/d5551640-ddad-11f1-81e1-cf7317aa5114.jpg", "published_at": "Wed, 11 Nov 2026 16:03:02 GMT", "category_hint": "Football"}, {"id": 12, "original_title": "Leader, role model, extraordinary - how Kane's 'fairytale' came true", "thai_title": "ผู้นำและแบบอย่าง! เส้นทางเทพนิยายของ แฮร์รี่ เคน สู่การเป็นนักเตะที่ติดทีมชาติอังกฤษมากที่สุด", "tag": "Football", "bullet_points": ["แฮร์รี่ เคน เตรียมสร้างประวัติศาสตร์ติดทีมชาติอังกฤษสูงสุด 126 นัด", "เป็นเจ้าของสถิติดาวซัลโวสูงสุดตลอดกาลทีมชาติอังกฤษและเจ้าของรางวัล Ballon d'Or 2026", "ได้รับการยกย่องจากกุนซือและตำนานทีมชาติในฐานะผู้เล่นที่ทรงคุณค่าและเป็นแบบอย่าง"], "link": "https://www.bbc.co.uk/sport/football/articles/c60qkdj4lp34o?at_medium=RSS&at_campaign=rss", "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/67bf/live/ee8455c0-dab2-11f1-8c3b-f3c0d6bd7c4f.png", "published_at": "Wed, 11 Nov 2026 16:44:58 GMT", "category_hint": "Football"}, {"id": 13, "original_title": "Legally restrict heading a football in training, says MP", "thai_title": "ส.ส. อังกฤษผลักดันกฎหมายควบคุมการโหม่งบอลในการซ้อม หวั่นความเสี่ยงโรคสมองเสื่อม", "tag": "Football", "bullet_points": ["นักฟุตบอลเสี่ยงเสียชีวิตจากโรคสมองเสื่อมมากกว่าคนปกติ 3.5 เท่า", "ส.ส. เกรแฮม มอร์ริส ยื่นญัตติเข้าสภาเพื่อควบคุมการโหม่งบอลในการซ้อม", "เรียกร้องการยอมรับ CTE เป็นปัญหาสาธารณสุขและสร้างมาตรการคุ้มครองผู้เล่นระดับชาติ"], "link": "https://www.bbc.co.uk/sport/football/articles/cm1ewpjyy3dzo?at_medium=RSS&at_campaign=rss", "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/2766/live/008813c0-ddf5-11f1-8445-15eb55286f71.jpg", "published_at": "Wed, 11 Nov 2026 17:38:18 GMT", "category_hint": "Football"}, {"id": 14, "original_title": "Assessing the reasons for Man City's decline in form under Maresca", "thai_title": "วิเคราะห์วิกฤตศรัทธา แมนฯ ซิตี้ ฟอร์มดิ่งภายใต้การคุมทีมของ มาเรสก้า", "tag": "Football", "bullet_points": ["แมนฯ ซิตี้ แพ้ 3 นัดรวดหลังออกสตาร์ทฤดูกาลด้วยชัยชนะ 7 นัดติดต่อกัน", "ความไม่แน่นอนจากคดีความทางการเงินของสโมสรส่งผลต่อจิตใจนักเตะ", "ผู้เชี่ยวชาญชี้ว่าความเชื่อมั่นของทีมลดลงเนื่องจากการพ่ายแพ้ซ้ำซาก"], "link": "https://www.bbc.co.uk/sport/football/articles/cw30e0yz0p04o?at_medium=RSS&at_campaign=rss", "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/4c72/live/a41350a0-dcfa-11f1-9ef0-4b5930e2f80e.jpg", "published_at": "Wed, 11 Nov 2026 11:47:09 GMT", "category_hint": "Football"}, {"id": 15, "original_title": "Arsenal join Scott chase - Thursday's gossip", "thai_title": "อาร์เซน่อลเปิดฉากล่าตัว อเล็กซ์ สก็อตต์ ด้านแมนฯ ยูไนเต็ดเล็งเสริมแนวรับเพิ่ม", "tag": "Football", "bullet_points": ["อาร์เซน่อลร่วมวงล่าตัว อเล็กซ์ สก็อตต์", "แมนฯ ยูไนเต็ด สนใจดึง เนธาน คอลลินส์ และ คาลวิน บาสซี่ย์ เสริมแนวรับ", "มาร์ติน ซูบิเมนดี้ ยืนยันความสุขในลอนดอนแม้ตกเป็นข่าวกับหลายสโมสรยักษ์ใหญ่"], "link": "https://www.bbc.co.uk/sport/football/articles/c62l51xyl98no?at_medium=RSS&at_campaign=rss", "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/2955/live/0bc2bd20-de14-11f1-b441-2b33b063138f.png", "published_at": "Wed, 11 Nov 2026 21:38:01 GMT", "category_hint": "Football"}];
+    let currentTag = 'ALL';
+    let searchQuery = '';
+
+    function filterTag(tag) {
+      currentTag = tag;
+      ['ALL', 'Football', 'Technology', 'Chelsea'].forEach(t => {
+        const btn = document.getElementById('filter' + t);
+        if (btn) {
+          if ((t === 'Chelsea' && tag === 'Chelsea FC') || t === tag) {
+            btn.className = "px-3 py-1 bg-white text-black font-mono font-bold text-xs rounded-sm transition";
+          } else {
+            btn.className = "px-3 py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-mono text-xs rounded-sm transition";
+          }
+        }
+      });
+      render();
+    }
+
+    function handleSearch() {
+      searchQuery = document.getElementById('searchInput').value.toLowerCase();
+      render();
+    }
+
+    function render() {
+      const grid = document.getElementById('newsGrid');
+      grid.innerHTML = '';
+
+      const filtered = allNews.filter(item => {
+        const matchTag = (currentTag === 'ALL') || (item.tag === currentTag);
+        const matchQuery = !searchQuery || 
+          (item.thai_title || '').toLowerCase().includes(searchQuery) ||
+          (item.tag || '').toLowerCase().includes(searchQuery);
+        return matchTag && matchQuery;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div class="col-span-3 text-center py-16 text-zinc-500 font-mono">ไม่มีข่าวในหมวดนี้ใน 12 ชั่วโมงล่าสุด</div>';
+        return;
+      }
+
+      filtered.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = 'bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition flex flex-col justify-between overflow-hidden rounded-sm cursor-pointer group';
+        div.onclick = () => openModal(allNews.indexOf(item));
+        
+        const bulletsHtml = (item.bullet_points || []).slice(0, 3).map(b => 
+          `<li class="flex items-start gap-1.5"><span class="text-[#ff3366] font-bold">›</span><span>${b}</span></li>`
+        ).join('');
+
+        div.innerHTML = `
+          <div>
+            <div class="w-full h-44 overflow-hidden bg-zinc-950">
+              <img src="${item.cover_image_url}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+            </div>
+            <div class="p-5">
+              <div class="flex items-center gap-2 text-[11px] font-mono mb-2">
+                <span class="text-[#ff3366] font-bold">${item.tag}</span>
+                <span class="text-zinc-600">•</span>
+                <span class="text-zinc-500">${item.published_at}</span>
+              </div>
+              <h3 class="verge-title text-base font-bold text-white group-hover:text-[#ff3366] transition mb-3 leading-snug line-clamp-2">
+                ${item.thai_title}
+              </h3>
+              <ul class="text-xs text-zinc-300 space-y-1.5 font-light">
+                ${bulletsHtml}
+              </ul>
+            </div>
+          </div>
+          <div class="p-5 pt-0 border-t border-zinc-800/80 text-[11px] font-mono text-zinc-500 flex items-center justify-between">
+            <span class="text-zinc-300 group-hover:text-white transition">อ่านรายละเอียด →</span>
+            <span>VERGE FEED</span>
+          </div>
+        `;
+        grid.appendChild(div);
+      });
+    }
+
+    function openModal(idx) {
+      const item = allNews[idx];
+      if (!item) return;
+      document.getElementById('modalTag').textContent = `// ${item.tag}`;
+      document.getElementById('modalImg').src = item.cover_image_url;
+      document.getElementById('modalTitle').textContent = item.thai_title;
+      document.getElementById('modalDate').textContent = `เผยแพร่: ${item.published_at}`;
+      
+      const bulletsList = document.getElementById('modalBullets');
+      bulletsList.innerHTML = '';
+      (item.bullet_points || []).forEach(b => {
+        const li = document.createElement('li');
+        li.className = 'flex items-start gap-2';
+        li.innerHTML = `<span class="text-[#ff3366] font-bold">›</span><span>${b}</span>`;
+        bulletsList.appendChild(li);
+      });
+
+      document.getElementById('modalSource').href = item.link;
+      document.getElementById('modalOverlay').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.add('hidden');
+    }
+
+    render();
+  </script>
+</body>
+</html>
