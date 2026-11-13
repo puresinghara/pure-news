@@ -8,8 +8,10 @@ Feeds:
 Features:
 - 30 Fresh Articles PER Category (Total 90 articles in database).
 - Technology: 100% The Verge.
-- Full In-Depth Translation: Captures every single quote, interview, statistic, context, and analysis (5-10+ paragraphs, never truncated).
+- Full In-Depth Translation Across ALL Categories: Captures every single quote, interview, statistic, context, and analysis (6-15+ paragraphs, never truncated).
+- Robust Full-Article Body Extractor: Extracts all <p> inside <article> without premature inner-div cuts.
 - Accurate Screenshots Gallery: Strictly genuine content screenshots, filters out ad widgets, SVGs, and badges.
+- Top-Cover Pinned Modal: Opens at the exact top (y=0) showing HD cover image first, never auto-scrolling down.
 - 12-Hour Freshness rule with automatic backfill up to 30 articles per topic.
 - Clean Modern Header: Pure News branding, category filter tabs only, no search input.
 - Mobile History Back: Swiping back on mobile closes modal dialog without exiting the site.
@@ -73,7 +75,7 @@ SYSTEM_PROMPT = """คุณคือนักข่าวและบรรณ�
 1. การแปลเนื้อหาฉบับเต็ม ("full_paragraphs"):
    - ต้องแปลและถ่ายทอดเนื้อหาข่าวอย่างละเอียด ครบทุกประเด็น ทุกคำสัมภาษณ์ (Direct quotes), ตัวเลขสถิติ, ข้อมูลและบริบทเหตุการณ์, รวมถึงบทวิเคราะห์ทั้งหมดที่ปรากฏในต้นฉบับ
    - ห้ามตัดทอนคำสัมภาษณ์เด็ดขาด (แปลคำพูดในเครื่องหมายคำพูดอย่างครบถ้วนทุกประโยค)
-   - ห้ามสรุปย่อแบบรวบรัด ให้แบ่งเป็นย่อหน้าตามลำดับเนื้อหาข่าวจริง (ความยาว 5-10 ย่อหน้าขึ้นไปตามความยาวต้นฉบับจริง)
+   - ห้ามสรุปย่อแบบรวบรัด ให้แบ่งเป็นย่อหน้าตามลำดับเนื้อหาข่าวจริง (ความยาว 6-15 ย่อหน้าขึ้นไปตามความยาวต้นฉบับจริง)
 2. สรุปประเด็นสำคัญ ("bullet_points"):
    - สรุปสาระสำคัญหลัก 4-6 ข้ออย่างกระชับ ชัดเจน และครอบคลุมเป็นภาษาไทย
 3. พาดหัวข่าว ("thai_title"):
@@ -142,23 +144,12 @@ def scrape_article_details(item: dict) -> dict:
             if img_m:
                 lead_img = make_hd_image_url(img_m.group(1))
 
-        # 2. Extract article body HTML container (prioritizing specific story body)
-        article_html = ""
-        for pat in [
-            r'<div[^>]+id=["\']article-body["\'][^>]*>(.*?)</div>\s*<(?:div|footer|aside|section)',
-            r'<div[^>]+class=["\'][^"\']*(?:article-body|c-entry-content|entry-content|article_body|story-body)[^"\']*["\'][^>]*>(.*?)</div>\s*<(?:div|footer|aside|section)',
-            r'<article[^>]*>(.*?)</article>',
-            r'<main[^>]*>(.*?)</main>'
-        ]:
-            m = re.search(pat, content, re.DOTALL | re.IGNORECASE)
-            if m:
-                article_html = m.group(1)
-                break
-        if not article_html:
-            article_html = content
+        # 2. Extract article container (using <article> or <main> so we never cut off at inner <div>)
+        art_m = re.search(r'<article[^>]*>(.*?)</article>', content, re.DOTALL | re.IGNORECASE)
+        article_html = art_m.group(1) if art_m else content
 
-        # 3. Clean and extract ALL paragraphs
-        raw_p = re.findall(r'<p[^>]*>(.*?)</p>', article_html, re.DOTALL)
+        # 3. Clean and extract ALL paragraphs without truncation
+        raw_p = re.findall(r'<p[^>]*>(.*?)</p>', article_html, re.DOTALL | re.IGNORECASE)
         bad_phrases = [
             'terms of service', 'privacy policy', 'cookie', 'sign up', 'newsletter',
             'subscribe', 'all rights reserved', 'follow us', 'comments', 'please login',
@@ -166,15 +157,21 @@ def scrape_article_details(item: dict) -> dict:
             'days ago', 'minutes ago', 'read more:', 'also read:', 'related:', 'loading...',
             'advertisement', 'sponsored', 'listen to the latest', 'watch:', 'quiz:',
             'bbc homepage', 'skip to content', 'accessibility help', 'welcome to pc gamer club',
-            'membership journey starts here', 'keep exploring and earning', 'free article view'
+            'membership journey starts here', 'keep exploring and earning', 'free article view',
+            'posts from this', 'sign up for', 'have you listened to', 'cast your vote',
+            'social links navigation', 'please follow our community guidelines',
+            'you must confirm your public display name'
         ]
+        seen_p = set()
         for p in raw_p:
             clean = re.sub(r'<[^>]+>', '', p).strip()
             clean = ' '.join(html.unescape(clean).split())
             if len(clean) > 25 and not any(bad in clean.lower() for bad in bad_phrases):
-                clean_paras.append(clean)
+                if clean not in seen_p:
+                    seen_p.add(clean)
+                    clean_paras.append(clean)
 
-        # 4. Extract genuine screenshots from article body ONLY
+        # 4. Extract genuine screenshots from article body ONLY (strictly NO sidebar/icons/widgets)
         img_tags = re.findall(r'<img[^>]+src=["\']([^"\']+)["\']', article_html)
         bad_img_keywords = [
             'flexiimages', '.svg', 'nosize', 'flags/', 'logo', 'avatar', 'icon', 
@@ -219,14 +216,14 @@ def scrape_article_details(item: dict) -> dict:
     clean_paras = list(dict.fromkeys(clean_paras))
     item["cover_image_url"] = lead_img
     item["gallery_images"] = gallery_images[:8]
-    item["raw_paragraphs"] = clean_paras[:40] if clean_paras else [item["description"]]
+    item["raw_paragraphs"] = clean_paras[:45] if clean_paras else [item["description"]]
     return item
 
 def call_gemini(item_info: dict) -> dict:
     """Call Gemini for comprehensive factual summary and multi-paragraph translation."""
-    title = item_info["title"]
-    category_hint = item_info["category_hint"]
-    paras_text = "\n\n".join(item_info["raw_paragraphs"])
+    title = item_info.get("title", item_info.get("original_title", ""))
+    category_hint = item_info.get("category_hint", item_info.get("tag", "Technology"))
+    paras_text = "\n\n".join(item_info.get("raw_paragraphs", []))
 
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
     user_prompt = f"""หัวข้อข่าวต้นฉบับ: {title}
@@ -235,18 +232,19 @@ def call_gemini(item_info: dict) -> dict:
 เนื้อหาข่าวภาษาอังกฤษฉบับเต็ม:
 {paras_text}
 
-คำสั่งสำคัญ:
-กรุณาแปลเนื้อหาข่าวนี้เป็นภาษาไทยอย่างละเอียด ครบถ้วนทุกประเด็น รวมถึงคำสัมภาษณ์ทั้งหมด (Direct quotes), ตัวเลข, สถิติ, และบริบทเหตุการณ์ทั้งหมด ห้ามตัดทอนหรือสรุปแบบรวบรัด โดยแปลแยกเป็นย่อหน้าตามลำดับเนื้อหาจริง (5-10 ย่อหน้าขึ้นไป)
+คำสั่งสำคัญอย่างยิ่ง:
+กรุณาแปลเนื้อหาข่าวนี้เป็นภาษาไทยอย่างละเอียด ลึกซึ้ง ครบถ้วนทุกประเด็น รวมถึงคำสัมภาษณ์ทั้งหมด (Direct quotes), ตัวเลข, สถิติ, และบริบทเหตุการณ์ทั้งหมด ห้ามตัดทอนหรือสรุปแบบรวบรัด โดยแปลแยกเป็นย่อหน้าตามลำดับเนื้อหาจริง (6-15 ย่อหน้าขึ้นไป)
 
 ตอบกลับเป็น JSON:
 {{
   "thai_title": "พาดหัวข่าวภาษาไทยที่กระชับ ตรงตาม Fact (ห้ามเป็นภาษาอังกฤษ)",
-  "tag": "Football | Technology | Gaming",
+  "tag": "{category_hint}",
   "bullet_points": [
     "ประเด็นสำคัญที่ 1 (ภาษาไทย)...",
     "ประเด็นสำคัญที่ 2 (ภาษาไทย)...",
     "ประเด็นสำคัญที่ 3 (ภาษาไทย)...",
-    "ประเด็นสำคัญที่ 4 (ภาษาไทย)..."
+    "ประเด็นสำคัญที่ 4 (ภาษาไทย)...",
+    "ประเด็นสำคัญที่ 5 (ภาษาไทย)..."
   ],
   "full_paragraphs": [
     "ย่อหน้าที่ 1 แปลครบถ้วน...",
@@ -254,7 +252,9 @@ def call_gemini(item_info: dict) -> dict:
     "ย่อหน้าที่ 3 แปลครบถ้วน...",
     "ย่อหน้าที่ 4 แปลครบถ้วน...",
     "ย่อหน้าที่ 5 แปลครบถ้วน...",
-    "ย่อหน้าที่ 6 แปลครบถ้วน..."
+    "ย่อหน้าที่ 6 แปลครบถ้วน...",
+    "ย่อหน้าที่ 7 แปลครบถ้วน...",
+    "ย่อหน้าที่ 8 แปลครบถ้วน..."
   ]
 }}"""
 
@@ -268,7 +268,7 @@ def call_gemini(item_info: dict) -> dict:
     
     for attempt in range(4):
         try:
-            with urllib.request.urlopen(req, timeout=40) as resp:
+            with urllib.request.urlopen(req, timeout=45) as resp:
                 data = json.loads(resp.read().decode('utf-8'))
                 raw_text = data["candidates"][0]["content"]["parts"][0]["text"]
                 parsed = json.loads(raw_text)
@@ -284,7 +284,6 @@ def call_gemini(item_info: dict) -> dict:
                 if any('\u0e00' <= c <= '\u0e7f' for c in thai_t):
                     return parsed
                 else:
-                    logger.warning(f"Gemini returned non-Thai title on attempt {attempt+1}: {thai_t}")
                     time.sleep(2 * (attempt + 1))
         except urllib.error.HTTPError as e:
             if e.code == 429:
@@ -300,12 +299,12 @@ def call_gemini(item_info: dict) -> dict:
     return {
         "thai_title": title,
         "tag": category_hint,
-        "bullet_points": [item_info["description"]],
-        "full_paragraphs": item_info["raw_paragraphs"][:6]
+        "bullet_points": [item_info.get("description", title)],
+        "full_paragraphs": item_info.get("raw_paragraphs", [])[:8]
     }
 
 def update_ui_files(news_list: list[dict]):
-    """Update README.md and centered index.html with clean Pure News branding, Thai Time, and History Back."""
+    """Update README.md and centered index.html with clean Pure News branding, Thai Time, and Top-pinned modal."""
     now_th = to_thailand_time(datetime.datetime.now(datetime.timezone.utc))
 
     football_count = sum(1 for x in news_list if x.get("tag") == "Football")
@@ -343,7 +342,7 @@ def update_ui_files(news_list: list[dict]):
     with open(README_FILE, 'w', encoding='utf-8') as f:
         f.write("\n".join(readme_lines))
 
-    # 2. index.html (Pure News - Clean Header, Center Modal, Mobile History Back, Screenshots Gallery)
+    # 2. index.html (Pure News - Clean Header, Top-Pinned Modal, Mobile History Back, Clean Screenshots Gallery)
     json_data_str = json.dumps(news_list, ensure_ascii=False)
     html_content = f'''<!DOCTYPE html>
 <html lang="th" class="dark">
@@ -413,9 +412,9 @@ def update_ui_files(news_list: list[dict]):
     </div>
   </main>
 
-  <!-- Centered Modal Dialog with Mobile Back Support & Screenshots Gallery -->
-  <div id="modalOverlay" onclick="if(event.target===this) closeModal()" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-    <div class="w-full max-w-3xl bg-[#0c0c0e] border border-zinc-800 rounded-lg shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col">
+  <!-- Top-Pinned Modal Dialog (Never auto-scrolls, shows cover image at the very top) -->
+  <div id="modalOverlay" onclick="if(event.target===this) closeModal()" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-start sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
+    <div class="w-full max-w-3xl bg-[#0c0c0e] sm:border sm:border-zinc-800 sm:rounded-lg shadow-2xl overflow-hidden my-0 sm:my-auto max-h-screen sm:max-h-[92vh] flex flex-col">
       
       <!-- Modal Header (Sticky) -->
       <div class="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-[#0e0e11] sticky top-0 z-10">
@@ -426,9 +425,9 @@ def update_ui_files(news_list: list[dict]):
         <button onclick="closeModal()" aria-label="Close" class="w-8 h-8 rounded-full bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center text-xl transition leading-none">&times;</button>
       </div>
 
-      <!-- Modal Body (Scrollable) -->
-      <div class="p-6 md:p-8 overflow-y-auto space-y-6">
-        <!-- HD Cover Image -->
+      <!-- Modal Body (Always resets to scrollTop = 0) -->
+      <div id="modalBody" class="p-6 md:p-8 overflow-y-auto space-y-6">
+        <!-- HD Cover Image (Right at the top) -->
         <div class="w-full h-64 sm:h-80 overflow-hidden rounded-md border border-zinc-800 bg-zinc-950">
           <img id="modalImg" src="" referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&q=80';" class="w-full h-full object-cover">
         </div>
@@ -567,7 +566,6 @@ def update_ui_files(news_list: list[dict]):
       const item = allNews[idx];
       if (!item) return;
 
-      // Mobile back gesture & history support
       isModalOpen = true;
       history.pushState({{ modalOpen: true, newsId: item.id }}, '', '#news-' + item.id);
 
@@ -613,8 +611,19 @@ def update_ui_files(news_list: list[dict]):
       }}
 
       document.getElementById('modalSource').href = item.link;
-      document.getElementById('modalOverlay').classList.remove('hidden');
+      
+      // Open and pin scroll position at the top cover image
+      const modalOverlay = document.getElementById('modalOverlay');
+      const modalBody = document.getElementById('modalBody');
+      modalOverlay.classList.remove('hidden');
       document.body.style.overflow = 'hidden';
+
+      modalOverlay.scrollTop = 0;
+      if (modalBody) modalBody.scrollTop = 0;
+      requestAnimationFrame(() => {{
+        modalOverlay.scrollTop = 0;
+        if (modalBody) modalBody.scrollTop = 0;
+      }});
     }}
 
     function closeModal(fromHistory = false) {{
@@ -623,27 +632,23 @@ def update_ui_files(news_list: list[dict]):
       document.getElementById('modalOverlay').classList.add('hidden');
       document.body.style.overflow = '';
 
-      // If closed by user tap (and not from browser back gesture), step back in history
       if (!fromHistory && history.state && history.state.modalOpen) {{
         history.back();
       }}
     }}
 
-    // Mobile back swipe / browser back event listener
     window.addEventListener('popstate', (e) => {{
       if (isModalOpen) {{
         closeModal(true);
       }}
     }});
 
-    // ESC key support
     document.addEventListener('keydown', (e) => {{
       if (e.key === 'Escape' && isModalOpen) {{
         closeModal();
       }}
     }});
 
-    // Deep link support e.g. https://domain/#news-12345
     window.addEventListener('DOMContentLoaded', () => {{
       const hash = window.location.hash;
       if (hash && hash.startsWith('#news-')) {{
@@ -720,21 +725,17 @@ def run():
         except Exception:
             pass
 
-    # Normalize existing database
     existing_by_link = {}
     for it in existing_news:
         link = it.get("link", "").strip()
         if not link: continue
         tag = it.get("tag", "")
         if "chelsea" in tag.lower(): it["tag"] = "Football"
-        
-        # Clean up any bad gallery images in cache (flexiimages or SVGs)
         if it.get("gallery_images"):
             it["gallery_images"] = [
                 g for g in it["gallery_images"] 
                 if not any(bad in g.lower() for bad in ['flexiimages', '.svg', 'nosize', 'flags/', 'icon', 'badge'])
             ]
-        
         it["cover_image_url"] = make_hd_image_url(it.get("cover_image_url", ""))
         existing_by_link[link] = it
 
@@ -743,7 +744,6 @@ def run():
     now_utc = datetime.datetime.now(datetime.timezone.utc)
     twelve_hours_ago = now_utc - datetime.timedelta(hours=12)
 
-    # Feeds: Technology is 100% The Verge ONLY
     categories_config = {
         "Football": [
             "http://feeds.bbci.co.uk/sport/football/rss.xml"
@@ -779,14 +779,11 @@ def run():
                     seen_links.add(e["link"])
                     candidates.append(e)
 
-        # Sort candidates newest first
         candidates.sort(key=lambda x: x["_pub_dt"], reverse=True)
 
-        # Step 1: Filter articles within last 12 hours
         within_12h = [c for c in candidates if c["_pub_dt"] >= twelve_hours_ago]
         logger.info(f"[{cat}] Candidates within last 12 hours: {len(within_12h)}")
 
-        # Step 2: Backfill rule - If < 30 articles in 12h, fill up to 30 from the latest candidates
         selected_candidates = within_12h[:]
         if len(selected_candidates) < TARGET_PER_CATEGORY:
             logger.info(f"[{cat}] Backfilling from latest candidates to reach target of {TARGET_PER_CATEGORY} articles...")
@@ -803,8 +800,6 @@ def run():
 
         for item in selected_candidates:
             link = item["link"]
-            
-            # For Technology: ensure link is strictly from The Verge
             if cat == "Technology" and "theverge.com" not in link:
                 continue
 
@@ -813,23 +808,22 @@ def run():
                 existing_item["tag"] = cat
                 existing_item["cover_image_url"] = make_hd_image_url(existing_item.get("cover_image_url", ""))
                 
-                # Check if it was REALLY translated to Thai and has full depth (at least 4 paragraphs)
                 thai_t = existing_item.get("thai_title", "")
                 has_thai = any('\u0e00' <= c <= '\u0e7f' for c in thai_t)
                 paragraphs = existing_item.get("full_paragraphs", [])
-                is_thorough = len(paragraphs) >= 4
+                total_chars = sum(len(p) for p in paragraphs)
+                is_thorough = len(paragraphs) >= 6 and total_chars >= 1800
 
                 if has_thai and is_thorough:
                     final_category_articles.append(existing_item)
                 else:
-                    logger.info(f"[{cat}] Needs thorough re-translation: {item['title'][:40]}...")
+                    logger.info(f"[{cat}] Needs thorough re-translation ({len(paragraphs)} paras, {total_chars} chars): {item['title'][:40]}...")
                     new_items_to_translate.append(item)
             else:
                 new_items_to_translate.append(item)
 
         logger.info(f"[{cat}] Reusing {len(final_category_articles)} existing thorough articles. Translating {len(new_items_to_translate)} new/upgraded articles.")
 
-        # Translate new items (if any) with polite concurrency
         if new_items_to_translate:
             logger.info(f"[{cat}] Scraping full content and gallery for {len(new_items_to_translate)} articles...")
             with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
@@ -846,7 +840,7 @@ def run():
                     "thai_title": trans.get("thai_title", item["title"]),
                     "tag": cat,
                     "bullet_points": trans.get("bullet_points", []),
-                    "full_paragraphs": trans.get("full_paragraphs", item["raw_paragraphs"][:6]),
+                    "full_paragraphs": trans.get("full_paragraphs", item["raw_paragraphs"][:8]),
                     "link": item["link"],
                     "cover_image_url": item["cover_image_url"],
                     "gallery_images": item.get("gallery_images", []),
@@ -856,10 +850,8 @@ def run():
                 final_category_articles.append(entry)
                 existing_by_link[item["link"]] = entry
 
-        # Ensure image uniqueness and quality across category articles
         for idx_art, art in enumerate(final_category_articles):
             img = art.get("cover_image_url", "").strip()
-            # If image missing or duplicate in this run
             if not img or img in global_used_images:
                 found_unique = False
                 for g in art.get("gallery_images", []):
