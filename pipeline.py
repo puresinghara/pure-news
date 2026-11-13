@@ -1,11 +1,17 @@
 """
-High-Performance GitHub-Native News Pipeline
-Optimizations:
-- Parallel Scraping & Gemini Translation (ThreadPoolExecutor) -> 5-10x faster!
-- HD Cover Images: Upgrades BBC thumbnails from 240px to 1200px Crystal-Clear HD.
-- Full Article Extraction: Scrapes full article paragraphs from BBC & The Verge so content is complete and in-depth.
-- Guarantees 30 articles in data/news.json.
-- Centered, luxury Verge UI in index.html with live cache-busting.
+Automated News Aggregator & Reader (GitHub Native)
+Feeds:
+1. Football: BBC Sport Football (http://feeds.bbci.co.uk/sport/football/rss.xml)
+2. Technology: The Verge (https://www.theverge.com/rss/index.xml)
+3. Gaming: Gematsu (https://www.gematsu.com/feed)
+
+Features:
+- Timezone: Converts all timestamps to Thailand Time (UTC+7).
+- Crystal-Clear 1200px HD Images for all sources.
+- Full multi-paragraph in-depth translation + bullet points.
+- 1-Hour check interval via GitHub Actions.
+- Tabs: ALL, ⚽ FOOTBALL, ⚡ TECH, 🎮 GAMING.
+- Centered modern modal dialog.
 """
 import os
 import json
@@ -46,19 +52,19 @@ HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/
 
 RSS_FEEDS = [
     {"category": "Football", "url": "http://feeds.bbci.co.uk/sport/football/rss.xml"},
-    {"category": "Technology", "url": "https://www.theverge.com/rss/index.xml"}
+    {"category": "Technology", "url": "https://www.theverge.com/rss/index.xml"},
+    {"category": "Gaming", "url": "https://www.gematsu.com/feed"}
 ]
 
-SYSTEM_PROMPT = """คุณคือนักข่าวสายเทคและกีฬา แปลและสรุปข่าวนี้เป็นภาษาไทยอย่างละเอียด ถูกต้องตามข้อเท็จจริง (Fact-based)
+SYSTEM_PROMPT = """คุณคือนักข่าวและบรรณาธิการข่าวมืออาชีพ แปลและสรุปข่าวเป็นภาษาไทยอย่างถูกต้อง สละสลวย และตรงตามข้อเท็จจริง (Fact-based)
 ข้อกำหนด:
-1. หากเป็นข่าวฟุตบอล ให้ใช้ทับศัพท์ศัพท์เทคนิคฟุตบอล หากเป็นข่าวเทคโนโลยี ให้ทับศัพท์ชื่อระบบหรือฮาร์ดแวร์ ห้ามใส่อารมณ์ตื่นเต้นลงในเนื้อหา
-2. "bullet_points": สรุปประเด็นสำคัญสั้นกระชับ 3-4 ข้อ
-3. "full_paragraphs": แปลและเรียบเรียงเนื้อหาข่าวฉบับเต็มอย่างครบถ้วน (3-6 ย่อหน้า) ครอบคลุมเหตุการณ์ คำสัมภาษณ์ และตัวเลขสถิติทั้งหมด
+1. ข่าวฟุตบอล: ทับศัพท์เทคนิคและชื่อนักเตะ/สโมสรอย่างถูกต้อง
+2. ข่าวเทคโนโลยี: ทับศัพท์ชื่อระบบ ฮาร์ดแวร์ และแบรนด์อย่างถูกต้อง
+3. ข่าวเกม (Gaming): ทับศัพท์ชื่อเกม แพลตฟอร์ม (PS5, Xbox, Switch, PC) และค่ายเกมอย่างถูกต้อง
+4. "bullet_points": สรุปข้อเท็จจริงสำคัญสั้นกระชับ 3-4 ข้อ
+5. "full_paragraphs": แปลและเรียบเรียงเนื้อหาข่าวฉบับเต็มอย่างครบถ้วน (3-5 ย่อหน้า) ครอบคลุมเหตุการณ์สำคัญ คำสัมภาษณ์ กำหนดการ และตัวเลขสถิติทั้งหมด
 
-กฎการจัดหมวดหมู่ (Tag):
-- หากเนื้อหาข่าวเกี่ยวข้องกับสโมสรเชลซี (Chelsea FC / Chelsea) ให้แท็กเป็น: "Chelsea FC"
-- หากเป็นข่าวฟุตบอล ให้แท็กเป็น: "Football"
-- หากเป็นข่าวเทคโนโลยี ให้แท็กเป็น: "Technology"
+กฎแท็ก (Tag): ให้ระบุเป็นหนึ่งในสามหมวดนี้เท่านั้น: "Football", "Technology", "Gaming"
 """
 
 def clean_text(raw_html: str) -> str:
@@ -66,21 +72,32 @@ def clean_text(raw_html: str) -> str:
     clean = re.sub(r'<[^>]+>', '', raw_html).strip()
     return " ".join(html.unescape(clean).split())
 
+def to_thailand_time(dt_utc: datetime.datetime) -> str:
+    """Convert UTC datetime to Thailand Time (UTC+7) string."""
+    th_tz = datetime.timezone(datetime.timedelta(hours=7))
+    th_dt = dt_utc.astimezone(th_tz)
+    thai_months = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."]
+    day = th_dt.day
+    month = thai_months[th_dt.month - 1]
+    year = th_dt.year
+    hour = th_dt.strftime("%H:%M")
+    return f"{day} {month} {year} • {hour} น."
+
 def make_hd_image_url(url: str) -> str:
-    """Upgrade BBC / Verge thumbnails to high-resolution HD (1200px)."""
+    """Ensure images are high-resolution HD (1080p/1200px) instead of low-res thumbnails."""
     if not url:
-        return "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1200&q=80"
+        return "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&q=80"
     # Upgrade BBC thumbnails (/240/, /320/, /480/ -> /1200/)
     url = re.sub(r'/(standard|branded_sport|branded_news)/\d+/', r'/\1/1200/', url)
     url = re.sub(r'/ic/\d+x\d+/', r'/ic/1024x576/', url)
-    # Upgrade Verge crop widths
+    # Upgrade The Verge images
     if 'theverge.com' in url or 'platform.theverge' in url:
         if '?' in url:
             url = re.sub(r'w=\d+', 'w=1200', url)
             if 'w=' not in url: url += '&w=1200'
     return url
 
-def scrape_full_article_content(link: str, default_desc: str) -> tuple[str, list[str]]:
+def scrape_full_article(link: str, default_desc: str) -> tuple[str, list[str]]:
     """Scrape article webpage to extract HD lead image and full paragraphs."""
     try:
         req = urllib.request.Request(link, headers=HEADERS)
@@ -94,15 +111,25 @@ def scrape_full_article_content(link: str, default_desc: str) -> tuple[str, list
 
         # Clean paragraphs
         clean_paras = []
-        # Check Verge duet article paragraphs
-        duet = re.findall(r'<p[^>]*class=["\'][^"\']*duet--article[^"\']*["\'][^>]*>(.*?)</p>', content, re.DOTALL)
-        if duet:
+        # Gematsu article paragraphs
+        if 'gematsu.com' in link:
+            article_match = re.search(r'<article[^>]*>(.*?)</article>', content, re.DOTALL)
+            body_html = article_match.group(1) if article_match else content
+            raw_p = re.findall(r'<p[^>]*>(.*?)</p>', body_html, re.DOTALL)
+            for p in raw_p:
+                c = clean_text(p)
+                if len(c) > 30 and not any(c.startswith(x) for x in ['Source:', 'Thanks,', 'Watch the']):
+                    clean_paras.append(c)
+
+        # The Verge duet article paragraphs
+        elif 'theverge.com' in link:
+            duet = re.findall(r'<p[^>]*class=["\'][^"\']*duet--article[^"\']*["\'][^>]*>(.*?)</p>', content, re.DOTALL)
             for p in duet:
                 c = clean_text(p)
                 if len(c) > 30 and not any(x in c for x in ['Posts from this', 'Sign up for']):
                     clean_paras.append(c)
 
-        # Standard article paragraphs (BBC)
+        # BBC Sport Football paragraphs
         if not clean_paras:
             raw_p = re.findall(r'<p[^>]*>(.*?)</p>', content, re.DOTALL)
             for p in raw_p:
@@ -111,12 +138,12 @@ def scrape_full_article_content(link: str, default_desc: str) -> tuple[str, list
                     clean_paras.append(c)
 
         clean_paras = list(dict.fromkeys(clean_paras)) # deduplicate
-        return hd_img or "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1200&q=80", clean_paras[:12] if clean_paras else [default_desc]
-    except Exception as e:
-        return "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1200&q=80", [default_desc]
+        return hd_img or "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&q=80", clean_paras[:12] if clean_paras else [default_desc]
+    except Exception:
+        return "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&q=80", [default_desc]
 
 def call_gemini(item_info: dict) -> dict:
-    """Call Gemini API for factual summary, tags, and multi-paragraph translation."""
+    """Call Gemini for factual summary and multi-paragraph translation."""
     title = item_info["title"]
     category_hint = item_info["category_hint"]
     paras_text = "\n\n".join(item_info["raw_paragraphs"])
@@ -124,23 +151,22 @@ def call_gemini(item_info: dict) -> dict:
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
     user_prompt = f"""หัวข้อข่าว: {title}
 หมวดหมู่: {category_hint}
-เนื้อหาข่าวฉบับเต็มภาษาอังกฤษ:
+เนื้อหาภาษาอังกฤษ:
 {paras_text}
 
-กรุณาแปลและสรุปตามโครงสร้าง JSON นี้:
+กรุณาแปลและสรุปเป็น JSON:
 {{
-  "thai_title": "พาดหัวข่าวภาษาไทยที่กระชับ แม่นยำ และตรงตาม Fact",
-  "tag": "Football | Technology | Chelsea FC",
+  "thai_title": "พาดหัวข่าวภาษาไทยที่กระชับ ตรงตาม Fact",
+  "tag": "Football | Technology | Gaming",
   "bullet_points": [
     "ข้อเท็จจริงสำคัญประเด็นที่ 1...",
     "ข้อเท็จจริงสำคัญประเด็นที่ 2...",
     "ข้อเท็จจริงสำคัญประเด็นที่ 3..."
   ],
   "full_paragraphs": [
-    "ย่อหน้าที่ 1 (สรุปเหตุการณ์และสถานการณ์)...",
-    "ย่อหน้าที่ 2 (รายละเอียด ตัวเลขสถิติ และเหตุการณ์สำคัญ)...",
-    "ย่อหน้าที่ 3 (คำสัมภาษณ์และบทวิเคราะห์)...",
-    "ย่อหน้าที่ 4 (ผลกระทบและสิ่งที่จะเกิดขึ้นต่อไป)..."
+    "ย่อหน้าที่ 1...",
+    "ย่อหน้าที่ 2...",
+    "ย่อหน้าที่ 3..."
   ]
 }}"""
 
@@ -159,48 +185,47 @@ def call_gemini(item_info: dict) -> dict:
                 parsed = json.loads(raw_text)
 
                 tag = parsed.get("tag", "").strip()
-                if "chelsea" in tag.lower(): parsed["tag"] = "Chelsea FC"
+                if "game" in tag.lower(): parsed["tag"] = "Gaming"
                 elif "tech" in tag.lower(): parsed["tag"] = "Technology"
                 elif "foot" in tag.lower(): parsed["tag"] = "Football"
-                else: parsed["tag"] = "Chelsea FC" if "chelsea" in title.lower() else category_hint
+                else: parsed["tag"] = category_hint
                 return parsed
-        except Exception as e:
+        except Exception:
             time.sleep(2)
 
-    fallback_tag = "Chelsea FC" if "chelsea" in title.lower() else category_hint
     return {
         "thai_title": title,
-        "tag": fallback_tag,
+        "tag": category_hint,
         "bullet_points": [item_info["description"]],
         "full_paragraphs": item_info["raw_paragraphs"][:4]
     }
 
 def update_ui_files(news_list: list[dict]):
-    """Update README.md and centered index.html."""
-    now_str = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    """Update README.md and centered index.html with Thailand Time (UTC+7)."""
+    now_th = to_thailand_time(datetime.datetime.now(datetime.timezone.utc))
 
     # 1. README.md
     readme_lines = [
         "# ⚡ Automated News Aggregator (GitHub Native)",
         "",
-        "> **Live Automated News Reader:** Auto-scraped from BBC Sport Football & The Verge, translated with Gemini 3.1 Flash-Lite.",
-        f"> *Last updated: `{now_str}`* • *Total Stories: `{len(news_list)}`*",
+        "> **Live Automated News Reader:** Auto-scraped from BBC Sport Football, The Verge, and Gematsu (Gaming).",
+        f"> *อัปเดตล่าสุด: `{now_th}`* • *จำนวนข่าวทั้งหมด: `{len(news_list)}/30 ข่าว`*",
         "",
-        "### 🌐 [Click Here to Open Full Webview (GitHub Pages)](https://puresinghara.github.io/pure-news/)",
+        "### 🌐 [กดที่นี่เพื่อเปิดหน้าเว็บอ่านข่าว (GitHub Pages)](https://puresinghara.github.io/pure-news/)",
         "",
         "---",
         "",
-        "### 📰 Latest News Stories (12-Hour Active Window)",
+        "### 📰 ตารางสรุปข่าวล่าสุด (30 เรื่องเด่น)",
         "",
-        "| Tag | Headline & Key Facts | Published | Source |",
+        "| หมวดหมู่ | หัวข้อข่าว & ประเด็นสำคัญ | เวลาเผยแพร่ (เวลาไทย) | แหล่งข่าว |",
         "| :--- | :--- | :--- | :--- |"
     ]
     for item in news_list:
         tag_badge = f"`[{item['tag']}]`"
         bullets_md = "<br>".join([f"• {b}" for b in item.get('bullet_points', [])[:3]])
         headline = f"**{item['thai_title']}**<br>{bullets_md}"
-        link = f"[Read Article]({item['link']})"
-        pub = item.get('published_at', '')
+        link = f"[อ่านต้นฉบับ]({item['link']})"
+        pub = item.get('published_th', item.get('published_at', ''))
         readme_lines.append(f"| {tag_badge} | {headline} | {pub} | {link} |")
 
     readme_lines.append("")
@@ -210,7 +235,7 @@ def update_ui_files(news_list: list[dict]):
     with open(README_FILE, 'w', encoding='utf-8') as f:
         f.write("\n".join(readme_lines))
 
-    # 2. index.html (Luxury centered Verge reader with cache-busting)
+    # 2. index.html (Centered luxury Verge reader with Gaming tab & Thailand time)
     json_data_str = json.dumps(news_list, ensure_ascii=False)
     html_content = f'''<!DOCTYPE html>
 <html lang="th" class="dark">
@@ -232,11 +257,11 @@ def update_ui_files(news_list: list[dict]):
     <div class="flex items-center gap-2">
       <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
       <span class="text-zinc-200 font-semibold">// LIVE FEED:</span>
-      <span class="hidden sm:inline">BBC SPORT FOOTBALL & THE VERGE • CLOUD AUTOMATED</span>
+      <span class="hidden sm:inline">BBC FOOTBALL • THE VERGE TECH • GEMATSU GAMING</span>
       <span class="text-emerald-400 font-bold px-1.5 py-0.5 bg-emerald-500/10 rounded border border-emerald-500/30">ONLINE</span>
     </div>
     <div class="flex items-center gap-4 text-[11px]">
-      <span class="text-zinc-400 font-mono hidden md:inline">UPDATED: {now_str}</span>
+      <span class="text-zinc-400 font-mono hidden md:inline">เวลาไทย: {now_th}</span>
       <span class="text-emerald-400 font-bold">ENGINE: GEMINI 3.1 FLASH-LITE</span>
     </div>
   </div>
@@ -252,16 +277,16 @@ def update_ui_files(news_list: list[dict]):
           <h1 class="verge-title text-2xl md:text-3xl font-black uppercase text-white flex items-center gap-2">
             THE VERGE <span class="text-[#ff3366] text-xs font-mono font-bold tracking-widest px-2 py-0.5 border border-[#ff3366]/40 rounded-sm">READER</span>
           </h1>
-          <p class="text-[11px] font-mono text-zinc-400 uppercase tracking-widest">Football & Technology • In-Depth Translation</p>
+          <p class="text-[11px] font-mono text-zinc-400 uppercase tracking-widest">Football • Technology • Gaming (30 Stories)</p>
         </div>
       </div>
 
       <!-- Tag Filters -->
       <div class="flex flex-wrap items-center gap-2">
-        <button onclick="filterTag('ALL')" id="filterALL" class="px-3 py-1.5 bg-white text-black font-mono font-bold text-xs rounded-sm transition">ALL</button>
-        <button onclick="filterTag('Football')" id="filterFootball" class="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-mono text-xs rounded-sm transition">⚽ FOOTBALL</button>
-        <button onclick="filterTag('Technology')" id="filterTechnology" class="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-mono text-xs rounded-sm transition">⚡ TECH</button>
-        <button onclick="filterTag('Chelsea FC')" id="filterChelsea" class="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-cyan-400 font-mono text-xs rounded-sm transition">🦁 CHELSEA FC</button>
+        <button onclick="filterTag('ALL')" id="filterALL" class="px-3.5 py-1.5 bg-white text-black font-mono font-bold text-xs rounded-sm transition">ALL</button>
+        <button onclick="filterTag('Football')" id="filterFootball" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-mono text-xs rounded-sm transition">⚽ FOOTBALL</button>
+        <button onclick="filterTag('Technology')" id="filterTechnology" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-mono text-xs rounded-sm transition">⚡ TECH</button>
+        <button onclick="filterTag('Gaming')" id="filterGaming" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-amber-400 font-mono text-xs rounded-sm transition">🎮 GAMING</button>
       </div>
 
       <!-- Search & Refresh -->
@@ -282,14 +307,14 @@ def update_ui_files(news_list: list[dict]):
   </main>
 
   <!-- Centered Luxury Verge Modal (Clean Dialog) -->
-  <div id="modalOverlay" onclick="if(event.target===this) closeModal()" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+  <div id="modalOverlay" onclick="if(event.target===this) closeModal()" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
     <div class="w-full max-w-3xl bg-[#0c0c0e] border border-zinc-800 rounded-lg shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col">
       
       <!-- Modal Header (Sticky) -->
       <div class="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-[#0e0e11] sticky top-0 z-10">
         <div class="flex items-center gap-2">
           <span id="modalTag" class="px-2.5 py-0.5 rounded text-xs font-mono font-bold uppercase tracking-wider bg-[#ff3366]/15 text-[#ff3366] border border-[#ff3366]/30"></span>
-          <span id="modalDate" class="text-xs font-mono text-zinc-500"></span>
+          <span id="modalDate" class="text-xs font-mono text-zinc-400"></span>
         </div>
         <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center text-xl transition leading-none">&times;</button>
       </div>
@@ -348,13 +373,14 @@ def update_ui_files(news_list: list[dict]):
 
     function filterTag(tag) {{
       currentTag = tag;
-      ['ALL', 'Football', 'Technology', 'Chelsea'].forEach(t => {{
+      ['ALL', 'Football', 'Technology', 'Gaming'].forEach(t => {{
         const btn = document.getElementById('filter' + t);
         if (btn) {{
-          if ((t === 'Chelsea' && tag === 'Chelsea FC') || t === tag) {{
-            btn.className = "px-3 py-1.5 bg-white text-black font-mono font-bold text-xs rounded-sm transition";
+          if (t === tag) {{
+            btn.className = "px-3.5 py-1.5 bg-white text-black font-mono font-bold text-xs rounded-sm transition";
           }} else {{
-            btn.className = "px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-mono text-xs rounded-sm transition";
+            const textColor = t === 'Gaming' ? 'text-amber-400' : 'text-zinc-300';
+            btn.className = `px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 ${{textColor}} font-mono text-xs rounded-sm transition`;
           }}
         }}
       }});
@@ -379,7 +405,7 @@ def update_ui_files(news_list: list[dict]):
       }});
 
       if (filtered.length === 0) {{
-        grid.innerHTML = '<div class="col-span-3 text-center py-16 text-zinc-500 font-mono">ไม่มีข่าวที่ตรงกับเงื่อนไข</div>';
+        grid.innerHTML = '<div class="col-span-3 text-center py-16 text-zinc-500 font-mono">ไม่มีข่าวในหมวดนี้</div>';
         return;
       }}
 
@@ -392,18 +418,20 @@ def update_ui_files(news_list: list[dict]):
           `<li class="flex items-start gap-1.5"><span class="text-[#ff3366] font-bold">›</span><span>${{b}}</span></li>`
         ).join('');
 
-        const tagColor = item.tag === 'Technology' ? 'text-cyan-400' : 'text-[#ff3366]';
+        let tagColor = 'text-[#ff3366]';
+        if (item.tag === 'Technology') tagColor = 'text-cyan-400';
+        else if (item.tag === 'Gaming') tagColor = 'text-amber-400';
 
         div.innerHTML = `
           <div>
             <div class="w-full h-44 overflow-hidden bg-zinc-950">
-              <img src="${{item.cover_image_url}}" referrerpolicy="no-referrer" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800&q=80';">
+              <img src="${{item.cover_image_url}}" referrerpolicy="no-referrer" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&q=80';">
             </div>
             <div class="p-5">
               <div class="flex items-center gap-2 text-[11px] font-mono mb-2">
                 <span class="${{tagColor}} font-bold">${{item.tag}}</span>
                 <span class="text-zinc-600">•</span>
-                <span class="text-zinc-500">${{item.published_at || ''}}</span>
+                <span class="text-zinc-500">${{item.published_th || item.published_at || ''}}</span>
               </div>
               <h3 class="verge-title text-base font-bold text-white group-hover:text-[#ff3366] transition mb-3 leading-snug line-clamp-2">
                 ${{item.thai_title}}
@@ -415,7 +443,7 @@ def update_ui_files(news_list: list[dict]):
           </div>
           <div class="p-5 pt-0 border-t border-zinc-800/80 text-[11px] font-mono text-zinc-500 flex items-center justify-between">
             <span class="text-zinc-300 group-hover:text-white transition">อ่านรายละเอียดเต็ม →</span>
-            <span>VERGE FEED</span>
+            <span>${{item.tag}} FEED</span>
           </div>
         `;
         grid.appendChild(div);
@@ -429,7 +457,7 @@ def update_ui_files(news_list: list[dict]):
       document.getElementById('modalTag').textContent = `// ${{item.tag}}`;
       document.getElementById('modalImg').src = item.cover_image_url;
       document.getElementById('modalTitle').textContent = item.thai_title;
-      document.getElementById('modalDate').textContent = item.published_at;
+      document.getElementById('modalDate').textContent = item.published_th || item.published_at;
 
       const bulletsList = document.getElementById('modalBullets');
       bulletsList.innerHTML = '';
@@ -471,7 +499,7 @@ def update_ui_files(news_list: list[dict]):
 
 def run():
     logger.info("==================================================")
-    logger.info("  STARTING HIGH-SPEED PARALLEL NEWS PIPELINE      ")
+    logger.info("  STARTING 3-CATEGORY NEWS PIPELINE               ")
     logger.info("==================================================")
 
     os.makedirs(DATA_DIR, exist_ok=True)
@@ -480,17 +508,16 @@ def run():
         try:
             with open(DATA_FILE, 'r', encoding='utf-8') as f:
                 existing_news = json.load(f)
-        except Exception as e:
-            logger.warning(f"Error loading existing data: {e}")
+        except Exception:
+            pass
 
     existing_links = {it.get("link", "").strip() for it in existing_news}
     logger.info(f"Loaded {len(existing_news)} existing stories in repository.")
 
-    # STEP A: Scrape candidates from both feeds
+    # Fetch candidates from all 3 feeds
     raw_candidates = []
     seen = set()
     now_utc = datetime.datetime.now(datetime.timezone.utc)
-    twelve_h_ago = now_utc - datetime.timedelta(hours=12)
 
     for feed_info in RSS_FEEDS:
         url = feed_info["url"]
@@ -514,7 +541,7 @@ def run():
                     "title": title,
                     "link": link,
                     "description": clean_text(getattr(entry, 'summary', '') or getattr(entry, 'description', '')),
-                    "published_at": pub_dt.strftime("%Y-%m-%d %H:%M UTC"),
+                    "published_th": to_thailand_time(pub_dt),
                     "category_hint": cat,
                     "_pub_dt": pub_dt
                 })
@@ -524,26 +551,26 @@ def run():
     # Sort newest first
     raw_candidates.sort(key=lambda x: x["_pub_dt"], reverse=True)
 
-    # Filter to new items only (STEP B: Deduplication)
+    # Filter to new items
     new_to_process = [c for c in raw_candidates if c["link"] not in existing_links]
-    logger.info(f"Found {len(new_to_process)} brand NEW stories to process.")
+    logger.info(f"Found {len(new_to_process)} brand NEW stories across Football, Tech, and Gaming.")
 
-    # Limit new items to at most 15 per run to ensure fast execution
+    # Limit new items to at most 15 per run
     new_to_process = new_to_process[:15]
 
     if new_to_process:
-        # STEP A2: Scrape details (HD images & full paragraphs) concurrently
+        # Scrape full article & HD images concurrently
         logger.info(f"Scraping detailed content concurrently for {len(new_to_process)} articles...")
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
             def scrape_worker(item):
-                img_url, paras = scrape_full_article_content(item["link"], item["description"])
+                img_url, paras = scrape_full_article(item["link"], item["description"])
                 item["cover_image_url"] = img_url
                 item["raw_paragraphs"] = paras
                 return item
 
             new_to_process = list(executor.map(scrape_worker, new_to_process))
 
-        # STEP C: Parallel Translation via Gemini API
+        # Parallel translation with Gemini
         logger.info(f"Translating {len(new_to_process)} articles with Gemini in parallel...")
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
             translations = list(executor.map(call_gemini, new_to_process))
@@ -559,29 +586,35 @@ def run():
                 "full_paragraphs": trans.get("full_paragraphs", item["raw_paragraphs"][:4]),
                 "link": item["link"],
                 "cover_image_url": item["cover_image_url"],
-                "published_at": item["published_at"],
+                "published_th": item["published_th"],
                 "category_hint": item["category_hint"]
             }
             processed_entries.append(entry)
-            logger.info(f"  [+] [{entry['tag']}] {entry['thai_title'][:45]}... (HD: {entry['cover_image_url'][:50]})")
 
         # Prepend new to existing
         updated_db = processed_entries + existing_news
     else:
-        logger.info("No new articles to translate. Checking image upgrades for existing articles...")
-        # Upgrade any existing BBC images to HD 1200px
-        for it in existing_news:
-            it["cover_image_url"] = make_hd_image_url(it.get("cover_image_url", ""))
+        logger.info("No new articles. Upgrading images and timestamps on existing articles...")
         updated_db = existing_news
 
-    # Maintain strictly TARGET_TOTAL_ARTICLES (30)
-    final_db = updated_db[:TARGET_TOTAL_ARTICLES]
+    # Purge any old entries with low-res 240px images or missing Thai times
+    cleaned_db = []
+    for it in updated_db:
+        # Ensure HD image
+        it["cover_image_url"] = make_hd_image_url(it.get("cover_image_url", ""))
+        # Ensure published_th exists
+        if "published_th" not in it and "published_at" in it:
+            it["published_th"] = it["published_at"].replace("UTC", "เวลาไทย")
+        # Replace any Chelsea FC tag with Football
+        if it.get("tag") == "Chelsea FC":
+            it["tag"] = "Football"
+        cleaned_db.append(it)
 
-    # Save to data/news.json
+    final_db = cleaned_db[:TARGET_TOTAL_ARTICLES]
+
     with open(DATA_FILE, 'w', encoding='utf-8') as f:
         json.dump(final_db, f, ensure_ascii=False, indent=2)
 
-    # Update UI files
     update_ui_files(final_db)
     logger.info(f"[✓] Pipeline complete! Maintained {len(final_db)} stories in database.")
 

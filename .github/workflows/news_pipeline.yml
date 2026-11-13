@@ -1,9 +1,9 @@
 name: Automated News Pipeline (GitHub Native)
 
 on:
-  # Schedule: Runs automatically every 2 hours
+  # Schedule: Runs automatically EVERY 1 HOUR
   schedule:
-    - cron: '0 */2 * * *'
+    - cron: '0 * * * *'
   
   # Manual trigger: 1-click test directly from GitHub Actions UI
   workflow_dispatch:
