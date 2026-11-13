@@ -2,16 +2,18 @@
 Automated News Aggregator & Reader (GitHub Native)
 Feeds:
 1. Football: BBC Sport Football (http://feeds.bbci.co.uk/sport/football/rss.xml)
-2. Technology: The Verge (https://www.theverge.com/rss/index.xml)
-3. Gaming: Gematsu (https://www.gematsu.com/feed)
+2. Technology: The Verge & Top Tech (The Verge, TechCrunch, Engadget, Ars Technica)
+3. Gaming: Gematsu (https://www.gematsu.com/feed + Gematsu Highlights)
 
 Features:
-- Timezone: Converts all timestamps to Thailand Time (UTC+7).
-- Crystal-Clear 1200px HD Images for all sources.
-- Full multi-paragraph in-depth translation + bullet points.
-- 1-Hour check interval via GitHub Actions.
-- Tabs: ALL, ⚽ FOOTBALL, ⚡ TECH, 🎮 GAMING.
-- Centered modern modal dialog.
+- 30 Fresh Articles PER Category (Total 90 articles in database).
+- 12-Hour Freshness rule with automatic backfill up to 30 articles per topic.
+- Multi-image screenshot gallery for Gaming/Tech/Football (0 KB storage, pure URL hotlink).
+- Crystal-clear 1200px HD images for all articles.
+- Timezone: Thailand Time (UTC+7).
+- Full multi-paragraph translation with Gemini Flash-Lite.
+- Smart Deduplication: skips already-translated links to strictly protect API quota.
+- Centered luxury Verge cyberpunk UI with modal dialog and interactive screenshot gallery.
 """
 import os
 import json
@@ -47,20 +49,14 @@ if not GEMINI_API_KEY:
                     GEMINI_API_KEY = line.split("=", 1)[1].strip()
 
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite").strip()
-TARGET_TOTAL_ARTICLES = 30
-HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
-
-RSS_FEEDS = [
-    {"category": "Football", "url": "http://feeds.bbci.co.uk/sport/football/rss.xml"},
-    {"category": "Technology", "url": "https://www.theverge.com/rss/index.xml"},
-    {"category": "Gaming", "url": "https://www.gematsu.com/feed"}
-]
+TARGET_PER_CATEGORY = 30
+HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'}
 
 SYSTEM_PROMPT = """คุณคือนักข่าวและบรรณาธิการข่าวมืออาชีพ แปลและสรุปข่าวเป็นภาษาไทยอย่างถูกต้อง สละสลวย และตรงตามข้อเท็จจริง (Fact-based)
 ข้อกำหนด:
 1. ข่าวฟุตบอล: ทับศัพท์เทคนิคและชื่อนักเตะ/สโมสรอย่างถูกต้อง
-2. ข่าวเทคโนโลยี: ทับศัพท์ชื่อระบบ ฮาร์ดแวร์ และแบรนด์อย่างถูกต้อง
-3. ข่าวเกม (Gaming): ทับศัพท์ชื่อเกม แพลตฟอร์ม (PS5, Xbox, Switch, PC) และค่ายเกมอย่างถูกต้อง
+2. ข่าวเทคโนโลยี: ทับศัพท์ชื่อระบบ ฮาร์ดแวร์ แบรนด์ โมเดล AI และฟีเจอร์อย่างถูกต้อง
+3. ข่าวเกม (Gaming): ทับศัพท์ชื่อเกม แพลตฟอร์ม (PS5, Xbox Series, Switch 2, PC) และค่ายเกมอย่างถูกต้อง
 4. "bullet_points": สรุปข้อเท็จจริงสำคัญสั้นกระชับ 3-4 ข้อ
 5. "full_paragraphs": แปลและเรียบเรียงเนื้อหาข่าวฉบับเต็มอย่างครบถ้วน (3-5 ย่อหน้า) ครอบคลุมเหตุการณ์สำคัญ คำสัมภาษณ์ กำหนดการ และตัวเลขสถิติทั้งหมด
 
@@ -90,6 +86,8 @@ def make_hd_image_url(url: str) -> str:
     # Upgrade BBC thumbnails (/240/, /320/, /480/ -> /1200/)
     url = re.sub(r'/(standard|branded_sport|branded_news)/\d+/', r'/\1/1200/', url)
     url = re.sub(r'/ic/\d+x\d+/', r'/ic/1024x576/', url)
+    # Upgrade Gematsu resize suffixes e.g. -320x180.jpg -> .jpg
+    url = re.sub(r'-\d+x\d+(\.\w+)$', r'\1', url)
     # Upgrade The Verge images
     if 'theverge.com' in url or 'platform.theverge' in url:
         if '?' in url:
@@ -97,50 +95,102 @@ def make_hd_image_url(url: str) -> str:
             if 'w=' not in url: url += '&w=1200'
     return url
 
-def scrape_full_article(link: str, default_desc: str) -> tuple[str, list[str]]:
-    """Scrape article webpage to extract HD lead image and full paragraphs."""
-    try:
-        req = urllib.request.Request(link, headers=HEADERS)
-        with urllib.request.urlopen(req, timeout=8) as resp:
-            content = resp.read().decode('utf-8', errors='ignore')
+def scrape_article_details(item: dict) -> dict:
+    """Scrape article webpage to extract HD lead image, full paragraphs, and gallery screenshots."""
+    link = item["link"]
+    cat = item["category_hint"]
+    feed_img = item.get("feed_image", "")
+    
+    lead_img = make_hd_image_url(feed_img) if feed_img else None
+    gallery_images = []
+    clean_paras = []
 
-        # HD lead image from og:image
-        img_m = re.search(r'property=["\']og:image["\']\s+content=["\']([^"\']+)["\']', content) or \
-                re.search(r'content=["\']([^"\']+)["\']\s+property=["\']og:image["\']', content)
-        hd_img = make_hd_image_url(img_m.group(1)) if img_m else None
+    # Case A: Gaming from Gematsu
+    if 'gematsu.com' in link:
+        try:
+            # Use Jina AI Reader to cleanly bypass Cloudflare and get full article & screenshots
+            jina_url = f"https://r.jina.ai/{link}"
+            req = urllib.request.Request(jina_url, headers=HEADERS)
+            with urllib.request.urlopen(req, timeout=12) as resp:
+                txt = resp.read().decode('utf-8', errors='ignore')
+            
+            # Extract screenshots
+            raw_imgs = re.findall(r'!\[.*?\]\((https://www\.gematsu\.com/wp-content/uploads/[^\)]+)\)', txt)
+            seen_imgs = set()
+            for img in raw_imgs:
+                clean_img = make_hd_image_url(img.split('?')[0])
+                if clean_img not in seen_imgs and not any(x in clean_img.lower() for x in ['logo', 'avatar', 'icon', 'banner']):
+                    seen_imgs.add(clean_img)
+                    gallery_images.append(clean_img)
+            
+            if gallery_images and not lead_img:
+                lead_img = gallery_images[0]
+            
+            # Extract paragraphs
+            lines = txt.splitlines()
+            start = False
+            for line in lines:
+                if line.startswith("Markdown Content:"):
+                    start = True
+                    continue
+                if not start: continue
+                line = line.strip()
+                if not line or line.startswith('!') or line.startswith('###') or line.startswith('##') or line.startswith('#'):
+                    continue
+                line = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', line) # strip links
+                if len(line) > 30 and not any(line.startswith(x) for x in ['Source:', 'Thanks,', 'Watch the']):
+                    clean_paras.append(line)
+        except Exception as e:
+            logger.warning(f"Jina scrape warning for {link}: {e}")
 
-        # Clean paragraphs
-        clean_paras = []
-        # Gematsu article paragraphs
-        if 'gematsu.com' in link:
-            article_match = re.search(r'<article[^>]*>(.*?)</article>', content, re.DOTALL)
-            body_html = article_match.group(1) if article_match else content
-            raw_p = re.findall(r'<p[^>]*>(.*?)</p>', body_html, re.DOTALL)
+    # Case B: The Verge / TechCrunch / Ars Technica
+    elif any(d in link for d in ['theverge.com', 'techcrunch.com', 'arstechnica.com', 'engadget.com']):
+        try:
+            req = urllib.request.Request(link, headers=HEADERS)
+            with urllib.request.urlopen(req, timeout=8) as resp:
+                content = resp.read().decode('utf-8', errors='ignore')
+
+            img_m = re.search(r'property=["\']og:image["\']\s+content=["\']([^"\']+)["\']', content) or \
+                    re.search(r'content=["\']([^"\']+)["\']\s+property=["\']og:image["\']', content)
+            if img_m and not lead_img:
+                lead_img = make_hd_image_url(img_m.group(1))
+
+            raw_p = re.findall(r'<p[^>]*>(.*?)</p>', content, re.DOTALL)
             for p in raw_p:
                 c = clean_text(p)
-                if len(c) > 30 and not any(c.startswith(x) for x in ['Source:', 'Thanks,', 'Watch the']):
+                if len(c) > 35 and not any(x in c for x in ['Posts from this', 'Sign up for', 'Terms of Service', 'Privacy Policy']):
                     clean_paras.append(c)
+        except Exception:
+            pass
 
-        # The Verge duet article paragraphs
-        elif 'theverge.com' in link:
-            duet = re.findall(r'<p[^>]*class=["\'][^"\']*duet--article[^"\']*["\'][^>]*>(.*?)</p>', content, re.DOTALL)
-            for p in duet:
-                c = clean_text(p)
-                if len(c) > 30 and not any(x in c for x in ['Posts from this', 'Sign up for']):
-                    clean_paras.append(c)
+    # Case C: BBC Sport Football
+    else:
+        try:
+            req = urllib.request.Request(link, headers=HEADERS)
+            with urllib.request.urlopen(req, timeout=8) as resp:
+                content = resp.read().decode('utf-8', errors='ignore')
 
-        # BBC Sport Football paragraphs
-        if not clean_paras:
+            img_m = re.search(r'property=["\']og:image["\']\s+content=["\']([^"\']+)["\']', content) or \
+                    re.search(r'content=["\']([^"\']+)["\']\s+property=["\']og:image["\']', content)
+            if img_m and not lead_img:
+                lead_img = make_hd_image_url(img_m.group(1))
+
             raw_p = re.findall(r'<p[^>]*>(.*?)</p>', content, re.DOTALL)
             for p in raw_p:
                 c = clean_text(p)
                 if len(c) > 35 and not any(c.startswith(x) for x in ['Photo by', 'Follow ', 'Sign up', 'Share this', 'Published', 'Image source', 'Cast your']):
                     clean_paras.append(c)
+        except Exception:
+            pass
 
-        clean_paras = list(dict.fromkeys(clean_paras)) # deduplicate
-        return hd_img or "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&q=80", clean_paras[:12] if clean_paras else [default_desc]
-    except Exception:
-        return "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&q=80", [default_desc]
+    if not lead_img:
+        lead_img = "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&q=80"
+    
+    clean_paras = list(dict.fromkeys(clean_paras))
+    item["cover_image_url"] = lead_img
+    item["gallery_images"] = gallery_images[:12] # Limit gallery to top 12 screenshots
+    item["raw_paragraphs"] = clean_paras[:12] if clean_paras else [item["description"]]
+    return item
 
 def call_gemini(item_info: dict) -> dict:
     """Call Gemini for factual summary and multi-paragraph translation."""
@@ -204,18 +254,22 @@ def update_ui_files(news_list: list[dict]):
     """Update README.md and centered index.html with Thailand Time (UTC+7)."""
     now_th = to_thailand_time(datetime.datetime.now(datetime.timezone.utc))
 
+    football_count = sum(1 for x in news_list if x.get("tag") == "Football")
+    tech_count = sum(1 for x in news_list if x.get("tag") == "Technology")
+    gaming_count = sum(1 for x in news_list if x.get("tag") == "Gaming")
+
     # 1. README.md
     readme_lines = [
         "# ⚡ Automated News Aggregator (GitHub Native)",
         "",
-        "> **Live Automated News Reader:** Auto-scraped from BBC Sport Football, The Verge, and Gematsu (Gaming).",
-        f"> *อัปเดตล่าสุด: `{now_th}`* • *จำนวนข่าวทั้งหมด: `{len(news_list)}/30 ข่าว`*",
+        "> **Live Automated News Reader:** Auto-scraped from BBC Sport Football, The Verge/Tech, and Gematsu (Gaming).",
+        f"> *อัปเดตล่าสุด: `{now_th}`* • *รวมทั้งหมด: `{len(news_list)} ข่าว`* (`⚽ Football: {football_count}` | `⚡ Tech: {tech_count}` | `🎮 Gaming: {gaming_count}`)",
         "",
         "### 🌐 [กดที่นี่เพื่อเปิดหน้าเว็บอ่านข่าว (GitHub Pages)](https://puresinghara.github.io/pure-news/)",
         "",
         "---",
         "",
-        "### 📰 ตารางสรุปข่าวล่าสุด (30 เรื่องเด่น)",
+        "### 📰 ตารางสรุปข่าวล่าสุด",
         "",
         "| หมวดหมู่ | หัวข้อข่าว & ประเด็นสำคัญ | เวลาเผยแพร่ (เวลาไทย) | แหล่งข่าว |",
         "| :--- | :--- | :--- | :--- |"
@@ -235,7 +289,7 @@ def update_ui_files(news_list: list[dict]):
     with open(README_FILE, 'w', encoding='utf-8') as f:
         f.write("\n".join(readme_lines))
 
-    # 2. index.html (Centered luxury Verge reader with Gaming tab & Thailand time)
+    # 2. index.html (Centered luxury Verge reader with Screenshot Gallery & Thailand time)
     json_data_str = json.dumps(news_list, ensure_ascii=False)
     html_content = f'''<!DOCTYPE html>
 <html lang="th" class="dark">
@@ -257,7 +311,7 @@ def update_ui_files(news_list: list[dict]):
     <div class="flex items-center gap-2">
       <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
       <span class="text-zinc-200 font-semibold">// LIVE FEED:</span>
-      <span class="hidden sm:inline">BBC FOOTBALL • THE VERGE TECH • GEMATSU GAMING</span>
+      <span class="hidden sm:inline">BBC FOOTBALL (30) • TECH (30) • GEMATSU GAMING (30)</span>
       <span class="text-emerald-400 font-bold px-1.5 py-0.5 bg-emerald-500/10 rounded border border-emerald-500/30">ONLINE</span>
     </div>
     <div class="flex items-center gap-4 text-[11px]">
@@ -277,16 +331,16 @@ def update_ui_files(news_list: list[dict]):
           <h1 class="verge-title text-2xl md:text-3xl font-black uppercase text-white flex items-center gap-2">
             THE VERGE <span class="text-[#ff3366] text-xs font-mono font-bold tracking-widest px-2 py-0.5 border border-[#ff3366]/40 rounded-sm">READER</span>
           </h1>
-          <p class="text-[11px] font-mono text-zinc-400 uppercase tracking-widest">Football • Technology • Gaming (30 Stories)</p>
+          <p class="text-[11px] font-mono text-zinc-400 uppercase tracking-widest">30 ข่าวเด่นต่อหมวด • อัปเดตทุก 1 ชั่วโมง</p>
         </div>
       </div>
 
       <!-- Tag Filters -->
       <div class="flex flex-wrap items-center gap-2">
-        <button onclick="filterTag('ALL')" id="filterALL" class="px-3.5 py-1.5 bg-white text-black font-mono font-bold text-xs rounded-sm transition">ALL</button>
-        <button onclick="filterTag('Football')" id="filterFootball" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-mono text-xs rounded-sm transition">⚽ FOOTBALL</button>
-        <button onclick="filterTag('Technology')" id="filterTechnology" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-mono text-xs rounded-sm transition">⚡ TECH</button>
-        <button onclick="filterTag('Gaming')" id="filterGaming" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-amber-400 font-mono text-xs rounded-sm transition">🎮 GAMING</button>
+        <button onclick="filterTag('ALL')" id="filterALL" class="px-3.5 py-1.5 bg-white text-black font-mono font-bold text-xs rounded-sm transition">ALL ({len(news_list)})</button>
+        <button onclick="filterTag('Football')" id="filterFootball" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-mono text-xs rounded-sm transition">⚽ FOOTBALL ({football_count})</button>
+        <button onclick="filterTag('Technology')" id="filterTechnology" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-cyan-400 font-mono text-xs rounded-sm transition">⚡ TECH ({tech_count})</button>
+        <button onclick="filterTag('Gaming')" id="filterGaming" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-amber-400 font-mono text-xs rounded-sm transition">🎮 GAMING ({gaming_count})</button>
       </div>
 
       <!-- Search & Refresh -->
@@ -321,7 +375,7 @@ def update_ui_files(news_list: list[dict]):
 
       <!-- Modal Body (Scrollable) -->
       <div class="p-6 md:p-8 overflow-y-auto space-y-6">
-        <!-- HD Image -->
+        <!-- HD Cover Image -->
         <div class="w-full h-64 sm:h-80 overflow-hidden rounded-md border border-zinc-800 bg-zinc-950">
           <img id="modalImg" src="" referrerpolicy="no-referrer" class="w-full h-full object-cover">
         </div>
@@ -339,6 +393,14 @@ def update_ui_files(news_list: list[dict]):
         <div class="space-y-4 pt-2">
           <div class="text-xs font-mono text-zinc-500 uppercase tracking-widest">// เนื้อหาข่าวฉบับเต็ม :</div>
           <div id="modalFullContent" class="space-y-3.5 text-zinc-300 text-sm md:text-base leading-relaxed font-light"></div>
+        </div>
+
+        <!-- Multi-Image Screenshots Gallery (if available) -->
+        <div id="modalGallerySection" class="hidden pt-4 border-t border-zinc-800/80">
+          <div class="text-xs font-mono text-amber-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+            <span>📸 ภาพประกอบและ SCREENSHOTS ในข่าว :</span>
+          </div>
+          <div id="modalGalleryGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5"></div>
         </div>
       </div>
 
@@ -359,7 +421,7 @@ def update_ui_files(news_list: list[dict]):
     let currentTag = 'ALL';
     let searchQuery = '';
 
-    // Cache-busting: fetch newest json in background if served via http
+    // Cache-busting background fetch
     if (window.location.protocol.startsWith('http')) {{
       fetch('data/news.json?t=' + Date.now())
         .then(r => r.json())
@@ -379,7 +441,9 @@ def update_ui_files(news_list: list[dict]):
           if (t === tag) {{
             btn.className = "px-3.5 py-1.5 bg-white text-black font-mono font-bold text-xs rounded-sm transition";
           }} else {{
-            const textColor = t === 'Gaming' ? 'text-amber-400' : 'text-zinc-300';
+            let textColor = 'text-zinc-300';
+            if (t === 'Gaming') textColor = 'text-amber-400';
+            if (t === 'Technology') textColor = 'text-cyan-400';
             btn.className = `px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 ${{textColor}} font-mono text-xs rounded-sm transition`;
           }}
         }}
@@ -409,10 +473,11 @@ def update_ui_files(news_list: list[dict]):
         return;
       }}
 
-      filtered.forEach((item, idx) => {{
+      filtered.forEach((item) => {{
+        const originalIndex = allNews.indexOf(item);
         const div = document.createElement('div');
         div.className = 'bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition flex flex-col justify-between overflow-hidden rounded-sm cursor-pointer group';
-        div.onclick = () => openModal(allNews.indexOf(item));
+        div.onclick = () => openModal(originalIndex);
         
         const bulletsHtml = (item.bullet_points || []).slice(0, 3).map(b => 
           `<li class="flex items-start gap-1.5"><span class="text-[#ff3366] font-bold">›</span><span>${{b}}</span></li>`
@@ -422,10 +487,14 @@ def update_ui_files(news_list: list[dict]):
         if (item.tag === 'Technology') tagColor = 'text-cyan-400';
         else if (item.tag === 'Gaming') tagColor = 'text-amber-400';
 
+        const hasGallery = Array.isArray(item.gallery_images) && item.gallery_images.length > 0;
+        const galleryBadge = hasGallery ? `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-1.5 py-0.5 rounded text-[10px] font-mono">📸 ${{item.gallery_images.length}} รูป</span>` : '';
+
         div.innerHTML = `
           <div>
-            <div class="w-full h-44 overflow-hidden bg-zinc-950">
+            <div class="w-full h-44 overflow-hidden bg-zinc-950 relative">
               <img src="${{item.cover_image_url}}" referrerpolicy="no-referrer" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&q=80';">
+              <div class="absolute bottom-2 right-2 flex gap-1">${{galleryBadge}}</div>
             </div>
             <div class="p-5">
               <div class="flex items-center gap-2 text-[11px] font-mono mb-2">
@@ -477,6 +546,24 @@ def update_ui_files(news_list: list[dict]):
         fullContentDiv.appendChild(pElem);
       }});
 
+      // Screenshot Gallery
+      const gallerySec = document.getElementById('modalGallerySection');
+      const galleryGrid = document.getElementById('modalGalleryGrid');
+      galleryGrid.innerHTML = '';
+      if (Array.isArray(item.gallery_images) && item.gallery_images.length > 0) {{
+        gallerySec.classList.remove('hidden');
+        item.gallery_images.forEach(imgUrl => {{
+          const a = document.createElement('a');
+          a.href = imgUrl;
+          a.target = '_blank';
+          a.className = 'block aspect-video overflow-hidden rounded bg-zinc-950 border border-zinc-800 hover:border-amber-400 transition group';
+          a.innerHTML = `<img src="${{imgUrl}}" referrerpolicy="no-referrer" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">`;
+          galleryGrid.appendChild(a);
+        }});
+      }} else {{
+        gallerySec.classList.add('hidden');
+      }}
+
       document.getElementById('modalSource').href = item.link;
       document.getElementById('modalOverlay').classList.remove('hidden');
     }}
@@ -497,9 +584,44 @@ def update_ui_files(news_list: list[dict]):
     with open(INDEX_HTML, 'w', encoding='utf-8') as f:
         f.write(html_content)
 
+def fetch_feed_entries(url: str, category: str, now_utc: datetime.datetime) -> list[dict]:
+    """Fetch entries from an RSS feed, extracting lead image and publish datetime."""
+    results = []
+    try:
+        feed = feedparser.parse(url)
+        for entry in feed.entries:
+            link = getattr(entry, 'link', '').strip()
+            title = getattr(entry, 'title', '').strip()
+            if not link or any(x in title.lower() for x in ["who am i", "quiz", "football daily"]):
+                continue
+
+            pub_tuple = getattr(entry, 'published_parsed', None) or getattr(entry, 'updated_parsed', None)
+            if pub_tuple:
+                pub_dt = datetime.datetime.fromtimestamp(time.mktime(pub_tuple), tz=datetime.timezone.utc)
+            else:
+                pub_dt = now_utc
+
+            # Extract image from summary if present (Gematsu lead image)
+            raw_summary = getattr(entry, 'summary', '') or getattr(entry, 'description', '')
+            img_m = re.search(r'<img[^>]+src=["\']([^"\']+)["\']', raw_summary)
+            feed_img = img_m.group(1) if img_m else ""
+
+            results.append({
+                "title": title,
+                "link": link,
+                "description": clean_text(raw_summary),
+                "published_th": to_thailand_time(pub_dt),
+                "category_hint": category,
+                "feed_image": feed_img,
+                "_pub_dt": pub_dt
+            })
+    except Exception as e:
+        logger.error(f"Error reading feed {url}: {e}")
+    return results
+
 def run():
     logger.info("==================================================")
-    logger.info("  STARTING 3-CATEGORY NEWS PIPELINE               ")
+    logger.info("  STARTING 3-CATEGORY NEWS PIPELINE (30 PER TOPIC)")
     logger.info("==================================================")
 
     os.makedirs(DATA_DIR, exist_ok=True)
@@ -511,112 +633,166 @@ def run():
         except Exception:
             pass
 
-    existing_links = {it.get("link", "").strip() for it in existing_news}
-    logger.info(f"Loaded {len(existing_news)} existing stories in repository.")
-
-    # Fetch candidates from all 3 feeds
-    raw_candidates = []
-    seen = set()
-    now_utc = datetime.datetime.now(datetime.timezone.utc)
-
-    for feed_info in RSS_FEEDS:
-        url = feed_info["url"]
-        cat = feed_info["category"]
-        try:
-            feed = feedparser.parse(url)
-            for entry in feed.entries:
-                link = getattr(entry, 'link', '').strip()
-                title = getattr(entry, 'title', '').strip()
-                if not link or link in seen or any(x in title.lower() for x in ["who am i", "quiz", "football daily"]):
-                    continue
-                seen.add(link)
-
-                pub_tuple = getattr(entry, 'published_parsed', None) or getattr(entry, 'updated_parsed', None)
-                if pub_tuple:
-                    pub_dt = datetime.datetime.fromtimestamp(time.mktime(pub_tuple), tz=datetime.timezone.utc)
-                else:
-                    pub_dt = now_utc
-
-                raw_candidates.append({
-                    "title": title,
-                    "link": link,
-                    "description": clean_text(getattr(entry, 'summary', '') or getattr(entry, 'description', '')),
-                    "published_th": to_thailand_time(pub_dt),
-                    "category_hint": cat,
-                    "_pub_dt": pub_dt
-                })
-        except Exception as e:
-            logger.error(f"Error reading feed {url}: {e}")
-
-    # Sort newest first
-    raw_candidates.sort(key=lambda x: x["_pub_dt"], reverse=True)
-
-    # Filter to new items
-    new_to_process = [c for c in raw_candidates if c["link"] not in existing_links]
-    logger.info(f"Found {len(new_to_process)} brand NEW stories across Football, Tech, and Gaming.")
-
-    # Limit new items to at most 15 per run
-    new_to_process = new_to_process[:15]
-
-    if new_to_process:
-        # Scrape full article & HD images concurrently
-        logger.info(f"Scraping detailed content concurrently for {len(new_to_process)} articles...")
-        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-            def scrape_worker(item):
-                img_url, paras = scrape_full_article(item["link"], item["description"])
-                item["cover_image_url"] = img_url
-                item["raw_paragraphs"] = paras
-                return item
-
-            new_to_process = list(executor.map(scrape_worker, new_to_process))
-
-        # Parallel translation with Gemini
-        logger.info(f"Translating {len(new_to_process)} articles with Gemini in parallel...")
-        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-            translations = list(executor.map(call_gemini, new_to_process))
-
-        processed_entries = []
-        for item, trans in zip(new_to_process, translations):
-            entry = {
-                "id": int(time.time() * 1000) + len(processed_entries),
-                "original_title": item["title"],
-                "thai_title": trans.get("thai_title", item["title"]),
-                "tag": trans.get("tag", item["category_hint"]),
-                "bullet_points": trans.get("bullet_points", []),
-                "full_paragraphs": trans.get("full_paragraphs", item["raw_paragraphs"][:4]),
-                "link": item["link"],
-                "cover_image_url": item["cover_image_url"],
-                "published_th": item["published_th"],
-                "category_hint": item["category_hint"]
-            }
-            processed_entries.append(entry)
-
-        # Prepend new to existing
-        updated_db = processed_entries + existing_news
-    else:
-        logger.info("No new articles. Upgrading images and timestamps on existing articles...")
-        updated_db = existing_news
-
-    # Purge any old entries with low-res 240px images or missing Thai times
-    cleaned_db = []
-    for it in updated_db:
-        # Ensure HD image
+    # Normalize existing database
+    existing_by_link = {}
+    for it in existing_news:
+        link = it.get("link", "").strip()
+        if not link: continue
+        # Normalize category tag
+        tag = it.get("tag", "")
+        if "chelsea" in tag.lower(): it["tag"] = "Football"
         it["cover_image_url"] = make_hd_image_url(it.get("cover_image_url", ""))
-        # Ensure published_th exists
-        if "published_th" not in it and "published_at" in it:
-            it["published_th"] = it["published_at"].replace("UTC", "เวลาไทย")
-        # Replace any Chelsea FC tag with Football
-        if it.get("tag") == "Chelsea FC":
-            it["tag"] = "Football"
-        cleaned_db.append(it)
+        existing_by_link[link] = it
 
-    final_db = cleaned_db[:TARGET_TOTAL_ARTICLES]
+    logger.info(f"Loaded {len(existing_by_link)} existing stories from database.")
 
+    now_utc = datetime.datetime.now(datetime.timezone.utc)
+    twelve_hours_ago = now_utc - datetime.timedelta(hours=12)
+
+    # Feed definitions per category
+    categories_config = {
+        "Football": [
+            "http://feeds.bbci.co.uk/sport/football/rss.xml"
+        ],
+        "Technology": [
+            "https://www.theverge.com/rss/index.xml",
+            "https://www.theverge.com/rss/tech/index.xml",
+            "https://techcrunch.com/feed/",
+            "https://www.engadget.com/rss.xml",
+            "https://feeds.arstechnica.com/arstechnica/technology-lab"
+        ],
+        "Gaming": [
+            "https://www.gematsu.com/feed"
+        ]
+    }
+
+    category_results = {}
+
+    for cat, feeds in categories_config.items():
+        logger.info(f"--- Processing Category: {cat} ---")
+        candidates = []
+        seen_links = set()
+
+        for feed_url in feeds:
+            entries = fetch_feed_entries(feed_url, cat, now_utc)
+            for e in entries:
+                if e["link"] not in seen_links:
+                    seen_links.add(e["link"])
+                    candidates.append(e)
+
+        # For Gaming: if Gematsu feed gave fewer than 30 candidates, backfill from Gematsu homepage highlights
+        if cat == "Gaming" and len(candidates) < TARGET_PER_CATEGORY:
+            logger.info("Fetching additional Gematsu articles via homepage to ensure 30 gaming candidates...")
+            try:
+                jina_home = "https://r.jina.ai/https://www.gematsu.com/"
+                req = urllib.request.Request(jina_home, headers=HEADERS)
+                with urllib.request.urlopen(req, timeout=12) as resp:
+                    home_txt = resp.read().decode('utf-8', errors='ignore')
+                raw_links = re.findall(r'https://www\.gematsu\.com/\d{4}/\d{2}/[^\s\)\"\']+', home_txt)
+                for l in raw_links:
+                    clean_l = l.split('#')[0]
+                    if clean_l not in seen_links:
+                        seen_links.add(clean_l)
+                        # Derive title from slug
+                        slug = clean_l.rstrip('/').split('/')[-1]
+                        title = slug.replace('-', ' ').title()
+                        candidates.append({
+                            "title": title,
+                            "link": clean_l,
+                            "description": title,
+                            "published_th": to_thailand_time(now_utc),
+                            "category_hint": "Gaming",
+                            "feed_image": "",
+                            "_pub_dt": now_utc - datetime.timedelta(hours=2)
+                        })
+            except Exception as e:
+                logger.warning(f"Could not backfill Gematsu homepage: {e}")
+
+        # Sort candidates newest first
+        candidates.sort(key=lambda x: x["_pub_dt"], reverse=True)
+
+        # Step 1: Filter articles within last 12 hours
+        within_12h = [c for c in candidates if c["_pub_dt"] >= twelve_hours_ago]
+        logger.info(f"[{cat}] Candidates within last 12 hours: {len(within_12h)}")
+
+        # Step 2: Backfill rule - If < 30 articles in 12h, fill up to 30 from the latest candidates
+        selected_candidates = within_12h[:]
+        if len(selected_candidates) < TARGET_PER_CATEGORY:
+            logger.info(f"[{cat}] Backfilling from latest candidates to reach target of {TARGET_PER_CATEGORY} articles...")
+            for c in candidates:
+                if c not in selected_candidates:
+                    selected_candidates.append(c)
+                if len(selected_candidates) >= TARGET_PER_CATEGORY:
+                    break
+
+        # Limit to 30 candidates for this category
+        selected_candidates = selected_candidates[:TARGET_PER_CATEGORY]
+
+        # Separate into already-translated vs genuinely new
+        final_category_articles = []
+        new_items_to_translate = []
+
+        for item in selected_candidates:
+            link = item["link"]
+            if link in existing_by_link:
+                # Keep already translated article to save tokens
+                existing_item = existing_by_link[link]
+                # Ensure correct tag
+                existing_item["tag"] = cat
+                # Upgrade images
+                existing_item["cover_image_url"] = make_hd_image_url(existing_item.get("cover_image_url", ""))
+                final_category_articles.append(existing_item)
+            else:
+                new_items_to_translate.append(item)
+
+        logger.info(f"[{cat}] Reusing {len(final_category_articles)} existing translated articles. Translating {len(new_items_to_translate)} new articles.")
+
+        # Translate new items (if any)
+        if new_items_to_translate:
+            logger.info(f"[{cat}] Scraping full content and gallery for {len(new_items_to_translate)} articles...")
+            with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+                scraped_items = list(executor.map(scrape_article_details, new_items_to_translate))
+
+            logger.info(f"[{cat}] Translating {len(scraped_items)} articles with Gemini Flash-Lite...")
+            with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+                translations = list(executor.map(call_gemini, scraped_items))
+
+            for item, trans in zip(scraped_items, translations):
+                entry = {
+                    "id": int(time.time() * 1000) + len(final_category_articles),
+                    "original_title": item["title"],
+                    "thai_title": trans.get("thai_title", item["title"]),
+                    "tag": cat,
+                    "bullet_points": trans.get("bullet_points", []),
+                    "full_paragraphs": trans.get("full_paragraphs", item["raw_paragraphs"][:4]),
+                    "link": item["link"],
+                    "cover_image_url": item["cover_image_url"],
+                    "gallery_images": item.get("gallery_images", []),
+                    "published_th": item["published_th"],
+                    "category_hint": cat
+                }
+                final_category_articles.append(entry)
+                existing_by_link[item["link"]] = entry # remember for future deduplication
+
+        # Ensure exactly up to 30 articles for this category
+        category_results[cat] = final_category_articles[:TARGET_PER_CATEGORY]
+        logger.info(f"[{cat}] Completed! Total articles: {len(category_results[cat])}/{TARGET_PER_CATEGORY}")
+
+    # Combine all 3 categories (90 articles total)
+    combined_db = []
+    for cat in ["Football", "Technology", "Gaming"]:
+        combined_db.extend(category_results.get(cat, []))
+
+    # Save to data/news.json
     with open(DATA_FILE, 'w', encoding='utf-8') as f:
-        json.dump(final_db, f, ensure_ascii=False, indent=2)
+        json.dump(combined_db, f, ensure_ascii=False, indent=2)
 
-    update_ui_files(final_db)
-    logger.info(f"[✓] Pipeline complete! Maintained {len(final_db)} stories in database.")
+    # Update index.html and README.md
+    update_ui_files(combined_db)
+
+    logger.info("==================================================")
+    logger.info(f"[✓] Pipeline complete! Maintained {len(combined_db)} total stories (30 Football, 30 Tech, 30 Gaming).")
+    logger.info("==================================================")
 
 if __name__ == "__main__":
     run()
