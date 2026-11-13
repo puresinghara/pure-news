@@ -1,5 +1,291 @@
 [
   {
+    "id": 1794552723416,
+    "original_title": "Donald Trump really wants Tim Cook to run Nvidia",
+    "thai_title": "โดนัลด์ ทรัมป์ เสนอชื่อ ทิม คุก นั่งแท่นซีอีโอ Nvidia แทน เจนเซน หวง",
+    "tag": "Technology",
+    "bullet_points": [
+      "เจนเซน หวง ลาออกจากตำแหน่งซีอีโอ Nvidia หลังมีรายงานข่าวเรื่องความสัมพันธ์ส่วนตัว",
+      "ปัจจุบัน CFO ของ Nvidia ดำรงตำแหน่งรักษาการซีอีโอชั่วคราว",
+      "โดนัลด์ ทรัมป์ เสนอชื่อ ทิม คุก อดีตซีอีโอ Apple ให้เข้ามารับตำแหน่งผู้นำบริษัท Nvidia"
+    ],
+    "link": "https://www.theverge.com/tech/1032774/president-donald-trump-tim-cook-nvidia-jensen-huang",
+    "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/08/gettyimages-2228842017.jpg?quality=90&strip=all&crop=0,0,100,100",
+    "published_at": "2026-11-13 00:46 UTC",
+    "category_hint": "Technology"
+  },
+  {
+    "id": 1794552734162,
+    "original_title": "Xbox announces Wolfenstein 3",
+    "thai_title": "Xbox ประกาศเปิดตัวเกม Wolfenstein 3",
+    "tag": "Technology",
+    "bullet_points": [
+      "Xbox ประกาศพัฒนาเกม Wolfenstein 3 อย่างเป็นทางการ",
+      "พัฒนาโดยสตูดิโอ MachineGames ภายใต้สังกัด Bethesda",
+      "เป็นการสานต่อจากภาค Wolfenstein II: The New Colossus ที่วางจำหน่ายในปี 2017"
+    ],
+    "link": "https://www.theverge.com/news/1032431/xbox-bethesda-wolfenstein-3",
+    "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/11/ss_c195852422ed8e92ffa4d68ea4bfd34291823c3e.1920x1080.jpg?quality=90&strip=all&crop=0,0,100,100",
+    "published_at": "2026-11-13 00:11 UTC",
+    "category_hint": "Technology"
+  },
+  {
+    "id": 1794552736867,
+    "original_title": "Whoop launched a social network where every user has a ‘verified heartbeat’",
+    "thai_title": "Whoop เปิดตัวเครือข่ายสังคมออนไลน์สำหรับผู้ใช้งานอุปกรณ์สวมใส่",
+    "tag": "Technology",
+    "bullet_points": [
+      "Whoop เปิดตัวแพลตฟอร์มโซเชียลเน็ตเวิร์กชื่อ Whoop Humans สำหรับสมาชิกผู้ใช้งานอุปกรณ์สวมใส่",
+      "ผู้ใช้งานสามารถแชร์ข้อมูลสุขภาพ กิจกรรม และความสำเร็จส่วนบุคคลให้กับสมาชิกคนอื่นได้",
+      "รองรับการโพสต์รูปภาพและข้อความในรูปแบบ Moments รวมถึงการแสดงความคิดเห็นและโต้ตอบกับโพสต์ของสมาชิกอื่น",
+      "แพลตฟอร์มเน้นการยืนยันตัวตนผ่านข้อมูลอัตราการเต้นของหัวใจจริงจากอุปกรณ์"
+    ],
+    "link": "https://www.theverge.com/gadgets/1032630/whoop-humans-social-network",
+    "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/11/whoop-humans-launch-screenshots-trio-2.jpeg?quality=90&strip=all&crop=0,0,100,100",
+    "published_at": "2026-11-12 23:43 UTC",
+    "category_hint": "Technology"
+  },
+  {
+    "id": 1794552745311,
+    "original_title": "Humble Bundle redesign removes two-factor verification from settings",
+    "thai_title": "Humble Bundle ปรับดีไซน์หน้าเว็บใหม่ ตัดเมนูตั้งค่า Two-factor verification ออก",
+    "tag": "Technology",
+    "bullet_points": [
+      "Humble Bundle ปรับปรุงหน้าเว็บไซต์ใหม่ในส่วนของหน้าร้านค้า",
+      "ผู้ใช้งานไม่สามารถเพิ่มหรืออัปเดตวิธีการยืนยันตัวตนแบบ Two-factor verification ผ่านหน้า Settings ได้อีกต่อไป",
+      "มีรายงานว่าหน้า Support ของ Humble Bundle ยังคงมีเนื้อหาเกี่ยวกับ Two-factor verification อยู่ แต่ฟังก์ชันการตั้งค่าในหน้าผู้ใช้งานถูกนำออกไปแล้ว"
+    ],
+    "link": "https://www.theverge.com/games/1032659/humble-bundle-redesign-two-factor-verification-security-settings",
+    "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/11/Screenshot-2026-11-12-at-3.28.10-PM.png?quality=90&strip=all&crop=0,0,100,88.092261904762",
+    "published_at": "2026-11-12 23:30 UTC",
+    "category_hint": "Technology"
+  },
+  {
+    "id": 1794552748321,
+    "original_title": "Microsoft Outlook is still down",
+    "thai_title": "Microsoft Outlook ประสบปัญหาการใช้งานทั่วโลก",
+    "tag": "Technology",
+    "bullet_points": [
+      "ผู้ใช้งานไม่สามารถเข้าถึงอีเมลผ่านทางเว็บไซต์และแอปพลิเคชันได้ตั้งแต่เวลาประมาณ 13.00 น. (ET) ของวันพฤหัสบดี",
+      "Microsoft 365 ยืนยันปัญหาผ่านบัญชีโซเชียลมีเดียทางการ",
+      "สาเหตุเกิดจากโครงสร้างพื้นฐานในหลายภูมิภาคมีภาระการประมวลผลสูงเกินกำหนด"
+    ],
+    "link": "https://www.theverge.com/tech/1032226/microsoft-outlook-is-down",
+    "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/10/STK153_MICROSOFT_OUTLOOK_B_66565e.jpg?quality=90&strip=all&crop=0,0,100,100",
+    "published_at": "2026-11-12 23:24 UTC",
+    "category_hint": "Technology"
+  },
+  {
+    "id": 1794552750342,
+    "original_title": "'A lie' & 'nonsense' - Palmer committed to England, says Rogers",
+    "thai_title": "Morgan Rogers ยืนยัน Cole Palmer ยังคงมุ่งมั่นกับทีมชาติอังกฤษ",
+    "tag": "Chelsea FC",
+    "bullet_points": [
+      "Morgan Rogers ปฏิเสธกระแสข่าวที่ระบุว่า Cole Palmer ไม่มีความมุ่งมั่นในการเล่นให้ทีมชาติอังกฤษ",
+      "Rogers ระบุว่าข้อกล่าวหาดังกล่าวไม่เป็นความจริงและเป็นเรื่องไร้สาระ"
+    ],
+    "link": "https://www.bbc.co.uk/sport/football/articles/c6e9kjne5y8vo?at_medium=RSS&at_campaign=rss",
+    "cover_image_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/8b18/live/725b0530-dee9-11f1-8111-290450ddba8c.jpg",
+    "published_at": "2026-11-12 23:09 UTC",
+    "category_hint": "Football"
+  },
+  {
+    "id": 1794552752602,
+    "original_title": "Xbox owners are getting more customizations for backgrounds and the Guide menu",
+    "thai_title": "Xbox ทดสอบฟีเจอร์ปรับแต่งหน้าจอและเมนู Guide ใหม่",
+    "tag": "Technology",
+    "bullet_points": [
+      "Microsoft เริ่มทดสอบฟีเจอร์ปรับแต่งใหม่สำหรับผู้ใช้งาน Xbox Insiders",
+      "รองรับการบันทึก Dynamic Background ที่ชื่นชอบและตั้งค่าให้สลับภาพอัตโนมัติได้",
+      "เพิ่มตัวเลือกการจัดการ Library สำหรับเกมดิจิทัล",
+      "สามารถย้ายตำแหน่งเมนู Xbox Guide ไปไว้ทางด้านขวาของหน้าจอได้"
+    ],
+    "link": "https://www.theverge.com/news/1032396/xbox-dashboard-guide-menu-right-side-background-shuffle-feature",
+    "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/11/STK048_XBOX_3_B.jpg?quality=90&strip=all&crop=0,0,100,100",
+    "published_at": "2026-11-12 23:00 UTC",
+    "category_hint": "Technology"
+  },
+  {
+    "id": 1794552776993,
+    "original_title": "Grealish apologises for absence after breach of discipline",
+    "thai_title": "แจ็ค กรีลิช ขอโทษแฟนบอลกรณีขาดซ้อมจากปัญหาด้านวินัย",
+    "tag": "Football",
+    "bullet_points": [
+      "แจ็ค กรีลิช ออกแถลงการณ์ขอโทษแฟนบอลเอฟเวอร์ตัน",
+      "สาเหตุการขาดหายไปเกิดจากปัญหาด้านวินัยภายในทีม",
+      "นักเตะยอมรับผิดต่อเหตุการณ์ที่เกิดขึ้น"
+    ],
+    "link": "https://www.bbc.co.uk/sport/football/articles/cr3wgp8e2ljxo?at_medium=RSS&at_campaign=rss",
+    "cover_image_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/6ba4/live/6d670f60-dedf-11f1-a75a-dbf83836672c.jpg",
+    "published_at": "2026-11-12 22:10 UTC",
+    "category_hint": "Football"
+  },
+  {
+    "id": 1794552811538,
+    "original_title": "Where does Kane rank among all-time England greats?",
+    "thai_title": "การจัดอันดับ Harry Kane ในฐานะผู้เล่นระดับตำนานของทีมชาติอังกฤษ",
+    "tag": "Football",
+    "bullet_points": [
+      "Harry Kane ครองสถิติผู้ทำประตูสูงสุดตลอดกาลของทีมชาติอังกฤษ",
+      "Harry Kane ครองสถิติผู้ลงสนามให้ทีมชาติอังกฤษมากที่สุด",
+      "มีการตั้งคำถามถึงตำแหน่งของ Harry Kane เมื่อเทียบกับผู้เล่นระดับตำนานคนอื่นๆ ของทีมชาติอังกฤษ"
+    ],
+    "link": "https://www.bbc.co.uk/sport/football/articles/cxj0lvqpn94qo?at_medium=RSS&at_campaign=rss",
+    "cover_image_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/5525/live/60ecddc0-de97-11f1-a701-fddedf244c16.png",
+    "published_at": "2026-11-12 22:09 UTC",
+    "category_hint": "Football"
+  },
+  {
+    "id": 1794552817180,
+    "original_title": "Google’s new Gemini model is better at understanding complicated questions",
+    "thai_title": "Google เปิดตัวโมเดล Gemini 4 Hydrogen รองรับการประมวลผลคำถามซับซ้อน",
+    "tag": "Technology",
+    "bullet_points": [
+      "Google เปิดตัวโมเดล Gemini 4 Hydrogen ที่พัฒนาความสามารถในการตอบคำถามที่มีความซับซ้อน",
+      "โมเดลสามารถแยกแยะและตอบโจทย์คำถามที่มีหลายส่วน คำถามที่มีการพิมพ์ผิด หรือคำถามที่มีความเฉพาะเจาะจงสูงได้",
+      "เปิดให้ใช้งานแล้ววันนี้ผ่านระบบ Search, แอปพลิเคชัน Gemini และบริการทุกระดับของ Google"
+    ],
+    "link": "https://www.theverge.com/ai-artificial-intelligence/1032505/google-search-ai-mode-gemini-4-hydrogen",
+    "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/chorus/uploads/chorus_asset/file/25290329/STK255_Google_Gemini_A.jpg?quality=90&strip=all&crop=0,0,100,100",
+    "published_at": "2026-11-12 21:55 UTC",
+    "category_hint": "Technology"
+  },
+  {
+    "id": 1794552846656,
+    "original_title": "Gritty Arsenal show different side in Barcelona draw",
+    "thai_title": "อาร์เซนอลเสมอบาร์เซโลนาในเกมกระชับมิตร",
+    "tag": "Football",
+    "bullet_points": [
+      "อาร์เซนอลเสมอกับบาร์เซโลนาในเกมการแข่งขัน",
+      "ผลการแข่งขันนัดนี้ถูกมองว่าเป็นจุดเปลี่ยนสำคัญของฤดูกาลสำหรับอาร์เซนอล",
+      "อาร์เซนอลแสดงให้เห็นถึงความยืดหยุ่นในการเล่นกับทีมแชมป์ยุโรป"
+    ],
+    "link": "https://www.bbc.co.uk/sport/football/articles/cqe85vym242jo?at_medium=RSS&at_campaign=rss",
+    "cover_image_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/6057/live/b497a8a0-dede-11f1-a75a-dbf83836672c.jpg",
+    "published_at": "2026-11-12 21:50 UTC",
+    "category_hint": "Football"
+  },
+  {
+    "id": 1794552862421,
+    "original_title": "Kane scores winner but who else made an impression? England player ratings",
+    "thai_title": "สรุปคะแนนผู้เล่นทีมชาติอังกฤษในเกม Nations League พบกับโครเอเชีย",
+    "tag": "Football",
+    "bullet_points": [
+      "Harry Kane เป็นผู้ทำประตูชัยให้กับทีมชาติอังกฤษในเกมพบกับโครเอเชีย",
+      "Sami Mokbel ผู้สื่อข่าวฟุตบอลอาวุโสเป็นผู้ให้คะแนนผลงานของผู้เล่นแต่ละคน",
+      "เนื้อหาเน้นการประเมินฟอร์มการเล่นของนักเตะอังกฤษในรายการ Nations League"
+    ],
+    "link": "https://www.bbc.co.uk/sport/football/articles/c64gnd7vd912o?at_medium=RSS&at_campaign=rss",
+    "cover_image_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/5fbd/live/589bbd20-dee3-11f1-93e1-3b657b665bcf.jpg",
+    "published_at": "2026-11-12 21:47 UTC",
+    "category_hint": "Football"
+  },
+  {
+    "id": 1794552866638,
+    "original_title": "‘It’s a mistake’: reactions from tech leaders on Jensen Huang’s resignation",
+    "thai_title": "Jensen Huang ลาออกจากตำแหน่ง CEO ของ Nvidia",
+    "tag": "Technology",
+    "bullet_points": [
+      "Jensen Huang ลาออกจากตำแหน่ง CEO ของ Nvidia อย่างเป็นทางการ",
+      "สาเหตุการลาออกเกี่ยวข้องกับรายงานข่าวเรื่องความสัมพันธ์ส่วนตัว 2 กรณี",
+      "หนึ่งในกรณีดังกล่าวถูกระบุว่าเกี่ยวข้องกับบุคคลที่ถูกสงสัยว่าเป็นสายลับจากประเทศจีน และอีกกรณีเป็นพนักงานภายใต้การบังคับบัญชาโดยตรง"
+    ],
+    "link": "https://www.theverge.com/tech/1032434/nvidia-jensen-huang-resignation-reactions",
+    "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/08/STKP210_JENSEN_HUANG_D.jpg?quality=90&strip=all&crop=0,0,100,100",
+    "published_at": "2026-11-12 21:45 UTC",
+    "category_hint": "Technology"
+  },
+  {
+    "id": 1794552878928,
+    "original_title": "The Oura Ring 4 is almost as good as the newer model, but $150 cheaper",
+    "thai_title": "Oura Ring 4 ลดราคาเหลือ 249 ดอลลาร์สหรัฐ",
+    "tag": "Technology",
+    "bullet_points": [
+      "Oura Ring 4 รุ่นก่อนหน้าปรับลดราคาลงเหลือ 249 ดอลลาร์สหรัฐ",
+      "ราคาดังกล่าวลดลงจากราคาปกติ 100 ดอลลาร์สหรัฐ",
+      "วางจำหน่ายผ่านช่องทาง Amazon, Best Buy และ Target",
+      "ราคาอาจมีความแตกต่างกันตามขนาดและสีของอุปกรณ์"
+    ],
+    "link": "https://www.theverge.com/gadgets/1032311/oura-ring-4-smart-ring-deal-sale",
+    "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/chorus/uploads/chorus_asset/file/25665142/247314_Oura_Ring_4_AKrales_0105.jpg?quality=90&strip=all&crop=0,0,100,100",
+    "published_at": "2026-11-12 21:28 UTC",
+    "category_hint": "Technology"
+  },
+  {
+    "id": 1794552882681,
+    "original_title": "Ghana kick-start Afcon 2027 bid despite Ayew penalty miss",
+    "thai_title": "กานาประเดิมรอบคัดเลือก Afcon 2027 แม้จอร์แดน อายิว พลาดจุดโทษ",
+    "tag": "Football",
+    "bullet_points": [
+      "กานาเริ่มต้นแคมเปญรอบคัดเลือก Afcon 2027",
+      "จอร์แดน อายิว ยิงจุดโทษไม่เข้าในเกมดังกล่าว",
+      "แคเมอรูน ไอวอรีโคสต์ และเซเนกัล เก็บชัยชนะได้ในรอบนี้"
+    ],
+    "link": "https://www.bbc.co.uk/sport/football/articles/c61md0mldvdgo?at_medium=RSS&at_campaign=rss",
+    "cover_image_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/4161/live/c73c90e0-deb8-11f1-8fb5-a771a656a227.jpg",
+    "published_at": "2026-11-12 21:28 UTC",
+    "category_hint": "Football"
+  },
+  {
+    "id": 1794552885128,
+    "original_title": "SFA in talks with Boston officials over biennial friendly match",
+    "thai_title": "SFA เจรจาทางการบอสตันจัดแมตช์กระชับมิตรทุก 2 ปี",
+    "tag": "Football",
+    "bullet_points": [
+      "สมาคมฟุตบอลสกอตแลนด์ (SFA) อยู่ระหว่างการหารือกับตัวแทนวุฒิสมาชิกจากรัฐแมสซาชูเซตส์ เมืองบอสตัน",
+      "เป้าหมายเพื่อจัดโปรแกรม Friendly match ระหว่างทีมชาติสกอตแลนด์กับทีมในสหรัฐอเมริกาแบบทุก 2 ปี",
+      "การเจรจานี้เป็นการต่อยอดความสัมพันธ์ที่เกิดขึ้นในช่วงการแข่งขันฟุตบอลโลกที่ผ่านมา"
+    ],
+    "link": "https://www.bbc.co.uk/news/articles/cqdr1jd5mpp5o?at_medium=RSS&at_campaign=rss",
+    "cover_image_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/51fa/live/0eea4910-687a-11f1-be92-f5f7087bcfc7.jpg",
+    "published_at": "2026-11-12 21:16 UTC",
+    "category_hint": "Football"
+  },
+  {
+    "id": 1794552918734,
+    "original_title": "Man Utd & Man City in Gusto battle - Friday's gossip",
+    "thai_title": "แมนฯ ยูไนเต็ด และ แมนฯ ซิตี้ สนใจคว้าตัว มาโล กุสโต",
+    "tag": "Chelsea FC",
+    "bullet_points": [
+      "แมนเชสเตอร์ ยูไนเต็ด และ แมนเชสเตอร์ ซิตี้ กำลังแข่งขันกันเพื่อคว้าตัว มาโล กุสโต กองหลังของเชลซี",
+      "ลีดส์ ยูไนเต็ด กำลังดำเนินการติดตามคว้าตัว วิลล์ แลงค์เชียร์"
+    ],
+    "link": "https://www.bbc.co.uk/sport/football/articles/cmp86enlly13o?at_medium=RSS&at_campaign=rss",
+    "cover_image_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/f120/live/31d11dd0-ded3-11f1-b441-2b33b063138f.png",
+    "published_at": "2026-11-12 21:13 UTC",
+    "category_hint": "Football"
+  },
+  {
+    "id": 1794552920812,
+    "original_title": "Here are the 25 original Xbox games you can now play on PC",
+    "thai_title": "Microsoft เปิดให้เล่นเกม Original Xbox จำนวน 25 เกมบน Windows PC",
+    "tag": "Technology",
+    "bullet_points": [
+      "Microsoft ฉลองครบรอบ 25 ปี Xbox ด้วยการเปิดตัวโครงการอนุรักษ์เกม",
+      "ผู้ใช้งาน Windows PC สามารถเล่นเกม Original Xbox ได้ 25 เกมผ่านแพลตฟอร์ม",
+      "เงื่อนไขการเล่นต้องเป็นเจ้าของสำเนาดิจิทัลของเกมดังกล่าว"
+    ],
+    "link": "https://www.theverge.com/games/1032321/microsoft-xbox-original-games-pc-backwards-compatibility",
+    "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/11/XBOX_PCBackCompat.jpg?quality=90&strip=all&crop=0,0,100,93.955555555556",
+    "published_at": "2026-11-12 21:00 UTC",
+    "category_hint": "Technology"
+  },
+  {
+    "id": 1794552934269,
+    "original_title": "Arsenal dig in for draw at Barcelona to extend unbeaten start",
+    "thai_title": "อาร์เซนอลบุกเสมอ บาร์เซโลนา 1-1 ในศึก Uefa Women's Champions League",
+    "tag": "Football",
+    "bullet_points": [
+      "อาร์เซนอลรักษาสถิติไร้พ่ายใน Uefa Women's Champions League เป็นนัดที่ 4 ติดต่อกัน",
+      "ผลการแข่งขันจบลงด้วยการเสมอ 1-1 ที่สนาม Camp Nou",
+      "อาร์เซนอลขยับขึ้นสู่กลุ่ม 4 อันดับแรกของตาราง มีโอกาสผ่านเข้าสู่รอบ Knockout stage"
+    ],
+    "link": "https://www.bbc.co.uk/sport/football/videos/crlye55q790yo?at_medium=RSS&at_campaign=rss",
+    "cover_image_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/17d7/live/103dfe40-ded3-11f1-b441-2b33b063138f.jpg",
+    "published_at": "2026-11-12 20:09 UTC",
+    "category_hint": "Football"
+  },
+  {
     "id": 1,
     "original_title": "Nvidia is reportedly preparing to fire Jensen Huang",
     "thai_title": "วิกฤตความเชื่อมั่น! บอร์ด Nvidia จ่อปลด Jensen Huang เซ่นปมฉาวความสัมพันธ์ซ้อน",
@@ -163,290 +449,5 @@
     "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/11/Scion_Kei_Truck_2027-2.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
     "published_at": "2026-11-11 17:09",
     "category_hint": "Technology"
-  },
-  {
-    "id": 12,
-    "original_title": "The best early Black Friday deals you can already shop",
-    "thai_title": "ช้อปก่อนใคร! รวมดีลเด็ดรับเทศกาล Black Friday ที่เริ่มลดราคาแล้วตั้งแต่วันนี้",
-    "tag": "Technology",
-    "bullet_points": [
-      "เทศกาลลดราคาก่อน Black Friday เริ่มต้นแล้ว มีสินค้าตั้งแต่ทีวี, เครื่องพิมพ์ 3D, จนถึงอุปกรณ์อัจฉริยะ",
-      "เน้นย้ำความสำคัญของการตรวจสอบคุณสมบัติและเปรียบเทียบราคาก่อนตัดสินใจซื้อ",
-      "มีสินค้าไฮไลท์ เช่น Hisense CanvasTV, Bambu Lab P2S Combo และนวัตกรรมรักษ์โลกอย่าง Birdfy Smart Bird Feeder"
-    ],
-    "link": "https://www.theverge.com/gadgets/1028991/black-friday-best-early-deals-2026",
-    "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/11/268838_BF_CM_EARLY_DEALS_Headers_CVirginia.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
-    "published_at": "2026-11-11 15:53",
-    "category_hint": "Technology"
-  },
-  {
-    "id": 13,
-    "original_title": "Sharge’s eye-catching MacBook charger is over 25 percent off",
-    "thai_title": "Sharge จัดโปรแรงลดราคาที่ชาร์จ MacBook สุดล้ำ ดีไซน์สวยกระแทกตา",
-    "tag": "Technology",
-    "bullet_points": [
-      "ที่ชาร์จ Pixel 140W GaN ลดราคาเหลือ 69.88 ดอลลาร์",
-      "รองรับการชาร์จ MacBook Pro 16 นิ้ว ถึง 50% ใน 25 นาที",
-      "ขนาดเล็กกว่าหัวชาร์จมาตรฐานของ Apple ถึง 47% พร้อมจอแสดงผลพิกเซลบอกค่าวัตต์"
-    ],
-    "link": "https://www.theverge.com/gadgets/1031301/sharge-140w-gan-charger-lenovo-yoga-mini-desktop-pc-deal-sale",
-    "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/11/sharge-pixel-140-charger-roundup.png?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
-    "published_at": "2026-11-11 15:30",
-    "category_hint": "Technology"
-  },
-  {
-    "id": 14,
-    "original_title": "Ocarina of Time is even better if you use a smartphone app",
-    "thai_title": "Ocarina of Time จะเล่นสนุกขึ้นอีกระดับ หากคุณใช้งานแอปเสริมตัวนี้",
-    "tag": "Technology",
-    "bullet_points": [
-      "Zelda Notes เป็นแอปเสริมฟรีสำหรับผู้เล่นเกมในเครือ Nintendo",
-      "ช่วยระบุตำแหน่งไอเท็มและเงื่อนไขการไขปริศนาภายในเกม Zelda: Ocarina of Time",
-      "ฟีเจอร์เด่นคือแผนที่ Interactive ที่กรองข้อมูลได้ทั้งช่วงวัยเด็กและผู้ใหญ่ของตัวละคร"
-    ],
-    "link": "https://www.theverge.com/games/1031321/the-legend-of-zelda-ocarina-of-time-notes-app-gold-skulltula",
-    "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/11/20261110-01M74FRERRH793DQ734KTJM2FA-061DB0ED-ACA3-47E5-8CA3-6B3B776C2354.jpeg?quality=90&strip=all&crop=0%2C3.4613147178592%2C100%2C93.077370564282&w=1200",
-    "published_at": "2026-11-11 15:00",
-    "category_hint": "Technology"
-  },
-  {
-    "id": 15,
-    "original_title": "The US is winning the AI race. Jensen Huang could have blown it",
-    "thai_title": "เมื่ออเมริกาครองความได้เปรียบด้าน AI แต่ Jensen Huang อาจเป็นจุดอ่อนที่ทำให้เกมเปลี่ยน",
-    "tag": "Technology",
-    "bullet_points": [
-      "Jensen Huang ถูกเปิดเผยว่ามีความสัมพันธ์กับบุคคลที่ถูกสงสัยว่าเป็นสายลับจีน",
-      "การขาดแคลนชิป Nvidia คือคอขวดสำคัญที่จีนพยายามเจาะทะลวงเพื่อเร่งความเร็วในการพัฒนา AI",
-      "ผู้เชี่ยวชาญเตือนว่าความได้เปรียบทาง AI ของสหรัฐฯ อาจพลิกผันได้หากจีนเข้าถึงเทคโนโลยีชิปชั้นสูงของ Nvidia ได้มากขึ้น"
-    ],
-    "link": "https://www.theverge.com/ai-artificial-intelligence/1031063/jensen-huang-ai-race-us-china-spy",
-    "cover_image_url": "https://platform.theverge.com/wp-content/uploads/sites/2/2026/09/gettyimages-2285784039.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
-    "published_at": "2026-11-10 19:04",
-    "category_hint": "Technology"
-  },
-  {
-    "id": 1,
-    "original_title": "The chaos that took Carrick from two-year deal to sacked within 15 games",
-    "thai_title": "จากสัญญา 2 ปีสู่การโดนปลด: เปิดเบื้องหลังความวุ่นวายในยุค ไมเคิล คาร์ริก กับแมนเชสเตอร์ ยูไนเต็ด",
-    "tag": "Football",
-    "bullet_points": [
-      "ไมเคิล คาร์ริก เคยได้รับความเชื่อมั่นด้วยสัญญา 2 ปี แต่กลับต้องถูกปลดหลังคุมทีมได้เพียง 15 นัด",
-      "คาร์ริกได้รับการยอมรับในเรื่องสปิริตและความเป็นผู้นำที่ปกป้องลูกทีมจากกระแสกดดันเสมอ",
-      "ความวุ่นวายในสโมสรและผลงานที่ไม่คงเส้นคงวาเป็นปัจจัยสำคัญที่ทำให้สถานการณ์ของคาร์ริกถึงทางตัน"
-    ],
-    "link": "https://www.bbc.co.uk/sport/football/articles/cm0rl4kwn8vqo?at_medium=RSS&at_campaign=rss",
-    "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/dfae/live/4d45e2e0-de7d-11f1-b88b-3f1671ea859d.jpg",
-    "published_at": "Thu, 12 Nov 2026 10:21:29 GMT",
-    "category_hint": "Football"
-  },
-  {
-    "id": 2,
-    "original_title": "Young duo at heart of Nations League's meanest defence",
-    "thai_title": "สองดาวรุ่งหัวใจหลัก! ผู้อยู่เบื้องหลังกำแพงเหล็กไร้พ่ายของไอร์แลนด์เหนือในศึกเนชันส์ลีก",
-    "tag": "Football",
-    "bullet_points": [
-      "ไอร์แลนด์เหนือเป็นทีมเดียวในเนชันส์ลีกที่ยังไม่เสียประตูในรายการนี้",
-      "Ruairi McConville และ Tom Atcheson คือสองดาวรุ่งที่ก้าวขึ้นมาอุดรอยรั่วแทนนักเตะตัวหลักที่บาดเจ็บ",
-      "ไมเคิล โอนีล ยกย่องฟอร์มการเล่นของเหล่าดาวรุ่งว่ามีศักยภาพที่ไร้ขีดจำกัด"
-    ],
-    "link": "https://www.bbc.co.uk/sport/articles/cw24epvmq96lo?at_medium=RSS&at_campaign=rss",
-    "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/e1cf/live/ea41ecb0-ddc9-11f1-93e1-3b657b665bcf.png",
-    "published_at": "Thu, 12 Nov 2026 08:17:52 GMT",
-    "category_hint": "Football"
-  },
-  {
-    "id": 3,
-    "original_title": "'Unfinished business' - Tuchel committed to England",
-    "thai_title": "ภารกิจยังไม่เสร็จสิ้น! 'ทูเคิล' ยืนกรานขอคุมทีมชาติอังกฤษยาวถึงยูโร 2028 ไม่สนข้อเสนอจากสโมสรยักษ์ใหญ่",
-    "tag": "Football",
-    "bullet_points": [
-      "โธมัส ทูเคิล ยืนยันไม่มีแผนลาออกจากทีมชาติอังกฤษก่อนจบศึกยูโร 2028",
-      "สัญญาของทูเคิลไม่มีเงื่อนไขค่าฉีกสัญญา และเจ้าตัวให้ความสำคัญกับ 'ภารกิจที่ยังไม่เสร็จสิ้น' กับทีมชาติ",
-      "ทูเคิลยอมรับว่ายังมีความคิดถึงบรรยากาศการคุมทีมในระดับสโมสรที่จะได้ลงเล่นมากกว่า 50 นัดต่อฤดูกาล"
-    ],
-    "link": "https://www.bbc.co.uk/sport/football/articles/cqg7l9x9jnzko?at_medium=RSS&at_campaign=rss",
-    "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/f2bb/live/c56e31c0-de71-11f1-9115-cfe6d179af3a.jpg",
-    "published_at": "Thu, 12 Nov 2026 08:42:47 GMT",
-    "category_hint": "Football"
-  },
-  {
-    "id": 4,
-    "original_title": "USA withdraw from U17 World Cup",
-    "thai_title": "สหรัฐฯ ประกาศถอนทีมลุยศึกฟุตบอลโลก U17 ที่กาตาร์ หวั่นวิกฤตความขัดแย้งในภูมิภาค",
-    "tag": "Football",
-    "bullet_points": [
-      "สหรัฐฯ ถอนทีมฟุตบอลชาย U17 ออกจากการแข่งขันฟุตบอลโลกที่กาตาร์",
-      "อ้างคำแนะนำจากกระทรวงการต่างประเทศสหรัฐฯ เรื่องความเสี่ยงจากความขัดแย้งด้วยอาวุธ (ระดับการเตือนภัยที่ 3)",
-      "หวั่นผลกระทบจากกลุ่มฮูตีที่โจมตีสนามบินในภูมิภาค ซึ่งอาจบานปลายจนเป็นอันตรายต่อทีมงานและนักกีฬา"
-    ],
-    "link": "https://www.bbc.co.uk/sport/football/articles/c6y49yz77pppo?at_medium=RSS&at_campaign=rss",
-    "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/79aa/live/f81c7430-de6a-11f1-9115-cfe6d179af3a.jpg",
-    "published_at": "Thu, 12 Nov 2026 07:44:21 GMT",
-    "category_hint": "Football"
-  },
-  {
-    "id": 5,
-    "original_title": "Robertson set to make history but his hero Dalglish will always be King",
-    "thai_title": "เตรียมขึ้นแท่นตำนาน! แอนดี้ โรเบิร์ตสัน เตรียมทำลายสถิติสูงสุดตลอดกาลของเคนนี ดัลกลิช",
-    "tag": "Football",
-    "bullet_points": [
-      "แอนดี้ โรเบิร์ตสัน เตรียมทำลายสถิติติดทีมชาติสกอตแลนด์สูงสุดตลอดกาลที่ 103 นัด",
-      "สถิติเดิมของ เคนนี ดัลกลิช ยืนหยัดมายาวนานถึง 40 ปี",
-      "โรเบิร์ตสันเผยว่าตนเองไม่ใช่คนที่มั่นใจในตัวเองสูง แต่เป็นคนที่มักตั้งคำถามกับตัวเองเพื่อพัฒนาอยู่เสมอ"
-    ],
-    "link": "https://www.bbc.co.uk/sport/football/articles/cxe89dq16dp2o?at_medium=RSS&at_campaign=rss",
-    "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/e440/live/1b368480-de00-11f1-93e1-3b657b665bcf.jpg",
-    "published_at": "Thu, 12 Nov 2026 07:19:57 GMT",
-    "category_hint": "Football"
-  },
-  {
-    "id": 6,
-    "original_title": "England's Blues brothers - how the Bellinghams helped save Birmingham",
-    "thai_title": "สองพี่น้องตระกูลเบลลิงแฮม: จากเด็กปั้นเบอร์มิงแฮมสู่หน้าประวัติศาสตร์ทีมชาติอังกฤษ",
-    "tag": "Football",
-    "bullet_points": [
-      "จู๊ดและโจบ เบลลิงแฮม เป็นผลผลิตจากศูนย์ฝึกเยาวชนของเบอร์มิงแฮม ซิตี้ ที่สร้างความประทับใจให้กับแฟนบอลอย่างมากในช่วงที่ทีมประสบปัญหาการเงินและการหนีตกชั้น",
-      "แม้พี่น้องคู่นี้จะผ่านการลงเล่นให้เบอร์มิงแฮมรวมกัน 70 นัด แต่ยังไม่เคยได้ลงสนามพร้อมกันในทีมชุดใหญ่เนื่องจากจู๊ดออกจากสโมสรก่อนโจบจะขึ้นมา",
-      "หากโจบได้รับเลือกให้ลงสนามในเกมพบโครเอเชีย ทั้งคู่จะสร้างประวัติศาสตร์เป็นพี่น้องคู่แรกในรอบ 19 ปีที่ลงเล่นให้ทีมชาติอังกฤษชุดใหญ่ร่วมกัน"
-    ],
-    "link": "https://www.bbc.co.uk/sport/football/articles/cm1j3j20r2rzo?at_medium=RSS&at_campaign=rss",
-    "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/c945/live/c3116c40-dce0-11f1-a8e1-e3454837ffc6.png",
-    "published_at": "Thu, 12 Nov 2026 07:12:41 GMT",
-    "category_hint": "Football"
-  },
-  {
-    "id": 7,
-    "original_title": "How 'Barca way' continues despite big-name exits",
-    "thai_title": "วิถีแห่งบาร์ซ่าไม่เคยจางหาย: เจาะลึกเหตุผลที่บาร์เซโลนาคงความแข็งแกร่งแม้เสียสตาร์ดัง",
-    "tag": "Football",
-    "bullet_points": [
-      "บาร์เซโลนาคว้าชัย 3 นัดรวดในรอบแบ่งกลุ่ม ยิงรวม 19 ประตู",
-      "อาร์เซนอลประสบปัญหาฟอร์มตกในลีก แต่ยังมีลุ้นในเวทียุโรปหลังเก็บได้ 7 คะแนน",
-      "บาร์ซ่ายังคงรักษามาตรฐานแชมป์ไว้ได้แม้เสียสตาร์ดังอย่าง อเล็กเซีย ปูเตยาส และ ซัลมา ปารายูเอโล"
-    ],
-    "link": "https://www.bbc.co.uk/sport/football/articles/c5vg23nmgp2yo?at_medium=RSS&at_campaign=rss",
-    "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/64ad/live/0b486200-dddd-11f1-b465-b9821c2582d4.jpg",
-    "published_at": "Thu, 12 Nov 2026 06:41:09 GMT",
-    "category_hint": "Football"
-  },
-  {
-    "id": 8,
-    "original_title": "Kane's top 10 England moments - which was your favourite?",
-    "thai_title": "ย้อนรอย 10 โมเมนต์ประวัติศาสตร์ของ แฮร์รี่ เคน ในสีเสื้อ 'สิงโตคำราม' ก่อนก้าวขึ้นเป็นนักเตะที่ติดทีมชาติมากที่สุด",
-    "tag": "Football",
-    "bullet_points": [
-      "แฮร์รี่ เคน เตรียมสร้างสถิติลงสนามให้ทีมชาติอังกฤษมากที่สุดตลอดกาล (126 นัด)",
-      "เจ้าของสถิติดาวยิงสูงสุดทีมชาติอังกฤษ 91 ประตู จากการลงเล่น 125 นัด",
-      "เริ่มต้นการติดทีมชาติอย่างน่าประทับใจด้วยการทำประตูได้ใน 79 วินาทีแรกที่ลงสนาม"
-    ],
-    "link": "https://www.bbc.co.uk/sport/football/articles/c64g12w5zpjpo?at_medium=RSS&at_campaign=rss",
-    "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/134b/live/944d3be0-c3e6-11f1-badc-154546719036.jpg",
-    "published_at": "Thu, 12 Nov 2026 06:25:26 GMT",
-    "category_hint": "Football"
-  },
-  {
-    "id": 9,
-    "original_title": "Wales' James warns of Norwegian revenge in Oslo",
-    "thai_title": "แดน เจมส์ เตือนทัพมังกรแดง เตรียมรับมือความแค้นจากนอร์เวย์ในออสโล",
-    "tag": "Football",
-    "bullet_points": [
-      "แดน เจมส์ เตือนเวลส์ให้ระวังการแก้แค้นจากนอร์เวย์หลังเคยบุกไปชนะมาได้",
-      "ชัยชนะที่คาร์ดิฟฟ์ช่วยลดความกดดันให้กุนซือ เคร็ก เบลลามี",
-      "เวลส์ต้องการชัยชนะในออสโลเพื่ออันดับที่ดีขึ้นในรอบคัดเลือกยูโร 2028"
-    ],
-    "link": "https://www.bbc.co.uk/sport/football/articles/c623jl1kenvyo?at_medium=RSS&at_campaign=rss",
-    "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/cc28/live/64a5da40-ddeb-11f1-9204-cdcddf7d901c.jpg",
-    "published_at": "Thu, 12 Nov 2026 04:32:42 GMT",
-    "category_hint": "Football"
-  },
-  {
-    "id": 10,
-    "original_title": "Pochettino a decade in Man Utd's making - but Carrick deserves better",
-    "thai_title": "ทศวรรษแห่งความสัมพันธ์ที่รอคอย: เมาริซิโอ โปเช็ตติโน่ กับภารกิจกอบกู้อาณาจักรปีศาจแดง",
-    "tag": "Football",
-    "bullet_points": [
-      "โปเช็ตติโน่จ่อรับตำแหน่งกุนซือแมนฯ ยูไนเต็ด หลังมีข่าวเชื่อมโยงกันมานาน 10 ปี",
-      "สถานการณ์ทีมปัจจุบันย่ำแย่จากการบริหารงานที่ผิดพลาดสะสมมานาน",
-      "การจัดการเรื่องการปลดคาร์ริคของบอร์ดบริหารถูกวิจารณ์ว่าขาดความเป็นมืออาชีพ"
-    ],
-    "link": "https://www.bbc.co.uk/sport/football/articles/cwzd9pvjy426o?at_medium=RSS&at_campaign=rss",
-    "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/7299/live/2b5bc490-ddcb-11f1-9053-236ccb99630c.jpg",
-    "published_at": "Wed, 11 Nov 2026 12:58:17 GMT",
-    "category_hint": "Football"
-  },
-  {
-    "id": 11,
-    "original_title": "Pochettino ready to accept Man Utd offer to replace Carrick",
-    "thai_title": "ดีลใกล้ปิด! โปเช็ตติโน่พร้อมตอบรับคุมทัพปีศาจแดงแทนคาร์ริค",
-    "tag": "Football",
-    "bullet_points": [
-      "โปเช็ตติโน่เตรียมรับงานคุมแมนฯ ยูไนเต็ด",
-      "ยูไนเต็ดต้องจ่ายค่าฉีกสัญญา 10 ล้านดอลลาร์ให้ US Soccer",
-      "การประชุมตัดสินอนาคตของคาร์ริคมีกำหนดจัดขึ้นที่โมนาโกวันพุธนี้"
-    ],
-    "link": "https://www.bbc.co.uk/sport/football/articles/cqvg25pj36mvo?at_medium=RSS&at_campaign=rss",
-    "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/6766/live/d5551640-ddad-11f1-81e1-cf7317aa5114.jpg",
-    "published_at": "Wed, 11 Nov 2026 16:03:02 GMT",
-    "category_hint": "Football"
-  },
-  {
-    "id": 12,
-    "original_title": "Leader, role model, extraordinary - how Kane's 'fairytale' came true",
-    "thai_title": "ผู้นำและแบบอย่าง! เส้นทางเทพนิยายของ แฮร์รี่ เคน สู่การเป็นนักเตะที่ติดทีมชาติอังกฤษมากที่สุด",
-    "tag": "Football",
-    "bullet_points": [
-      "แฮร์รี่ เคน เตรียมสร้างประวัติศาสตร์ติดทีมชาติอังกฤษสูงสุด 126 นัด",
-      "เป็นเจ้าของสถิติดาวซัลโวสูงสุดตลอดกาลทีมชาติอังกฤษและเจ้าของรางวัล Ballon d'Or 2026",
-      "ได้รับการยกย่องจากกุนซือและตำนานทีมชาติในฐานะผู้เล่นที่ทรงคุณค่าและเป็นแบบอย่าง"
-    ],
-    "link": "https://www.bbc.co.uk/sport/football/articles/c60qkdj4lp34o?at_medium=RSS&at_campaign=rss",
-    "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/67bf/live/ee8455c0-dab2-11f1-8c3b-f3c0d6bd7c4f.png",
-    "published_at": "Wed, 11 Nov 2026 16:44:58 GMT",
-    "category_hint": "Football"
-  },
-  {
-    "id": 13,
-    "original_title": "Legally restrict heading a football in training, says MP",
-    "thai_title": "ส.ส. อังกฤษผลักดันกฎหมายควบคุมการโหม่งบอลในการซ้อม หวั่นความเสี่ยงโรคสมองเสื่อม",
-    "tag": "Football",
-    "bullet_points": [
-      "นักฟุตบอลเสี่ยงเสียชีวิตจากโรคสมองเสื่อมมากกว่าคนปกติ 3.5 เท่า",
-      "ส.ส. เกรแฮม มอร์ริส ยื่นญัตติเข้าสภาเพื่อควบคุมการโหม่งบอลในการซ้อม",
-      "เรียกร้องการยอมรับ CTE เป็นปัญหาสาธารณสุขและสร้างมาตรการคุ้มครองผู้เล่นระดับชาติ"
-    ],
-    "link": "https://www.bbc.co.uk/sport/football/articles/cm1ewpjyy3dzo?at_medium=RSS&at_campaign=rss",
-    "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/2766/live/008813c0-ddf5-11f1-8445-15eb55286f71.jpg",
-    "published_at": "Wed, 11 Nov 2026 17:38:18 GMT",
-    "category_hint": "Football"
-  },
-  {
-    "id": 14,
-    "original_title": "Assessing the reasons for Man City's decline in form under Maresca",
-    "thai_title": "วิเคราะห์วิกฤตศรัทธา แมนฯ ซิตี้ ฟอร์มดิ่งภายใต้การคุมทีมของ มาเรสก้า",
-    "tag": "Football",
-    "bullet_points": [
-      "แมนฯ ซิตี้ แพ้ 3 นัดรวดหลังออกสตาร์ทฤดูกาลด้วยชัยชนะ 7 นัดติดต่อกัน",
-      "ความไม่แน่นอนจากคดีความทางการเงินของสโมสรส่งผลต่อจิตใจนักเตะ",
-      "ผู้เชี่ยวชาญชี้ว่าความเชื่อมั่นของทีมลดลงเนื่องจากการพ่ายแพ้ซ้ำซาก"
-    ],
-    "link": "https://www.bbc.co.uk/sport/football/articles/cw30e0yz0p04o?at_medium=RSS&at_campaign=rss",
-    "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/4c72/live/a41350a0-dcfa-11f1-9ef0-4b5930e2f80e.jpg",
-    "published_at": "Wed, 11 Nov 2026 11:47:09 GMT",
-    "category_hint": "Football"
-  },
-  {
-    "id": 15,
-    "original_title": "Arsenal join Scott chase - Thursday's gossip",
-    "thai_title": "อาร์เซน่อลเปิดฉากล่าตัว อเล็กซ์ สก็อตต์ ด้านแมนฯ ยูไนเต็ดเล็งเสริมแนวรับเพิ่ม",
-    "tag": "Football",
-    "bullet_points": [
-      "อาร์เซน่อลร่วมวงล่าตัว อเล็กซ์ สก็อตต์",
-      "แมนฯ ยูไนเต็ด สนใจดึง เนธาน คอลลินส์ และ คาลวิน บาสซี่ย์ เสริมแนวรับ",
-      "มาร์ติน ซูบิเมนดี้ ยืนยันความสุขในลอนดอนแม้ตกเป็นข่าวกับหลายสโมสรยักษ์ใหญ่"
-    ],
-    "link": "https://www.bbc.co.uk/sport/football/articles/c62l51xyl98no?at_medium=RSS&at_campaign=rss",
-    "cover_image_url": "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/2955/live/0bc2bd20-de14-11f1-b441-2b33b063138f.png",
-    "published_at": "Wed, 11 Nov 2026 21:38:01 GMT",
-    "category_hint": "Football"
   }
 ]
