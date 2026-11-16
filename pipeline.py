@@ -1,19 +1,20 @@
 """
 Automated News Aggregator & Reader (GitHub Native)
 Feeds:
-1. Football: BBC Sport Football (https://feeds.bbci.co.uk/sport/football/rss.xml)
+1. Football: BBC Sport Premier League (https://feeds.bbci.co.uk/sport/football/premier-league/rss.xml)
 2. Technology: The Verge ONLY (https://www.theverge.com/rss/...)
-3. Gaming: IGN Japan Games (https://jp.ign.com/games.xml)
-4. Review: IGN Japan Game Reviews (https://jp.ign.com/review.xml)
+3. Gadgets: Mashable SEA Gadgets (https://sea.mashable.com/gadgets.xml)
+4. Gaming: IGN Japan Games (https://jp.ign.com/games.xml)
+5. Review: IGN Japan Game Reviews (https://jp.ign.com/review.xml)
 
 Production Features:
-- 30 Fresh Articles PER Category (120 items total) with Database Backfill on feed outage.
+- 30 Fresh Articles PER Category (150 items total) with Database Backfill on feed outage.
 - Parallel Multi-Feed Fetching with per-feed fault isolation and strict HTTP timeouts.
 - GUID + Canonical URL Deduplication (prevents redundant Gemini re-translations).
-- Category-Specific Translation Prompts (English & Japanese -> Thai across 4 categories).
+- Category-Specific Translation Prompts (English & Japanese -> Thai across 5 categories).
 - Thread-safe Rate Limiter + Exponential Backoff with Random Jitter for Gemini API Free Tier.
 - Normalized UTC Timestamps (`published_ts`, `published_at`, `published_th`) and strict newest-first sorting.
-- High-performance Frontend with 16:9 covers, review scores, inline magazine screenshots, and YouTube embeds.
+- Minimal UI with custom logo, font size controls, 16:9 covers, inline screenshots, and YouTube embeds.
 """
 import calendar
 import concurrent.futures
@@ -113,15 +114,16 @@ CURATED_GAMING_COVERS = [
 CATEGORY_FALLBACK_COVERS = {
     "Football": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1200&q=80",
     "Technology": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80",
+    "Gadgets": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80",
     "Gaming": "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&q=80",
     "Review": "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&q=80",
 }
 
-CATEGORIES_ORDER = ["Football", "Technology", "Gaming", "Review"]
+CATEGORIES_ORDER = ["Football", "Technology", "Gadgets", "Gaming", "Review"]
 
 CATEGORIES_CONFIG = {
     "Football": [
-        "https://feeds.bbci.co.uk/sport/football/rss.xml",
+        "https://feeds.bbci.co.uk/sport/football/premier-league/rss.xml",
     ],
     "Technology": [
         "https://www.theverge.com/rss/index.xml",
@@ -131,6 +133,9 @@ CATEGORIES_CONFIG = {
         "https://www.theverge.com/rss/reviews/index.xml",
         "https://www.theverge.com/rss/gadgets/index.xml",
         "https://www.theverge.com/rss/creators/index.xml",
+    ],
+    "Gadgets": [
+        "https://sea.mashable.com/gadgets.xml",
     ],
     "Gaming": [
         "https://jp.ign.com/games.xml",
@@ -152,18 +157,22 @@ SYSTEM_PROMPT = """คุณคือนักข่าวและบรรณ�
    - แปลพาดหัวข่าวภาษาไทยให้กระชับ ดึงดูด ตรงประเด็น ทับศัพท์ถูกต้องตาม Fact ห้ามคืนค่าเป็นภาษาต้นฉบับล้วน
 4. ทับศัพท์ชื่อเฉพาะ สโมสร นักกีฬา แบรนด์ ฮาร์ดแวร์ โมเดล AI และชื่อเกมสากล ให้ถูกต้องตามหลักสากล
 
-กฎแท็ก (Tag): ให้ระบุเป็นหนึ่งในสี่หมวดนี้เท่านั้น: "Football", "Technology", "Gaming", "Review"
+กฎแท็ก (Tag): ให้ระบุเป็นหนึ่งในห้าหมวดนี้เท่านั้น: "Football", "Technology", "Gadgets", "Gaming", "Review"
 """
 
 CATEGORY_PROMPTS = {
-    "Football": """บทบาทเฉพาะหมวดหมู่ (BBC Football):
-- คุณคือบรรณาธิการข่าวฟุตบอลต่างประเทศมืออาชีพ เชี่ยวชาญพรีเมียร์ลีก ยูฟ่าแชมเปียนส์ลีก และฟุตบอลยุโรป
+    "Football": """บทบาทเฉพาะหมวดหมู่ (BBC Premier League):
+- คุณคือบรรณาธิการข่าวฟุตบอลพรีเมียร์ลีกอังกฤษมืออาชีพ เชี่ยวชาญข่าวสโมสร นักเตะ ตลาดซื้อขาย และสถิติฟุตบอลพรีเมียร์ลีก
 - ใช้สำนวนข่าวกีฬาฟุตบอลไทยที่เป็นธรรมชาติ แม่นยำ ไม่แปลตรงตัวแบบแข็งกระด้าง (เช่น clean sheet = คลีนชีต, transfer window = ตลาดซื้อขายนักเตะ, cap = การลงสนามรับใช้ทีมชาติ, draw = ผลเสมอ/เสมอกัน, manager/boss = กุนซือ/ผู้จัดการทีม)
 - ทับศัพท์ชื่อนักเตะ สโมสร ผู้จัดการทีม และสนามแข่งขันตามมาตรฐานสื่อกีฬาชั้นนำของไทย เก็บทุกคำพูดสัมภาษณ์ (Direct quotes) และสถิติตัวเลขครบถ้วน""",
     "Technology": """บทบาทเฉพาะหมวดหมู่ (The Verge - Technology & AI):
 - คุณคือบรรณาธิการข่าวเทคโนโลยีและนวัตกรรมระดับแนวหน้า สไตล์ The Verge ภาษาไทย
 - ใช้ภาษาที่ทันสมัย คมชัด ลึกซึ้ง คงคำศัพท์เทคนิคที่วงการไอทีไทยนิยมใช้ทับศัพท์หรือคงรูปภาษาอังกฤษไว้ตามความเหมาะสม (เช่น AI, LLM, API, SDK, GPU, NPU, Chipset, Benchmark, Cloud, Open-source, Firmware, OS)
 - ระบุชื่อบริษัท รุ่นผลิตภัณฑ์ สเปก ราคา และบริบททางธุรกิจหรือนโยบายเทคโนโลยีอย่างแม่นยำ""",
+    "Gadgets": """บทบาทเฉพาะหมวดหมู่ (Mashable SEA - Gadgets & Consumer Tech):
+- คุณคือบรรณาธิการข่าวแกดเจ็ตและอุปกรณ์อิเล็กทรอนิกส์มืออาชีพ แปลข่าวจาก Mashable SEA เป็นภาษาไทย
+- ใช้ภาษาที่อ่านสนุก ทันสมัย เข้าใจง่าย คงชื่อแบรนด์และชื่อรุ่นสินค้าภาษาอังกฤษไว้เสมอ (เช่น Apple, iPhone, Samsung, Google, Sennheiser, Sony, Garmin)
+- เก็บรายละเอียดฟีเจอร์เด่น สเปกการใช้งาน ราคา วันวางจำหน่าย และความน่าสนใจของอุปกรณ์อย่างครบถ้วน""",
     "Gaming": """บทบาทเฉพาะหมวดหมู่ (IGN Japan - ข่าวเกม):
 - คุณคือบรรณาธิการสื่อเกมมืออาชีพ แปลข่าวเกมจาก IGN Japan (ภาษาญี่ปุ่น) เป็นภาษาไทย
 - แปลงชื่อเกมจากภาษาญี่ปุ่น/คาตาคานะ เป็นชื่อภาษาอังกฤษสากลที่เกมเมอร์ไทยคุ้นเคย (เช่น 『ゼルダの伝説 時のオカリナ』 -> The Legend of Zelda: Ocarina of Time, 『クレイジータクシー：ワールドツアー』 -> Crazy Taxi: World Tour) ห้ามแปลชื่อเกมเป็นภาษาไทยแบบตรงตัว
@@ -307,8 +316,8 @@ def make_hd_image_url(url: str) -> str:
     # Upgrade BBC thumbnails (/240/, /320/, /480/ -> /1200/)
     url = re.sub(r"/(standard|branded_sport|branded_news)/\d+/", r"/\1/1200/", url)
     url = re.sub(r"/ic/\d+x\d+/", r"/ic/1024x576/", url)
-    # Upgrade IGN Japan thumbnails (sm.ign.com/t/ign_jp/...280.jpg or .640.jpg -> .1200.jpg)
-    if "sm.ign.com/t/" in url:
+    # Upgrade IGN Japan & Mashable SEA thumbnails (sm.*/t/...280.jpg -> .1200.jpg)
+    if "sm.ign.com/t/" in url or "sm.mashable.com/t/" in url:
         url = re.sub(r"\.\d+\.(jpg|jpeg|png|webp)(\?.*)?$", r".1200.\1", url, flags=re.IGNORECASE)
     # Upgrade Eurogamer (assetsio.gnwcdn.com)
     if "assetsio.gnwcdn.com" in url:
@@ -650,6 +659,8 @@ def call_gemini(item_info: dict) -> dict:
             tag = parsed.get("tag", "").strip()
             if "rev" in tag.lower():
                 parsed["tag"] = "Review"
+            elif "gadget" in tag.lower():
+                parsed["tag"] = "Gadgets"
             elif "game" in tag.lower():
                 parsed["tag"] = "Gaming"
             elif "tech" in tag.lower():
@@ -695,12 +706,13 @@ def sanitize_article(item: dict) -> dict:
 
 
 def update_ui_files(news_list: list[dict]):
-    """Update README.md and index.html with 4 tabs, 16:9 covers, inline screenshots, and video embeds."""
+    """Update README.md and index.html with minimal header, custom logo, 5 categories, font controls, and media layout."""
     clean_news = [sanitize_article(x) for x in news_list]
     now_th = to_thailand_time(datetime.datetime.now(datetime.timezone.utc))
 
     football_count = sum(1 for x in clean_news if x.get("tag") == "Football")
     tech_count = sum(1 for x in clean_news if x.get("tag") == "Technology")
+    gadgets_count = sum(1 for x in clean_news if x.get("tag") == "Gadgets")
     gaming_count = sum(1 for x in clean_news if x.get("tag") == "Gaming")
     review_count = sum(1 for x in clean_news if x.get("tag") == "Review")
 
@@ -708,8 +720,8 @@ def update_ui_files(news_list: list[dict]):
     readme_lines = [
         "# ⚡ Pure News — Automated News & Game Reviews Aggregator",
         "",
-        "> **Live Automated News Reader:** Auto-scraped from BBC Sport Football, The Verge (100%), IGN Japan Games, and IGN Japan Reviews.",
-        f"> *อัปเดตล่าสุด: `{now_th}`* • *รวมทั้งหมด: `{len(clean_news)} รายการ`* (`⚽ Football: {football_count}` | `⚡ Tech: {tech_count}` | `🎮 IGN Games: {gaming_count}` | `⭐ Reviews: {review_count}`)",
+        "> **Live Automated News Reader:** Auto-scraped from BBC Premier League, The Verge, Mashable SEA Gadgets, IGN Japan Games, and IGN Japan Reviews.",
+        f"> *อัปเดตล่าสุด: `{now_th}`* • *รวมทั้งหมด: `{len(clean_news)} รายการ`* (`⚽ Premier League: {football_count}` | `⚡ Tech: {tech_count}` | `📱 Gadgets: {gadgets_count}` | `🎮 IGN Games: {gaming_count}` | `⭐ Reviews: {review_count}`)",
         "",
         "### 🌐 [กดที่นี่เพื่อเปิดหน้าเว็บอ่านข่าว (GitHub Pages)](https://puresinghara.github.io/pure-news/)",
         "",
@@ -743,8 +755,8 @@ def update_ui_files(news_list: list[dict]):
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pure News // รวมข่าวเด่น &amp; รีวิวเกม 4 หมวดหมู่</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+  <title>Pure News</title>
+  <link rel="icon" type="image/jpeg" href="logo.jpg">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700;800&family=Prompt:wght@300;400;500;600;700&display=swap');
@@ -754,44 +766,26 @@ def update_ui_files(news_list: list[dict]):
 </head>
 <body class="bg-[#09090b] text-zinc-100 min-h-screen antialiased selection:bg-[#ff3366] selection:text-white">
 
-  <!-- Top Announcement Bar -->
-  <div class="border-b border-zinc-800 bg-zinc-950 px-4 py-2 text-xs font-mono flex items-center justify-between text-zinc-400">
-    <div class="flex items-center gap-2">
-      <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-      <span class="text-zinc-200 font-semibold">// LIVE FEED:</span>
-      <span class="hidden sm:inline">BBC FOOTBALL ({football_count}) • THE VERGE ({tech_count}) • IGN GAMES ({gaming_count}) • REVIEWS ({review_count})</span>
-      <span class="text-emerald-400 font-bold px-1.5 py-0.5 bg-emerald-500/10 rounded border border-emerald-500/30">ONLINE</span>
-    </div>
-    <div class="flex items-center gap-4 text-[11px]">
-      <span id="lastUpdatedLabel" class="text-zinc-400 font-mono hidden md:inline">เวลาไทย: {now_th}</span>
-      <span class="text-emerald-400 font-bold">GEMINI 3.1 FLASH-LITE</span>
-    </div>
-  </div>
-
-  <!-- Clean Minimal Header (Pure News + Category Tabs) -->
+  <!-- Clean Minimal Header (Logo + Pure News + Category Tabs) -->
   <header class="border-b border-zinc-800 bg-[#0c0c0e]/95 sticky top-0 z-40 backdrop-blur-md">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-4">
       
       <!-- Brand Logo -->
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-md bg-gradient-to-tr from-[#ff3366] to-[#00e5ff] flex items-center justify-center font-black text-black text-xl font-mono shadow-[0_0_20px_rgba(255,51,102,0.4)]">
-          PN
-        </div>
-        <div>
-          <h1 class="brand-title text-2xl md:text-3xl font-extrabold uppercase text-white tracking-wider flex items-center gap-2 leading-none">
-            PURE NEWS
-          </h1>
-          <p class="text-[11px] font-mono text-zinc-400 uppercase tracking-widest mt-0.5">ข่าวเด่น &amp; รีวิวเกม 4 หมวด • อัปเดตทุก 1 ชั่วโมง</p>
-        </div>
+        <img src="logo.jpg" alt="Pure News" class="w-10 h-10 rounded-md object-cover border border-zinc-700/80 shadow-sm bg-[#faf7f2]">
+        <h1 class="brand-title text-2xl md:text-3xl font-extrabold uppercase text-white tracking-wider leading-none">
+          PURE NEWS
+        </h1>
       </div>
 
       <!-- Clean Category Filter Tabs -->
       <div class="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
-        <button onclick="filterTag('ALL')" id="filterALL" class="px-3.5 py-1.5 bg-white text-black font-mono font-bold text-xs rounded transition whitespace-nowrap">ALL ({len(clean_news)})</button>
-        <button onclick="filterTag('Football')" id="filterFootball" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-mono text-xs rounded transition whitespace-nowrap">⚽ BBC FOOTBALL ({football_count})</button>
-        <button onclick="filterTag('Technology')" id="filterTechnology" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-cyan-400 font-mono text-xs rounded transition whitespace-nowrap">⚡ THE VERGE ({tech_count})</button>
-        <button onclick="filterTag('Gaming')" id="filterGaming" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-amber-400 font-mono text-xs rounded transition whitespace-nowrap">🎮 IGN GAMES ({gaming_count})</button>
-        <button onclick="filterTag('Review')" id="filterReview" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-purple-400 font-mono text-xs rounded transition whitespace-nowrap">⭐ GAME REVIEWS ({review_count})</button>
+        <button onclick="filterTag('ALL')" id="filterALL" class="px-3.5 py-1.5 bg-white text-black font-mono font-bold text-xs rounded transition whitespace-nowrap">ALL</button>
+        <button onclick="filterTag('Football')" id="filterFootball" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-mono text-xs rounded transition whitespace-nowrap">⚽ PREMIER LEAGUE</button>
+        <button onclick="filterTag('Technology')" id="filterTechnology" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-cyan-400 font-mono text-xs rounded transition whitespace-nowrap">⚡ THE VERGE</button>
+        <button onclick="filterTag('Gadgets')" id="filterGadgets" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-emerald-400 font-mono text-xs rounded transition whitespace-nowrap">📱 GADGETS</button>
+        <button onclick="filterTag('Gaming')" id="filterGaming" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-amber-400 font-mono text-xs rounded transition whitespace-nowrap">🎮 IGN GAMES</button>
+        <button onclick="filterTag('Review')" id="filterReview" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-purple-400 font-mono text-xs rounded transition whitespace-nowrap">⭐ GAME REVIEWS</button>
         <button onclick="refreshLiveNews(this)" title="ดึงข้อมูลข่าวล่าสุด" class="p-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 rounded transition ml-1 shrink-0">
           <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
         </button>
@@ -812,12 +806,19 @@ def update_ui_files(news_list: list[dict]):
     <div class="w-full max-w-3xl bg-[#0c0c0e] sm:border sm:border-zinc-800 sm:rounded-lg shadow-2xl overflow-hidden my-0 sm:my-auto max-h-screen sm:max-h-[92vh] flex flex-col">
       
       <!-- Modal Header (Sticky) -->
-      <div class="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-[#0e0e11] sticky top-0 z-10">
-        <div class="flex items-center gap-2">
-          <span id="modalTag" class="px-2.5 py-0.5 rounded text-xs font-mono font-bold uppercase tracking-wider bg-[#ff3366]/15 text-[#ff3366] border border-[#ff3366]/30"></span>
-          <span id="modalDate" class="text-xs font-mono text-zinc-400"></span>
+      <div class="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-[#0e0e11] sticky top-0 z-10 gap-3">
+        <div class="flex items-center gap-2 min-w-0">
+          <span id="modalTag" class="px-2.5 py-0.5 rounded text-xs font-mono font-bold uppercase tracking-wider bg-[#ff3366]/15 text-[#ff3366] border border-[#ff3366]/30 shrink-0"></span>
+          <span id="modalDate" class="text-xs font-mono text-zinc-400 truncate"></span>
         </div>
-        <button onclick="closeModal()" aria-label="Close" class="w-8 h-8 rounded-full bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center text-xl transition leading-none">&times;</button>
+        <div class="flex items-center gap-2 shrink-0">
+          <div class="flex items-center bg-zinc-900 border border-zinc-800 rounded-full p-0.5">
+            <button onclick="changeFontSize(-1)" title="ลดขนาดตัวอักษร" class="px-2.5 py-1 text-xs font-mono font-bold text-zinc-300 hover:text-white hover:bg-zinc-800 rounded-full transition">A-</button>
+            <span id="fontSizeLabel" class="text-[11px] font-mono text-zinc-500 px-1.5 select-none">100%</span>
+            <button onclick="changeFontSize(1)" title="เพิ่มขนาดตัวอักษร" class="px-2.5 py-1 text-xs font-mono font-bold text-zinc-300 hover:text-white hover:bg-zinc-800 rounded-full transition">A+</button>
+          </div>
+          <button onclick="closeModal()" aria-label="Close" class="w-8 h-8 rounded-full bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center text-xl transition leading-none">&times;</button>
+        </div>
       </div>
 
       <!-- Modal Body (Always resets to scrollTop = 0) -->
@@ -887,13 +888,50 @@ def update_ui_files(news_list: list[dict]):
     const CATEGORY_FALLBACKS = {{
       Football: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1200&q=80',
       Technology: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80',
+      Gadgets: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80',
       Gaming: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&q=80',
       Review: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&q=80'
     }};
 
+    const FONT_STEPS = [
+      {{ pct: '85%', body: '0.875rem', bullet: '0.8125rem', title: '1.25rem' }},
+      {{ pct: '100%', body: '1rem', bullet: '0.875rem', title: '1.5rem' }},
+      {{ pct: '115%', body: '1.125rem', bullet: '1rem', title: '1.65rem' }},
+      {{ pct: '130%', body: '1.25rem', bullet: '1.0625rem', title: '1.8rem' }},
+      {{ pct: '150%', body: '1.4rem', bullet: '1.15rem', title: '2rem' }}
+    ];
+    let currentFontIdx = 1;
+    try {{
+      const savedIdx = parseInt(localStorage.getItem('pureNewsFontIdx') || '1', 10);
+      if (!isNaN(savedIdx) && savedIdx >= 0 && savedIdx < FONT_STEPS.length) {{
+        currentFontIdx = savedIdx;
+      }}
+    }} catch (e) {{}}
+
     let allNews = {json_data_str};
     let currentTag = 'ALL';
     let isModalOpen = false;
+
+    function applyFontSize() {{
+      const step = FONT_STEPS[currentFontIdx] || FONT_STEPS[1];
+      const fullEl = document.getElementById('modalFullContent');
+      const bulletEl = document.getElementById('modalBullets');
+      const titleEl = document.getElementById('modalTitle');
+      const labelEl = document.getElementById('fontSizeLabel');
+      if (fullEl) fullEl.style.fontSize = step.body;
+      if (bulletEl) bulletEl.style.fontSize = step.bullet;
+      if (titleEl) titleEl.style.fontSize = step.title;
+      if (labelEl) labelEl.textContent = step.pct;
+    }}
+
+    function changeFontSize(delta) {{
+      const next = Math.max(0, Math.min(FONT_STEPS.length - 1, currentFontIdx + delta));
+      if (next !== currentFontIdx) {{
+        currentFontIdx = next;
+        try {{ localStorage.setItem('pureNewsFontIdx', String(currentFontIdx)); }} catch (e) {{}}
+        applyFontSize();
+      }}
+    }}
 
     function escapeHtml(str) {{
       if (str === null || str === undefined) return '';
@@ -927,23 +965,6 @@ def update_ui_files(news_list: list[dict]):
       }}
     }}
 
-    function updateFilterCounts() {{
-      const fb = allNews.filter(x => x.tag === 'Football').length;
-      const tech = allNews.filter(x => x.tag === 'Technology').length;
-      const gm = allNews.filter(x => x.tag === 'Gaming').length;
-      const rev = allNews.filter(x => x.tag === 'Review').length;
-      const elAll = document.getElementById('filterALL');
-      const elFb = document.getElementById('filterFootball');
-      const elTech = document.getElementById('filterTechnology');
-      const elGm = document.getElementById('filterGaming');
-      const elRev = document.getElementById('filterReview');
-      if (elAll) elAll.textContent = `ALL (${{allNews.length}})`;
-      if (elFb) elFb.textContent = `⚽ BBC FOOTBALL (${{fb}})`;
-      if (elTech) elTech.textContent = `⚡ THE VERGE (${{tech}})`;
-      if (elGm) elGm.textContent = `🎮 IGN GAMES (${{gm}})`;
-      if (elRev) elRev.textContent = `⭐ GAME REVIEWS (${{rev}})`;
-    }}
-
     async function refreshLiveNews(btn) {{
       const svg = btn ? btn.querySelector('svg') : null;
       if (svg) svg.classList.add('animate-spin');
@@ -953,7 +974,6 @@ def update_ui_files(news_list: list[dict]):
           const data = await r.json();
           if (Array.isArray(data) && data.length > 0) {{
             allNews = data;
-            updateFilterCounts();
             render();
           }}
         }}
@@ -966,7 +986,7 @@ def update_ui_files(news_list: list[dict]):
 
     function filterTag(tag) {{
       currentTag = tag;
-      ['ALL', 'Football', 'Technology', 'Gaming', 'Review'].forEach(t => {{
+      ['ALL', 'Football', 'Technology', 'Gadgets', 'Gaming', 'Review'].forEach(t => {{
         const btn = document.getElementById('filter' + t);
         if (btn) {{
           if (t === tag) {{
@@ -975,6 +995,7 @@ def update_ui_files(news_list: list[dict]):
             let textColor = 'text-zinc-300';
             if (t === 'Gaming') textColor = 'text-amber-400';
             if (t === 'Technology') textColor = 'text-cyan-400';
+            if (t === 'Gadgets') textColor = 'text-emerald-400';
             if (t === 'Review') textColor = 'text-purple-400';
             btn.className = `px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 ${{textColor}} font-mono text-xs rounded transition whitespace-nowrap`;
           }}
@@ -1009,6 +1030,7 @@ def update_ui_files(news_list: list[dict]):
 
         let tagColor = 'text-[#ff3366]';
         if (item.tag === 'Technology') tagColor = 'text-cyan-400';
+        else if (item.tag === 'Gadgets') tagColor = 'text-emerald-400';
         else if (item.tag === 'Gaming') tagColor = 'text-amber-400';
         else if (item.tag === 'Review') tagColor = 'text-purple-400';
 
@@ -1152,6 +1174,7 @@ def update_ui_files(news_list: list[dict]):
       }}
 
       document.getElementById('modalSource').href = item.link || '#';
+      applyFontSize();
       
       // Open and pin scroll position at the top cover image
       const modalOverlay = document.getElementById('modalOverlay');
@@ -1277,6 +1300,7 @@ def fetch_category_feeds(cat: str, feeds: list[str], now_utc: datetime.datetime)
     candidates = []
     seen_guids = set()
     seen_links = set()
+    seen_titles = set()
 
     max_workers = min(6, max(1, len(feeds)))
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
@@ -1291,10 +1315,13 @@ def fetch_category_feeds(cat: str, feeds: list[str], now_utc: datetime.datetime)
             for e in entries:
                 g = e["guid"]
                 cl = e["canonical_link"]
-                if g in seen_guids or cl in seen_links:
+                tl = (e.get("title") or "").strip().lower()
+                if g in seen_guids or cl in seen_links or (tl and tl in seen_titles):
                     continue
                 seen_guids.add(g)
                 seen_links.add(cl)
+                if tl:
+                    seen_titles.add(tl)
                 candidates.append(e)
 
     return candidates
@@ -1311,6 +1338,8 @@ def normalize_existing_item(it: dict, now_utc: datetime.datetime) -> dict | None
         tag = "Football"
     elif "tech" in tag.lower():
         tag = "Technology"
+    elif "gadget" in tag.lower():
+        tag = "Gadgets"
     elif "rev" in tag.lower():
         tag = "Review"
     elif "game" in tag.lower() or "gaming" in tag.lower():
@@ -1386,6 +1415,8 @@ def load_existing_database(now_utc: datetime.datetime) -> tuple[list[dict], dict
         if cat in ("Gaming", "Review") and "jp.ign.com" not in it["link"].lower():
             continue
         if cat == "Technology" and "theverge.com" not in it["link"].lower():
+            continue
+        if cat == "Gadgets" and "mashable.com" not in it["link"].lower():
             continue
         normalized_items.append(it)
         existing_by_guid[it["guid"]] = it
@@ -1478,6 +1509,8 @@ def run():
         for item in selected_candidates:
             link = item["link"]
             if cat == "Technology" and "theverge.com" not in link.lower():
+                continue
+            if cat == "Gadgets" and "mashable.com" not in link.lower():
                 continue
             if cat in ("Gaming", "Review") and "jp.ign.com" not in link.lower():
                 continue
