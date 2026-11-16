@@ -145,6 +145,150 @@ CATEGORIES_CONFIG = {
     ],
 }
 
+VERGE_SUBTAG_MAP = {
+    "ai-artificial-intelligence": "AI",
+    "tech": "TECH",
+    "entertainment": "ENTERTAINMENT",
+    "science": "SCIENCE",
+    "gadgets": "GADGETS",
+    "policy": "POLICY",
+    "transportation": "TRANSPORTATION",
+    "reviews": "REVIEWS",
+    "creators": "CREATORS",
+    "column": "COLUMN",
+    "podcast": "PODCAST",
+    "games": "GAMING",
+    "gaming": "GAMING",
+}
+
+CLUB_SUBTAG_PATTERNS = [
+    (r"\bman(?:chester)?\s*utd\b|\bmanchester\s+united\b|\bold\s+trafford\b", "MAN UTD"),
+    (r"\bliverpool\b|\banfield\b|\bvan\s+dijk\b|\bsalah\b", "LIVERPOOL"),
+    (r"\barsenal\b|\barteta\b|\bgunners\b|\bsaka\b", "ARSENAL"),
+    (r"\bman(?:chester)?\s*city\b|\bguardiola\b|\bhaaland\b", "MAN CITY"),
+    (r"\bchelsea\b|\bstamford\s+bridge\b|\bpalmer\b", "CHELSEA"),
+    (r"\btottenham\b|\bspurs\b", "SPURS"),
+    (r"\bnewcastle\b|\bmagpies\b", "NEWCASTLE"),
+    (r"\baston\s+villa\b|\bvilla\b", "ASTON VILLA"),
+    (r"\beverton\b|\bgoodison\b", "EVERTON"),
+    (r"\bwest\s+ham\b|\bhammers\b", "WEST HAM"),
+    (r"\bcrystal\s+palace\b", "CRYSTAL PALACE"),
+    (r"\bbrighton\b", "BRIGHTON"),
+    (r"\bfulham\b", "FULHAM"),
+    (r"\bbournemouth\b", "BOURNEMOUTH"),
+    (r"\bbrentford\b", "BRENTFORD"),
+    (r"\bnottingham\s+forest\b|\bforest\b", "FOREST"),
+    (r"\bwolves\b|\bwolverhampton\b", "WOLVES"),
+    (r"\bleicester\b", "LEICESTER"),
+    (r"\bsouthampton\b", "SOUTHAMPTON"),
+    (r"\bipswich\b", "IPSWICH"),
+    (r"\bleeds\b", "LEEDS"),
+    (r"\bsunderland\b", "SUNDERLAND"),
+    (r"\bburnley\b", "BURNLEY"),
+    (r"\bengland\b|\btuchel\b", "ENGLAND"),
+]
+
+GAME_SUBTAG_PATTERNS = [
+    (r"zelda|ocarina", "ZELDA"),
+    (r"metal\s*gear", "METAL GEAR"),
+    (r"monster\s*hunter", "MONSTER HUNTER"),
+    (r"fire\s*emblem", "FIRE EMBLEM"),
+    (r"call\s*of\s*duty", "CALL OF DUTY"),
+    (r"grand\s*theft\s*auto|gta", "GTA"),
+    (r"final\s*fantasy", "FINAL FANTASY"),
+    (r"elder\s*scrolls", "ELDER SCROLLS"),
+    (r"dragon.?s\s*dogma", "DRAGON'S DOGMA"),
+    (r"silent\s*hill", "SILENT HILL"),
+    (r"resident\s*evil|biohazard", "RESIDENT EVIL"),
+    (r"elden\s*ring", "ELDEN RING"),
+    (r"onimusha", "ONIMUSHA"),
+    (r"castlevania", "CASTLEVANIA"),
+    (r"ace\s*combat", "ACE COMBAT"),
+    (r"gears\s*of\s*war", "GEARS OF WAR"),
+    (r"minecraft", "MINECRAFT"),
+    (r"marvel|wolverine", "MARVEL"),
+    (r"houkai|honkai|star\s*rail", "HONKAI: STAR RAIL"),
+    (r"persona", "PERSONA"),
+    (r"switch[\s-]*2", "SWITCH 2"),
+    (r"\bps5\b|playstation[\s-]*5", "PS5"),
+    (r"\bxbox\b", "XBOX"),
+    (r"steam-frame|google-pixel|gaming-device", "HARDWARE"),
+]
+
+
+def extract_sub_tag(item: dict) -> str:
+    """Derive a clean uppercase sub-category tag from URL path and article title/bullets."""
+    cat = item.get("tag") or item.get("category_hint") or ""
+    link = item.get("link", "")
+    title_raw = (item.get("original_title") or item.get("title") or "") + " " + (item.get("thai_title") or "")
+    title = title_raw.lower()
+    bullets_txt = " ".join(item.get("bullet_points") or [])[:400].lower()
+
+    seg = ""
+    if link:
+        try:
+            parts = urllib.parse.urlsplit(link).path.strip("/").split("/")
+            seg = parts[0].lower() if parts and parts[0] else ""
+        except Exception:
+            seg = ""
+
+    if cat == "Technology":
+        return VERGE_SUBTAG_MAP.get(seg, "TECH")
+
+    if cat == "Gadgets":
+        if seg == "smart-home":
+            return "SMART HOME"
+        if seg == "mobile":
+            return "MOBILE"
+        if seg == "tablets":
+            return "TABLETS"
+        if seg == "earbuds":
+            return "EARBUDS"
+        body = f"{seg} {title}"
+        if any(k in body for k in ["airpod", "earbud", "headphone", "speaker", "audio"]):
+            return "AUDIO"
+        if any(k in body for k in ["glasses", "watch", "ring", "wearable", "garmin", "fitbit"]):
+            return "WEARABLES"
+        if any(k in body for k in ["iphone", "galaxy", "pixel", "smartphone", "android", "phone"]):
+            return "MOBILE"
+        if any(k in body for k in ["ipad", "tablet", "kindle"]):
+            return "TABLETS"
+        if any(k in body for k in ["macbook", "laptop", "pc", "surface"]):
+            return "LAPTOPS"
+        if any(k in body for k in ["tv", "home", "vacuum", "security", "wifi", "router"]):
+            return "SMART HOME"
+        return "GADGETS"
+
+    if cat == "Football":
+        body = f"{title} {bullets_txt}"
+        for pat, label in CLUB_SUBTAG_PATTERNS:
+            if re.search(pat, body, re.IGNORECASE):
+                return label
+        return "PREMIER LEAGUE"
+
+    if cat in ("Gaming", "Review"):
+        body = f"{seg.replace('-', ' ')} {title}"
+        for pat, label in GAME_SUBTAG_PATTERNS:
+            if re.search(pat, body, re.IGNORECASE):
+                return label
+        if seg and seg not in ("games", "article", "review"):
+            clean_seg = re.sub(r"-\d+$", "", seg).replace("-", " ").upper().strip()
+            if len(clean_seg) > 22:
+                clean_seg = " ".join(clean_seg.split()[:3])[:22].strip()
+            if clean_seg:
+                return clean_seg
+        if "switch 2" in body or "nintendo" in body:
+            return "NINTENDO"
+        if "ps5" in body or "playstation" in body:
+            return "PLAYSTATION"
+        if "xbox" in body:
+            return "XBOX"
+        if "steam" in body or "pc" in body:
+            return "PC GAMING"
+        return "IGN GAMES" if cat == "Gaming" else "GAME REVIEW"
+
+    return ""
+
 SYSTEM_PROMPT = """คุณคือนักข่าวและบรรณาธิการข่าวมืออาชีพ แปลและถ่ายทอดเนื้อหาข่าวและบทความรีวิวจากภาษาต้นฉบับ (ภาษาอังกฤษ หรือ ภาษาญี่ปุ่น) เป็นภาษาไทยอย่างละเอียด ครบถ้วนสมบูรณ์ทุกมิติ และตรงตามข้อเท็จจริง (Fact-based) 100%
 กฎสำคัญที่สุด:
 1. การแปลเนื้อหาฉบับเต็ม ("full_paragraphs"):
@@ -809,6 +953,7 @@ def update_ui_files(news_list: list[dict]):
       <div class="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-[#0e0e11] sticky top-0 z-10 gap-3">
         <div class="flex items-center gap-2 min-w-0">
           <span id="modalTag" class="px-2.5 py-0.5 rounded text-xs font-mono font-bold uppercase tracking-wider bg-[#ff3366]/15 text-[#ff3366] border border-[#ff3366]/30 shrink-0"></span>
+          <span id="modalSubTag" class="hidden px-2 py-0.5 rounded text-xs font-mono font-semibold uppercase tracking-wider bg-zinc-800 text-zinc-200 border border-zinc-700 shrink-0"></span>
           <span id="modalDate" class="text-xs font-mono text-zinc-400 truncate"></span>
         </div>
         <div class="flex items-center gap-2 shrink-0">
@@ -1002,6 +1147,12 @@ def update_ui_files(news_list: list[dict]):
         }}
       }});
       render();
+      window.scrollTo({{ top: 0, left: 0, behavior: 'instant' }});
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      requestAnimationFrame(() => {{
+        window.scrollTo(0, 0);
+      }});
     }}
 
     function render() {{
@@ -1039,6 +1190,8 @@ def update_ui_files(news_list: list[dict]):
         const imgSrc = item.cover_image_url || CATEGORY_FALLBACKS[item.tag] || CATEGORY_FALLBACKS.Gaming;
         const loadingAttr = cardIdx < 6 ? 'eager' : 'lazy';
         const safeTag = escapeHtml(item.tag || '');
+        const safeSubTag = escapeHtml(item.sub_tag || '');
+        const subTagBadge = safeSubTag ? `<span class="px-1.5 py-0.5 rounded bg-zinc-800/90 text-zinc-200 border border-zinc-700/80 text-[10px] font-mono font-semibold tracking-wide uppercase">${{safeSubTag}}</span>` : '';
         const safeDate = escapeHtml(item.published_th || item.published_at || '');
         const safeTitle = escapeHtml(item.thai_title || item.original_title || '');
 
@@ -1049,8 +1202,9 @@ def update_ui_files(news_list: list[dict]):
               ${{reviewBadge}}
             </div>
             <div class="p-5">
-              <div class="flex items-center gap-2 text-[11px] font-mono mb-2">
-                <span class="${{tagColor}} font-bold">${{safeTag}}</span>
+              <div class="flex items-center flex-wrap gap-1.5 text-[11px] font-mono mb-2.5">
+                <span class="${{tagColor}} font-bold uppercase">${{safeTag}}</span>
+                ${{subTagBadge}}
                 <span class="text-zinc-600">•</span>
                 <span class="text-zinc-500">${{safeDate}}</span>
               </div>
@@ -1064,7 +1218,7 @@ def update_ui_files(news_list: list[dict]):
           </div>
           <div class="p-5 pt-0 border-t border-zinc-800/80 text-[11px] font-mono text-zinc-500 flex items-center justify-between">
             <span class="text-zinc-300 group-hover:text-white transition">อ่านรายละเอียดเต็ม →</span>
-            <span>${{safeTag}} FEED</span>
+            <span>${{safeSubTag || (safeTag + ' FEED')}}</span>
           </div>
         `;
         grid.appendChild(div);
@@ -1079,6 +1233,16 @@ def update_ui_files(news_list: list[dict]):
       history.pushState({{ modalOpen: true, newsId: item.id }}, '', '#news-' + item.id);
 
       document.getElementById('modalTag').textContent = `// ${{item.tag}}`;
+      const modalSubTag = document.getElementById('modalSubTag');
+      if (modalSubTag) {{
+        if (item.sub_tag) {{
+          modalSubTag.textContent = item.sub_tag;
+          modalSubTag.classList.remove('hidden');
+        }} else {{
+          modalSubTag.classList.add('hidden');
+          modalSubTag.textContent = '';
+        }}
+      }}
       const modalImg = document.getElementById('modalImg');
       modalImg.onerror = null;
       modalImg.src = TRANSPARENT_GIF;
@@ -1361,6 +1525,7 @@ def normalize_existing_item(it: dict, now_utc: datetime.datetime) -> dict | None
         it["videos"] = []
     if "review_score" not in it:
         it["review_score"] = ""
+    it["sub_tag"] = extract_sub_tag(it)
     it["cover_image_url"] = make_hd_image_url(it.get("cover_image_url", ""))
     return it
 
@@ -1530,6 +1695,7 @@ def run():
                         existing_item["videos"] = []
                     if "review_score" not in existing_item:
                         existing_item["review_score"] = ""
+                    existing_item["sub_tag"] = extract_sub_tag(existing_item)
                     final_category_articles.append(existing_item)
                 else:
                     logger.info(f"[{cat}] Existing article needs valid Thai translation: {item['title'][:45]}...")
@@ -1560,6 +1726,7 @@ def run():
                     "original_title": item["title"],
                     "thai_title": trans.get("thai_title", item["title"]),
                     "tag": cat,
+                    "sub_tag": "",
                     "bullet_points": trans.get("bullet_points", []),
                     "full_paragraphs": trans.get("full_paragraphs", item["raw_paragraphs"][:8]),
                     "link": item["link"],
@@ -1573,6 +1740,7 @@ def run():
                     "published_th": item["published_th"],
                     "category_hint": cat,
                 }
+                entry["sub_tag"] = extract_sub_tag(entry)
                 if trans.get("_translation_failed"):
                     if prev_existing and is_valid_translation(prev_existing):
                         final_category_articles.append(prev_existing)

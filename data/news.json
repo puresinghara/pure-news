@@ -39,7 +39,8 @@
     "published_ts": 1794695216,
     "published_at": "2026-11-14T22:26:56Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "PREMIER LEAGUE"
   },
   {
     "id": 1794802776973,
@@ -82,7 +83,8 @@
     "published_ts": 1794610397,
     "published_at": "2026-11-13T22:53:17Z",
     "published_th": "14 พ.ย. 2026 • 05:53 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "MAN UTD"
   },
   {
     "id": 1794802776975,
@@ -125,7 +127,8 @@
     "published_ts": 1794583686,
     "published_at": "2026-11-13T15:28:06Z",
     "published_th": "13 พ.ย. 2026 • 22:28 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "MAN UTD"
   },
   {
     "id": 1794802776977,
@@ -172,7 +175,8 @@
     "published_ts": 1794571788,
     "published_at": "2026-11-13T12:09:48Z",
     "published_th": "13 พ.ย. 2026 • 19:09 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "MAN UTD"
   },
   {
     "id": 1794802776979,
@@ -211,7 +215,8 @@
     "published_ts": 1794563701,
     "published_at": "2026-11-13T09:55:01Z",
     "published_th": "13 พ.ย. 2026 • 16:55 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "MAN UTD"
   },
   {
     "id": 1794802776981,
@@ -252,7 +257,8 @@
     "published_ts": 1794521413,
     "published_at": "2026-11-12T22:10:13Z",
     "published_th": "13 พ.ย. 2026 • 05:10 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "PREMIER LEAGUE"
   },
   {
     "id": 1794802776983,
@@ -294,7 +300,8 @@
     "published_ts": 1794503720,
     "published_at": "2026-11-12T17:15:20Z",
     "published_th": "13 พ.ย. 2026 • 00:15 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "CRYSTAL PALACE"
   },
   {
     "id": 1794802776985,
@@ -323,7 +330,8 @@
     "published_ts": 1794482746,
     "published_at": "2026-11-12T11:25:46Z",
     "published_th": "12 พ.ย. 2026 • 18:25 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "MAN UTD"
   },
   {
     "id": 1794802776987,
@@ -371,7 +379,8 @@
     "published_ts": 1794478889,
     "published_at": "2026-11-12T10:21:29Z",
     "published_th": "12 พ.ย. 2026 • 17:21 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "PREMIER LEAGUE"
   },
   {
     "id": 1794802776989,
@@ -419,7 +428,8 @@
     "published_ts": 1794397629,
     "published_at": "2026-11-11T11:47:09Z",
     "published_th": "11 พ.ย. 2026 • 18:47 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "MAN CITY"
   },
   {
     "id": 1794802776991,
@@ -459,7 +469,8 @@
     "published_ts": 1794392617,
     "published_at": "2026-11-11T10:23:37Z",
     "published_th": "11 พ.ย. 2026 • 17:23 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "PREMIER LEAGUE"
   },
   {
     "id": 1794802776993,
@@ -499,7 +510,8 @@
     "published_ts": 1794234859,
     "published_at": "2026-11-09T14:34:19Z",
     "published_th": "9 พ.ย. 2026 • 21:34 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "PREMIER LEAGUE"
   },
   {
     "id": 1794802776995,
@@ -543,7 +555,8 @@
     "published_ts": 1794228083,
     "published_at": "2026-11-09T12:41:23Z",
     "published_th": "9 พ.ย. 2026 • 19:41 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "CHELSEA"
   },
   {
     "id": 1794802776997,
@@ -583,7 +596,8 @@
     "published_ts": 1794225611,
     "published_at": "2026-11-09T12:00:11Z",
     "published_th": "9 พ.ย. 2026 • 19:00 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "LIVERPOOL"
   },
   {
     "id": 1794802776999,
@@ -612,7 +626,8 @@
     "published_ts": 1794182000,
     "published_at": "2026-11-08T23:53:20Z",
     "published_th": "9 พ.ย. 2026 • 06:53 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "MAN UTD"
   },
   {
     "id": 1794802777001,
@@ -642,7 +657,8 @@
     "published_ts": 1794181995,
     "published_at": "2026-11-08T23:53:15Z",
     "published_th": "9 พ.ย. 2026 • 06:53 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "PREMIER LEAGUE"
   },
   {
     "id": 1794802777003,
@@ -672,7 +688,8 @@
     "published_ts": 1794181988,
     "published_at": "2026-11-08T23:53:08Z",
     "published_th": "9 พ.ย. 2026 • 06:53 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "PREMIER LEAGUE"
   },
   {
     "id": 1794802777005,
@@ -721,7 +738,8 @@
     "published_ts": 1794168353,
     "published_at": "2026-11-08T20:05:53Z",
     "published_th": "9 พ.ย. 2026 • 03:05 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "MAN UTD"
   },
   {
     "id": 1794802777007,
@@ -750,7 +768,8 @@
     "published_ts": 1794168076,
     "published_at": "2026-11-08T20:01:16Z",
     "published_th": "9 พ.ย. 2026 • 03:01 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "MAN UTD"
   },
   {
     "id": 1794802777009,
@@ -779,7 +798,8 @@
     "published_ts": 1794168021,
     "published_at": "2026-11-08T20:00:21Z",
     "published_th": "9 พ.ย. 2026 • 03:00 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "BRIGHTON"
   },
   {
     "id": 1794802777011,
@@ -808,7 +828,8 @@
     "published_ts": 1794167993,
     "published_at": "2026-11-08T19:59:53Z",
     "published_th": "9 พ.ย. 2026 • 02:59 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "BOURNEMOUTH"
   },
   {
     "id": 1794802777013,
@@ -837,7 +858,8 @@
     "published_ts": 1794167926,
     "published_at": "2026-11-08T19:58:46Z",
     "published_th": "9 พ.ย. 2026 • 02:58 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "LIVERPOOL"
   },
   {
     "id": 1794802777015,
@@ -866,7 +888,8 @@
     "published_ts": 1794167911,
     "published_at": "2026-11-08T19:58:31Z",
     "published_th": "9 พ.ย. 2026 • 02:58 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "CHELSEA"
   },
   {
     "id": 1794802777017,
@@ -895,7 +918,8 @@
     "published_ts": 1794166764,
     "published_at": "2026-11-08T19:39:24Z",
     "published_th": "9 พ.ย. 2026 • 02:39 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "MAN UTD"
   },
   {
     "id": 1794802777019,
@@ -944,7 +968,8 @@
     "published_ts": 1794165876,
     "published_at": "2026-11-08T19:24:36Z",
     "published_th": "9 พ.ย. 2026 • 02:24 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "ARSENAL"
   },
   {
     "id": 1794802777021,
@@ -973,7 +998,8 @@
     "published_ts": 1794165226,
     "published_at": "2026-11-08T19:13:46Z",
     "published_th": "9 พ.ย. 2026 • 02:13 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "MAN UTD"
   },
   {
     "id": 1794802777023,
@@ -1016,7 +1042,8 @@
     "published_ts": 1794165121,
     "published_at": "2026-11-08T19:12:01Z",
     "published_th": "9 พ.ย. 2026 • 02:12 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "LEEDS"
   },
   {
     "id": 1794802777025,
@@ -1067,7 +1094,8 @@
     "published_ts": 1794162056,
     "published_at": "2026-11-08T18:20:56Z",
     "published_th": "9 พ.ย. 2026 • 01:20 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "CHELSEA"
   },
   {
     "id": 1794802777027,
@@ -1096,7 +1124,8 @@
     "published_ts": 1794159780,
     "published_at": "2026-11-08T17:43:00Z",
     "published_th": "9 พ.ย. 2026 • 00:43 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "BRIGHTON"
   },
   {
     "id": 1794802777029,
@@ -1126,7 +1155,8 @@
     "published_ts": 1794159053,
     "published_at": "2026-11-08T17:30:53Z",
     "published_th": "9 พ.ย. 2026 • 00:30 น.",
-    "category_hint": "Football"
+    "category_hint": "Football",
+    "sub_tag": "BRIGHTON"
   },
   {
     "id": 1794801329656,
@@ -1160,7 +1190,8 @@
     "published_ts": 1794792416,
     "published_at": "2026-11-16T01:26:56Z",
     "published_th": "16 พ.ย. 2026 • 08:26 น.",
-    "category_hint": "Technology"
+    "category_hint": "Technology",
+    "sub_tag": "TECH"
   },
   {
     "id": 1794789938069,
@@ -1197,7 +1228,8 @@
     "published_ts": 1794779362,
     "published_at": "2026-11-15T21:49:22Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "ENTERTAINMENT"
   },
   {
     "id": 1794789938070,
@@ -1233,7 +1265,8 @@
     "published_ts": 1794776702,
     "published_at": "2026-11-15T21:05:02Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "SCIENCE"
   },
   {
     "id": 1794789938071,
@@ -1269,7 +1302,8 @@
     "published_ts": 1794775429,
     "published_at": "2026-11-15T20:43:49Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "TECH"
   },
   {
     "id": 1794789938072,
@@ -1304,7 +1338,8 @@
     "published_ts": 1794770143,
     "published_at": "2026-11-15T19:15:43Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "AI"
   },
   {
     "id": 1794789938073,
@@ -1344,7 +1379,8 @@
     "published_ts": 1794762000,
     "published_at": "2026-11-15T17:00:00Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "GADGETS"
   },
   {
     "id": 1794776350641,
@@ -1379,7 +1415,8 @@
     "published_ts": 1794761956,
     "published_at": "2026-11-15T16:59:16Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "TECH"
   },
   {
     "id": 1794776350642,
@@ -1416,7 +1453,8 @@
     "published_ts": 1794758400,
     "published_at": "2026-11-15T16:00:00Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "ENTERTAINMENT"
   },
   {
     "id": 1794756050948,
@@ -1457,7 +1495,8 @@
     "published_ts": 1794751200,
     "published_at": "2026-11-15T14:00:00Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "GADGETS"
   },
   {
     "id": 1794756050949,
@@ -1491,7 +1530,8 @@
     "published_ts": 1794751050,
     "published_at": "2026-11-15T13:57:30Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "PODCAST"
   },
   {
     "id": 1794756050950,
@@ -1530,7 +1570,8 @@
     "published_ts": 1794747600,
     "published_at": "2026-11-15T13:00:00Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "COLUMN"
   },
   {
     "id": 1794703594261,
@@ -1566,7 +1607,8 @@
     "published_ts": 1794678268,
     "published_at": "2026-11-14T17:44:28Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "TRANSPORTATION"
   },
   {
     "id": 1794670625163,
@@ -1610,7 +1652,8 @@
     "published_ts": 1794668400,
     "published_at": "2026-11-14T15:00:00Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "GADGETS"
   },
   {
     "id": 1794670625164,
@@ -1648,7 +1691,8 @@
     "published_ts": 1794668400,
     "published_at": "2026-11-14T15:00:00Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "PODCAST"
   },
   {
     "id": 1794670625165,
@@ -1690,7 +1734,8 @@
     "published_ts": 1794665916,
     "published_at": "2026-11-14T14:18:36Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "TRANSPORTATION"
   },
   {
     "id": 1794670625166,
@@ -1734,7 +1779,8 @@
     "published_ts": 1794664800,
     "published_at": "2026-11-14T14:00:00Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "TECH"
   },
   {
     "id": 1794670625167,
@@ -1783,7 +1829,8 @@
     "published_ts": 1794661200,
     "published_at": "2026-11-14T13:00:00Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "TECH"
   },
   {
     "id": 1794670625168,
@@ -1849,7 +1896,8 @@
     "published_ts": 1794657600,
     "published_at": "2026-11-14T12:00:00Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "TECH"
   },
   {
     "id": 1794621511458,
@@ -1887,7 +1935,8 @@
     "published_ts": 1794613751,
     "published_at": "2026-11-13T23:49:11Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "TECH"
   },
   {
     "id": 1794606565579,
@@ -1924,7 +1973,8 @@
     "published_ts": 1794602710,
     "published_at": "2026-11-13T20:45:10Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "AI"
   },
   {
     "id": 1794606565580,
@@ -1963,7 +2013,8 @@
     "published_ts": 1794601800,
     "published_at": "2026-11-13T20:30:00Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "GADGETS"
   },
   {
     "id": 1794789938074,
@@ -2001,7 +2052,8 @@
     "published_ts": 1794597278,
     "published_at": "2026-11-13T19:14:38Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "GADGETS"
   },
   {
     "id": 1794606565582,
@@ -2038,7 +2090,8 @@
     "published_ts": 1794593441,
     "published_at": "2026-11-13T18:10:41Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "TECH"
   },
   {
     "id": 1794606565584,
@@ -2076,7 +2129,8 @@
     "published_ts": 1794589976,
     "published_at": "2026-11-13T17:12:56Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "TECH"
   },
   {
     "id": 1794606565587,
@@ -2120,7 +2174,8 @@
     "published_ts": 1794585600,
     "published_at": "2026-11-13T16:00:00Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "TECH"
   },
   {
     "id": 1794670625170,
@@ -2189,7 +2244,8 @@
     "published_ts": 1794585600,
     "published_at": "2026-11-13T16:00:00Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "GADGETS"
   },
   {
     "id": 1794585361895,
@@ -2223,7 +2279,8 @@
     "published_ts": 1794581236,
     "published_at": "2026-11-13T14:47:16Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "PODCAST"
   },
   {
     "id": 1794585361896,
@@ -2262,7 +2319,8 @@
     "published_ts": 1794580200,
     "published_at": "2026-11-13T14:30:00Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "POLICY"
   },
   {
     "id": 1794585361897,
@@ -2302,7 +2360,8 @@
     "published_ts": 1794578400,
     "published_at": "2026-11-13T14:00:00Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "AI"
   },
   {
     "id": 1794789938075,
@@ -2335,7 +2394,8 @@
     "published_ts": 1794571200,
     "published_at": "2026-11-13T12:00:00Z",
     "videos": [],
-    "review_score": ""
+    "review_score": "",
+    "sub_tag": "AI"
   },
   {
     "id": 1794802913809,
@@ -2367,7 +2427,8 @@
     "published_ts": 1794498373,
     "published_at": "2026-11-12T15:46:13Z",
     "published_th": "12 พ.ย. 2026 • 22:46 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "WEARABLES"
   },
   {
     "id": 1794802913811,
@@ -2405,7 +2466,8 @@
     "published_ts": 1794231000,
     "published_at": "2026-11-09T13:30:00Z",
     "published_th": "9 พ.ย. 2026 • 20:30 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "MOBILE"
   },
   {
     "id": 1794802913813,
@@ -2446,7 +2508,8 @@
     "published_ts": 1792247971,
     "published_at": "2026-10-17T14:39:31Z",
     "published_th": "17 ต.ค. 2026 • 21:39 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "EARBUDS"
   },
   {
     "id": 1794802913815,
@@ -2477,7 +2540,8 @@
     "published_ts": 1792153736,
     "published_at": "2026-10-16T12:28:56Z",
     "published_th": "16 ต.ค. 2026 • 19:28 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "MOBILE"
   },
   {
     "id": 1794802913817,
@@ -2508,7 +2572,8 @@
     "published_ts": 1792147254,
     "published_at": "2026-10-16T10:40:54Z",
     "published_th": "16 ต.ค. 2026 • 17:40 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "GADGETS"
   },
   {
     "id": 1794802913819,
@@ -2551,7 +2616,8 @@
     "published_ts": 1791904920,
     "published_at": "2026-10-13T15:22:00Z",
     "published_th": "13 ต.ค. 2026 • 22:22 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "SMART HOME"
   },
   {
     "id": 1794802913821,
@@ -2591,7 +2657,8 @@
     "published_ts": 1791902167,
     "published_at": "2026-10-13T14:36:07Z",
     "published_th": "13 ต.ค. 2026 • 21:36 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "SMART HOME"
   },
   {
     "id": 1794802913823,
@@ -2627,7 +2694,8 @@
     "published_ts": 1791841000,
     "published_at": "2026-10-12T21:36:40Z",
     "published_th": "13 ต.ค. 2026 • 04:36 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "GADGETS"
   },
   {
     "id": 1794802913825,
@@ -2669,7 +2737,8 @@
     "published_ts": 1791622800,
     "published_at": "2026-10-10T09:00:00Z",
     "published_th": "10 ต.ค. 2026 • 16:00 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "MOBILE"
   },
   {
     "id": 1794802913827,
@@ -2705,7 +2774,8 @@
     "published_ts": 1791381963,
     "published_at": "2026-10-07T14:06:03Z",
     "published_th": "7 ต.ค. 2026 • 21:06 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "WEARABLES"
   },
   {
     "id": 1794802913829,
@@ -2737,7 +2807,8 @@
     "published_ts": 1790783706,
     "published_at": "2026-09-30T15:55:06Z",
     "published_th": "30 ก.ย. 2026 • 22:55 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "WEARABLES"
   },
   {
     "id": 1794802913831,
@@ -2771,7 +2842,8 @@
     "published_ts": 1790772723,
     "published_at": "2026-09-30T12:52:03Z",
     "published_th": "30 ก.ย. 2026 • 19:52 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "TABLETS"
   },
   {
     "id": 1794802913833,
@@ -2814,7 +2886,8 @@
     "published_ts": 1790215109,
     "published_at": "2026-09-24T01:58:29Z",
     "published_th": "24 ก.ย. 2026 • 08:58 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "WEARABLES"
   },
   {
     "id": 1794802913835,
@@ -2845,7 +2918,8 @@
     "published_ts": 1790173833,
     "published_at": "2026-09-23T14:30:33Z",
     "published_th": "23 ก.ย. 2026 • 21:30 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "GADGETS"
   },
   {
     "id": 1794802913837,
@@ -2895,7 +2969,8 @@
     "published_ts": 1790010025,
     "published_at": "2026-09-21T17:00:25Z",
     "published_th": "22 ก.ย. 2026 • 00:00 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "AUDIO"
   },
   {
     "id": 1794802913839,
@@ -2947,7 +3022,8 @@
     "published_ts": 1789722000,
     "published_at": "2026-09-18T09:00:00Z",
     "published_th": "18 ก.ย. 2026 • 16:00 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "WEARABLES"
   },
   {
     "id": 1794802913841,
@@ -2978,7 +3054,8 @@
     "published_ts": 1788964228,
     "published_at": "2026-09-09T14:30:28Z",
     "published_th": "9 ก.ย. 2026 • 21:30 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "GADGETS"
   },
   {
     "id": 1794802913843,
@@ -3023,7 +3100,8 @@
     "published_ts": 1788514200,
     "published_at": "2026-09-04T09:30:00Z",
     "published_th": "4 ก.ย. 2026 • 16:30 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "MOBILE"
   },
   {
     "id": 1794802913845,
@@ -3057,7 +3135,8 @@
     "published_ts": 1788321540,
     "published_at": "2026-09-02T03:59:00Z",
     "published_th": "2 ก.ย. 2026 • 10:59 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "WEARABLES"
   },
   {
     "id": 1794802913847,
@@ -3096,7 +3175,8 @@
     "published_ts": 1787676510,
     "published_at": "2026-08-25T16:48:30Z",
     "published_th": "25 ส.ค. 2026 • 23:48 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "GADGETS"
   },
   {
     "id": 1794802913849,
@@ -3130,7 +3210,8 @@
     "published_ts": 1787673221,
     "published_at": "2026-08-25T15:53:41Z",
     "published_th": "25 ส.ค. 2026 • 22:53 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "GADGETS"
   },
   {
     "id": 1794802913851,
@@ -3170,7 +3251,8 @@
     "published_ts": 1787155200,
     "published_at": "2026-08-19T16:00:00Z",
     "published_th": "19 ส.ค. 2026 • 23:00 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "MOBILE"
   },
   {
     "id": 1794802913853,
@@ -3203,7 +3285,8 @@
     "published_ts": 1785970800,
     "published_at": "2026-08-05T23:00:00Z",
     "published_th": "6 ส.ค. 2026 • 06:00 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "MOBILE"
   },
   {
     "id": 1794802913855,
@@ -3241,7 +3324,8 @@
     "published_ts": 1785664800,
     "published_at": "2026-08-02T10:00:00Z",
     "published_th": "2 ส.ค. 2026 • 17:00 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "GADGETS"
   },
   {
     "id": 1794802913857,
@@ -3273,7 +3357,8 @@
     "published_ts": 1785360331,
     "published_at": "2026-07-29T21:25:31Z",
     "published_th": "30 ก.ค. 2026 • 04:25 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "WEARABLES"
   },
   {
     "id": 1794802913859,
@@ -3312,7 +3397,8 @@
     "published_ts": 1784923236,
     "published_at": "2026-07-24T20:00:36Z",
     "published_th": "25 ก.ค. 2026 • 03:00 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "GADGETS"
   },
   {
     "id": 1794802913861,
@@ -3343,7 +3429,8 @@
     "published_ts": 1784920840,
     "published_at": "2026-07-24T19:20:40Z",
     "published_th": "25 ก.ค. 2026 • 02:20 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "GADGETS"
   },
   {
     "id": 1794802913863,
@@ -3380,7 +3467,8 @@
     "published_ts": 1784903441,
     "published_at": "2026-07-24T14:30:41Z",
     "published_th": "24 ก.ค. 2026 • 21:30 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "MOBILE"
   },
   {
     "id": 1794802913865,
@@ -3420,7 +3508,8 @@
     "published_ts": 1784812922,
     "published_at": "2026-07-23T13:22:02Z",
     "published_th": "23 ก.ค. 2026 • 20:22 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "MOBILE"
   },
   {
     "id": 1794802913867,
@@ -3461,7 +3550,8 @@
     "published_ts": 1784732239,
     "published_at": "2026-07-22T14:57:19Z",
     "published_th": "22 ก.ค. 2026 • 21:57 น.",
-    "category_hint": "Gadgets"
+    "category_hint": "Gadgets",
+    "sub_tag": "MOBILE"
   },
   {
     "id": 1794801451248,
@@ -3502,7 +3592,8 @@
     "published_ts": 1794797544,
     "published_at": "2026-11-16T02:52:24Z",
     "published_th": "16 พ.ย. 2026 • 09:52 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "METAL GEAR"
   },
   {
     "id": 1794801451250,
@@ -3538,7 +3629,8 @@
     "published_ts": 1794592837,
     "published_at": "2026-11-13T18:00:37Z",
     "published_th": "14 พ.ย. 2026 • 01:00 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "CRAZY TAXI WORLD TOUR"
   },
   {
     "id": 1794801451252,
@@ -3580,7 +3672,8 @@
     "published_ts": 1794560441,
     "published_at": "2026-11-13T09:00:41Z",
     "published_th": "13 พ.ย. 2026 • 16:00 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "IGN GAMES"
   },
   {
     "id": 1794801451254,
@@ -3621,7 +3714,8 @@
     "published_ts": 1794475607,
     "published_at": "2026-11-12T09:26:47Z",
     "published_th": "12 พ.ย. 2026 • 16:26 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "IGN GAMES"
   },
   {
     "id": 1794801451256,
@@ -3668,7 +3762,8 @@
     "published_ts": 1794469202,
     "published_at": "2026-11-12T07:40:02Z",
     "published_th": "12 พ.ย. 2026 • 14:40 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "FIRE EMBLEM"
   },
   {
     "id": 1794801451258,
@@ -3704,7 +3799,8 @@
     "published_ts": 1794440232,
     "published_at": "2026-11-11T23:37:12Z",
     "published_th": "12 พ.ย. 2026 • 06:37 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "ZELDA"
   },
   {
     "id": 1794801451260,
@@ -3749,7 +3845,8 @@
     "published_ts": 1794371747,
     "published_at": "2026-11-11T04:35:47Z",
     "published_th": "11 พ.ย. 2026 • 11:35 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "HONKAI: STAR RAIL"
   },
   {
     "id": 1794801451262,
@@ -3788,7 +3885,8 @@
     "published_ts": 1794366716,
     "published_at": "2026-11-11T03:11:56Z",
     "published_th": "11 พ.ย. 2026 • 10:11 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "GTA"
   },
   {
     "id": 1794801451264,
@@ -3826,7 +3924,8 @@
     "published_ts": 1794366716,
     "published_at": "2026-11-11T03:11:56Z",
     "published_th": "11 พ.ย. 2026 • 10:11 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "GTA"
   },
   {
     "id": 1794801451266,
@@ -3872,7 +3971,8 @@
     "published_ts": 1794282761,
     "published_at": "2026-11-10T03:52:41Z",
     "published_th": "10 พ.ย. 2026 • 10:52 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "GTA"
   },
   {
     "id": 1794801451268,
@@ -3921,7 +4021,8 @@
     "published_ts": 1794186041,
     "published_at": "2026-11-09T01:00:41Z",
     "published_th": "9 พ.ย. 2026 • 08:00 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "SWITCH 2"
   },
   {
     "id": 1794801451270,
@@ -3970,7 +4071,8 @@
     "published_ts": 1794186038,
     "published_at": "2026-11-09T01:00:38Z",
     "published_th": "9 พ.ย. 2026 • 08:00 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "PETIT PLANET"
   },
   {
     "id": 1794801451272,
@@ -4026,7 +4128,8 @@
     "published_ts": 1794019473,
     "published_at": "2026-11-07T02:44:33Z",
     "published_th": "7 พ.ย. 2026 • 09:44 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "GAMESCOM"
   },
   {
     "id": 1794801451274,
@@ -4075,7 +4178,8 @@
     "published_ts": 1793955637,
     "published_at": "2026-11-06T09:00:37Z",
     "published_th": "6 พ.ย. 2026 • 16:00 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "FOOTBALL MANAGER"
   },
   {
     "id": 1794801451276,
@@ -4110,7 +4214,8 @@
     "published_ts": 1793852689,
     "published_at": "2026-11-05T04:24:49Z",
     "published_th": "5 พ.ย. 2026 • 11:24 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "ZELDA"
   },
   {
     "id": 1794801451278,
@@ -4149,7 +4254,8 @@
     "published_ts": 1793846228,
     "published_at": "2026-11-05T02:37:08Z",
     "published_th": "5 พ.ย. 2026 • 09:37 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "PS5"
   },
   {
     "id": 1794801451280,
@@ -4189,7 +4295,8 @@
     "published_ts": 1793782837,
     "published_at": "2026-11-04T09:00:37Z",
     "published_th": "4 พ.ย. 2026 • 16:00 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "XBOX"
   },
   {
     "id": 1794801451282,
@@ -4264,7 +4371,8 @@
     "published_ts": 1793673033,
     "published_at": "2026-11-03T02:30:33Z",
     "published_th": "3 พ.ย. 2026 • 09:30 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "ZELDA"
   },
   {
     "id": 1794801451284,
@@ -4304,7 +4412,8 @@
     "published_ts": 1793596112,
     "published_at": "2026-11-02T05:08:32Z",
     "published_th": "2 พ.ย. 2026 • 12:08 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "PERSONA"
   },
   {
     "id": 1794801451286,
@@ -4353,7 +4462,8 @@
     "published_ts": 1793574036,
     "published_at": "2026-11-01T23:00:36Z",
     "published_th": "2 พ.ย. 2026 • 06:00 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "ZELDA"
   },
   {
     "id": 1794801451288,
@@ -4390,7 +4500,8 @@
     "published_ts": 1793502712,
     "published_at": "2026-11-01T03:11:52Z",
     "published_th": "1 พ.ย. 2026 • 10:11 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "PROJECT CENTURY RGG"
   },
   {
     "id": 1794801451290,
@@ -4428,7 +4539,8 @@
     "published_ts": 1793422836,
     "published_at": "2026-10-31T05:00:36Z",
     "published_th": "31 ต.ค. 2026 • 12:00 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "PHANTOM BLADE ZERO"
   },
   {
     "id": 1794801451292,
@@ -4461,7 +4573,8 @@
     "published_ts": 1793419240,
     "published_at": "2026-10-31T04:00:40Z",
     "published_th": "31 ต.ค. 2026 • 11:00 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "SILVER PALACE"
   },
   {
     "id": 1794801451294,
@@ -4496,7 +4609,8 @@
     "published_ts": 1793331539,
     "published_at": "2026-10-30T03:38:59Z",
     "published_th": "30 ต.ค. 2026 • 10:38 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "ELDER SCROLLS"
   },
   {
     "id": 1794801451296,
@@ -4530,7 +4644,8 @@
     "published_ts": 1793327353,
     "published_at": "2026-10-30T02:29:13Z",
     "published_th": "30 ต.ค. 2026 • 09:29 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "SWITCH 2"
   },
   {
     "id": 1794801451298,
@@ -4563,7 +4678,8 @@
     "published_ts": 1793252587,
     "published_at": "2026-10-29T05:43:07Z",
     "published_th": "29 ต.ค. 2026 • 12:43 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "PHANTOM BLADE ZERO"
   },
   {
     "id": 1794801451300,
@@ -4596,7 +4712,8 @@
     "published_ts": 1793235636,
     "published_at": "2026-10-29T01:00:36Z",
     "published_th": "29 ต.ค. 2026 • 08:00 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "PHANTOM BLADE ZERO"
   },
   {
     "id": 1794801451302,
@@ -4634,7 +4751,8 @@
     "published_ts": 1793235636,
     "published_at": "2026-10-29T01:00:36Z",
     "published_th": "29 ต.ค. 2026 • 08:00 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "PHANTOM BLADE ZERO"
   },
   {
     "id": 1794801451304,
@@ -4672,7 +4790,8 @@
     "published_ts": 1793174179,
     "published_at": "2026-10-28T07:56:19Z",
     "published_th": "28 ต.ค. 2026 • 14:56 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "PLAYSTATION"
   },
   {
     "id": 1794801451306,
@@ -4711,7 +4830,8 @@
     "published_ts": 1793153455,
     "published_at": "2026-10-28T02:10:55Z",
     "published_th": "28 ต.ค. 2026 • 09:10 น.",
-    "category_hint": "Gaming"
+    "category_hint": "Gaming",
+    "sub_tag": "ELDEN RING"
   },
   {
     "id": 1794801668375,
@@ -4769,7 +4889,8 @@
     "published_ts": 1794560862,
     "published_at": "2026-11-13T09:07:42Z",
     "published_th": "13 พ.ย. 2026 • 16:07 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "ZELDA"
   },
   {
     "id": 1794801668377,
@@ -4812,7 +4933,8 @@
     "published_ts": 1794548994,
     "published_at": "2026-11-13T05:49:54Z",
     "published_th": "13 พ.ย. 2026 • 12:49 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "MONSTER HUNTER"
   },
   {
     "id": 1794801668379,
@@ -4893,7 +5015,8 @@
     "published_ts": 1793592909,
     "published_at": "2026-11-02T04:15:09Z",
     "published_th": "2 พ.ย. 2026 • 11:15 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "FIRE EMBLEM"
   },
   {
     "id": 1794801668381,
@@ -4935,7 +5058,8 @@
     "published_ts": 1793251781,
     "published_at": "2026-10-29T05:29:41Z",
     "published_th": "29 ต.ค. 2026 • 12:29 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "CALL OF DUTY"
   },
   {
     "id": 1794801668383,
@@ -4976,7 +5100,8 @@
     "published_ts": 1793005239,
     "published_at": "2026-10-26T09:00:39Z",
     "published_th": "26 ต.ค. 2026 • 16:00 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "PHANTOM BLADE ZERO"
   },
   {
     "id": 1794801668385,
@@ -5022,7 +5147,8 @@
     "published_ts": 1792984101,
     "published_at": "2026-10-26T03:08:21Z",
     "published_th": "26 ต.ค. 2026 • 10:08 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "GTA"
   },
   {
     "id": 1794801668387,
@@ -5069,7 +5195,8 @@
     "published_ts": 1792571859,
     "published_at": "2026-10-21T08:37:39Z",
     "published_th": "21 ต.ค. 2026 • 15:37 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "FINAL FANTASY"
   },
   {
     "id": 1794801668389,
@@ -5121,7 +5248,8 @@
     "published_ts": 1792555299,
     "published_at": "2026-10-21T04:01:39Z",
     "published_th": "21 ต.ค. 2026 • 11:01 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "NINTENDO SWITCH SPORTS"
   },
   {
     "id": 1794801668391,
@@ -5163,7 +5291,8 @@
     "published_ts": 1792465684,
     "published_at": "2026-10-20T03:08:04Z",
     "published_th": "20 ต.ค. 2026 • 10:08 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "ZELDA"
   },
   {
     "id": 1794801668393,
@@ -5201,7 +5330,8 @@
     "published_ts": 1791970264,
     "published_at": "2026-10-14T09:31:04Z",
     "published_th": "14 ต.ค. 2026 • 16:31 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "CASTLEVANIA"
   },
   {
     "id": 1794801668395,
@@ -5243,7 +5373,8 @@
     "published_ts": 1791962257,
     "published_at": "2026-10-14T07:17:37Z",
     "published_th": "14 ต.ค. 2026 • 14:17 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "ACE COMBAT"
   },
   {
     "id": 1794801668397,
@@ -5282,7 +5413,8 @@
     "published_ts": 1791433366,
     "published_at": "2026-10-08T04:22:46Z",
     "published_th": "8 ต.ค. 2026 • 11:22 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "DRAGON'S DOGMA"
   },
   {
     "id": 1794801668399,
@@ -5317,7 +5449,8 @@
     "published_ts": 1790910302,
     "published_at": "2026-10-02T03:05:02Z",
     "published_th": "2 ต.ค. 2026 • 10:05 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "GEARS OF WAR"
   },
   {
     "id": 1794801668401,
@@ -5353,7 +5486,8 @@
     "published_ts": 1790654785,
     "published_at": "2026-09-29T04:06:25Z",
     "published_th": "29 ก.ย. 2026 • 11:06 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "MINECRAFT"
   },
   {
     "id": 1794801668403,
@@ -5387,7 +5521,8 @@
     "published_ts": 1790310997,
     "published_at": "2026-09-25T04:36:37Z",
     "published_th": "25 ก.ย. 2026 • 11:36 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "CONTROL RESONANT"
   },
   {
     "id": 1794801668405,
@@ -5436,7 +5571,8 @@
     "published_ts": 1790310988,
     "published_at": "2026-09-25T04:36:28Z",
     "published_th": "25 ก.ย. 2026 • 11:36 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "SORA NO KISEKI THE 2ND"
   },
   {
     "id": 1794801668407,
@@ -5488,7 +5624,8 @@
     "published_ts": 1789974309,
     "published_at": "2026-09-21T07:05:09Z",
     "published_th": "21 ก.ย. 2026 • 14:05 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "SILENT HILL"
   },
   {
     "id": 1794801668409,
@@ -5548,7 +5685,8 @@
     "published_ts": 1789451233,
     "published_at": "2026-09-15T05:47:13Z",
     "published_th": "15 ก.ย. 2026 • 12:47 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "STEAM FRAME"
   },
   {
     "id": 1794801668411,
@@ -5594,7 +5732,8 @@
     "published_ts": 1789099479,
     "published_at": "2026-09-11T04:04:39Z",
     "published_th": "11 ก.ย. 2026 • 11:04 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "MARVEL"
   },
   {
     "id": 1794801668413,
@@ -5639,7 +5778,8 @@
     "published_ts": 1788502702,
     "published_at": "2026-09-04T06:18:22Z",
     "published_th": "4 ก.ย. 2026 • 13:18 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "STARSAND ISLAND"
   },
   {
     "id": 1794801668415,
@@ -5674,7 +5814,8 @@
     "published_ts": 1788262064,
     "published_at": "2026-09-01T11:27:44Z",
     "published_th": "1 ก.ย. 2026 • 18:27 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "REBEL WOLVES PROJECT"
   },
   {
     "id": 1794801668417,
@@ -5720,7 +5861,8 @@
     "published_ts": 1788188469,
     "published_at": "2026-08-31T15:01:09Z",
     "published_th": "31 ส.ค. 2026 • 22:01 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "ONIMUSHA"
   },
   {
     "id": 1794801668419,
@@ -5757,7 +5899,8 @@
     "published_ts": 1787807084,
     "published_at": "2026-08-27T05:04:44Z",
     "published_th": "27 ส.ค. 2026 • 12:04 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "RESONANCE A PLAGUE"
   },
   {
     "id": 1794801668421,
@@ -5804,7 +5947,8 @@
     "published_ts": 1787565326,
     "published_at": "2026-08-24T09:55:26Z",
     "published_th": "24 ส.ค. 2026 • 16:55 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "HONOGURASHI"
   },
   {
     "id": 1794801668423,
@@ -5844,7 +5988,8 @@
     "published_ts": 1787543741,
     "published_at": "2026-08-24T03:55:41Z",
     "published_th": "24 ส.ค. 2026 • 10:55 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "RESIDENT EVIL"
   },
   {
     "id": 1794801668425,
@@ -5883,7 +6028,8 @@
     "published_ts": 1787205440,
     "published_at": "2026-08-20T05:57:20Z",
     "published_th": "20 ส.ค. 2026 • 12:57 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "GOOGLE PIXEL 11 PRO"
   },
   {
     "id": 1794801668427,
@@ -5933,7 +6079,8 @@
     "published_ts": 1787025304,
     "published_at": "2026-08-18T03:55:04Z",
     "published_th": "18 ส.ค. 2026 • 10:55 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "MORTAL SHELL II"
   },
   {
     "id": 1794801668429,
@@ -5973,7 +6120,8 @@
     "published_ts": 1786592321,
     "published_at": "2026-08-13T03:38:41Z",
     "published_th": "13 ส.ค. 2026 • 10:38 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "BEAST OF REINCARNATION"
   },
   {
     "id": 1794801668431,
@@ -6025,7 +6173,8 @@
     "published_ts": 1786555778,
     "published_at": "2026-08-12T17:29:38Z",
     "published_th": "13 ส.ค. 2026 • 00:29 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "MARVEL"
   },
   {
     "id": 1794801668433,
@@ -6073,6 +6222,7 @@
     "published_ts": 1786177810,
     "published_at": "2026-08-08T08:30:10Z",
     "published_th": "8 ส.ค. 2026 • 15:30 น.",
-    "category_hint": "Review"
+    "category_hint": "Review",
+    "sub_tag": "BIG WALK"
   }
 ]
