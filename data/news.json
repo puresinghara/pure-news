@@ -2302,6 +2302,41 @@
     "category_hint": "Technology"
   },
   {
+    "id": 1794872124557,
+    "guid": "https://www.engadget.com/2315100/how-to-put-ipad-in-recovery-mode",
+    "original_title": "How to put your iPad in recovery mode (with and without a home button)",
+    "thai_title": "วิธีเข้าโหมด Recovery บน iPad ทั้งรุ่นที่มีและไม่มีปุ่ม Home",
+    "tag": "Gadgets",
+    "sub_tag": "TABLETS",
+    "bullet_points": [
+      "Recovery Mode เป็นทางเลือกสุดท้ายในการแก้ไขปัญหาซอฟต์แวร์ iPad ที่รุนแรง เช่น เครื่องค้าง อัปเดตไม่ผ่าน หรือลืมรหัสผ่าน",
+      "การเข้าโหมด Recovery ต้องเชื่อมต่อ iPad เข้ากับคอมพิวเตอร์ผ่านสาย USB และใช้โปรแกรม Finder (Mac) หรือ Apple Devices (PC)",
+      "วิธีการเข้าโหมดจะแตกต่างกันตามรุ่นของ iPad โดยรุ่นที่มีปุ่ม Home จะใช้การกดปุ่ม Home พร้อมปุ่ม Power ส่วนรุ่นที่ไม่มีปุ่ม Home จะใช้การกดปุ่ม Volume และปุ่ม Power",
+      "เมื่อเข้าสู่โหมด Recovery ได้แล้ว ผู้ใช้สามารถเลือก 'Update' เพื่อติดตั้ง iPadOS ใหม่โดยไม่เสียข้อมูล หรือเลือก 'Restore' เพื่อล้างเครื่องเป็นค่าโรงงาน",
+      "หากการแก้ไขด้วยซอฟต์แวร์ไม่ได้ผล อาจถึงเวลาที่ต้องส่งซ่อมกับผู้เชี่ยวชาญหรือพิจารณาเปลี่ยนเครื่องใหม่"
+    ],
+    "full_paragraphs": [
+      "การที่ iPad ของคุณอัปเดตไม่ผ่านหรือลืมรหัสผ่าน ไม่ได้หมายความว่าจุดจบของอุปกรณ์ได้มาถึงแล้ว แม้ว่าปัญหา iPad หลายอย่างจะสามารถแก้ไขได้ด้วยการรีสตาร์ทเครื่องแบบง่ายๆ แต่บางครั้งวิธีนั้นก็อาจไม่เพียงพอ ปัญหาซอฟต์แวร์ที่รุนแรงอาจทำให้แท็บเล็ตของคุณไม่สามารถใช้งานได้เลย และในกรณีเหล่านี้ การนำ iPad เข้าสู่โหมด Recovery (Recovery Mode) อาจเป็นทางเลือกเดียวที่คุณมี",
+      "โหมด Recovery ยังช่วยให้คุณเชื่อมต่อ iPad เข้ากับคอมพิวเตอร์เพื่อทำการอัปเดต หรือในกรณีที่เลวร้ายที่สุดคือการกู้คืนเครื่องกลับสู่การตั้งค่าจากโรงงาน (Factory Default) ทางที่ดีควรเก็บโหมด Recovery ไว้ใช้เฉพาะเมื่อไม่มีวิธีอื่นที่ได้ผลแล้วเท่านั้น แต่เมื่อถึงเวลาที่จำเป็นต้องใช้ มันอาจเป็นตัวตัดสินระหว่าง iPad ที่กลายเป็นที่ทับกระดาษกับ iPad ที่กลับมาใช้งานได้เหมือนใหม่",
+      "มีสถานการณ์ไม่กี่อย่างที่คุณอาจจำเป็นต้องใช้โหมด Recovery เช่น การอัปเดตซอฟต์แวร์หลักที่อาจล้มเหลว ทำให้การติดตั้งไม่สมบูรณ์และส่งผลให้ iPad เปิดไม่ติด หรือ iPad ของคุณอาจรีบูตตัวเองซ้ำๆ หรือคุณอาจใส่รหัสผ่านผิดหลายครั้งจนถูกล็อกเครื่อง นอกจากนี้ คอมพิวเตอร์ของคุณอาจหยุดการจดจำ iPad หรือ iPad อาจแสดงหน้าจอที่แจ้งเตือนให้คุณเชื่อมต่อกับคอมพิวเตอร์",
+      "สำหรับการนำ iPad เข้าสู่โหมด Recovery ขั้นแรกให้เชื่อมต่อ iPad เข้ากับคอมพิวเตอร์ด้วยสาย USB จากนั้นเปิดโปรแกรม Finder บน Mac หรือแอป Apple Devices บน PC จากจุดนี้ กระบวนการจะแตกต่างกันไปขึ้นอยู่กับว่า iPad ของคุณมีปุ่ม Home หรือไม่ หากมีปุ่ม Home ให้กดปุ่ม Home และปุ่ม Power ค้างไว้พร้อมกัน ในที่สุดหน้าจอ iPad จะดับลงและแสดงโลโก้ Apple ขึ้นมา และสุดท้ายจะแสดงไอคอนโหมด Recovery ซึ่งเป็นรูปสาย USB เชื่อมต่อกับคอมพิวเตอร์ เมื่อเห็นดังนั้นให้ปล่อยปุ่มที่กดค้างไว้ได้เลย",
+      "สำหรับ iPad รุ่นใหม่ๆ อย่าง iPad Pro ซึ่งไม่มีปุ่ม Home คุณจำเป็นต้องใช้ปุ่ม Power และปุ่มปรับระดับเสียง (Volume) แทน โดยเริ่มจากกดปุ่มเพิ่มเสียง (Volume Up) แล้วปล่อย จากนั้นกดปุ่มลดเสียง (Volume Down) แล้วปล่อย ต่อมาให้กดปุ่ม Power ค้างไว้ โดยให้กดค้างไว้ผ่านช่วงที่โลโก้ Apple ปรากฏขึ้นจนกระทั่งไอคอนโหมด Recovery แสดงขึ้นมา แล้วจึงปล่อยมือ",
+      "ณ จุดนี้ คุณสามารถใช้ Finder หรือแอป Apple Devices บนคอมพิวเตอร์เพื่อค้นหา iPad ของคุณได้ หากกระบวนการสำเร็จ คุณจะเห็นหน้าต่างป๊อปอัปอธิบายว่า iPad จำเป็นต้องได้รับการกู้คืน (Restore) หรืออัปเดต (Update) ทางที่ดีควรเริ่มต้นด้วยตัวเลือกการอัปเดต ซึ่งจะช่วยให้คอมพิวเตอร์ของคุณติดตั้ง iPadOS ใหม่โดยไม่ส่งผลกระทบต่อข้อมูลอื่นๆ ที่จัดเก็บไว้ในอุปกรณ์ของคุณ",
+      "หากตัวเลือกนี้สำเร็จ คุณจะสามารถใช้งาน iPad ได้อีกครั้งโดยไม่สูญเสียข้อมูลใดๆ แต่ถ้าหากไม่ได้ผล คุณจะต้องนำเครื่องเข้าสู่โหมด Recovery อีกครั้งและเลือกตัวเลือกการกู้คืน (Restore) ซึ่งวิธีนี้จะคืนค่า iPad กลับสู่การตั้งค่าจากโรงงาน และเป็นการลบข้อมูลของคุณออกทั้งหมดในกระบวนการนี้",
+      "คุณสามารถกู้คืนทุกอย่างจากการสำรองข้อมูลล่าสุดของคุณได้ (หากคุณมีพื้นที่ iCloud เพียงพอ) แต่นี่เป็นกระบวนการที่ยุ่งยากกว่ามากและควรใช้เป็นทางเลือกสุดท้ายเท่านั้น หาก iPad ของคุณยังคงใช้งานไม่ได้หลังจากลองทั้งสองตัวเลือกแล้ว หรือคุณไม่สามารถทำให้เครื่องเข้าสู่โหมด Recovery ได้ อาจถึงเวลาที่ต้องนำเครื่องไปซ่อมโดยผู้เชี่ยวชาญหรือเลือกซื้อ iPad เครื่องใหม่"
+    ],
+    "link": "https://www.engadget.com/2315100/how-to-put-ipad-in-recovery-mode/",
+    "canonical_link": "https://www.engadget.com/2315100/how-to-put-ipad-in-recovery-mode",
+    "cover_image_url": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80&sig=gadgets-0",
+    "gallery_images": [],
+    "videos": [],
+    "review_score": "",
+    "published_ts": 1794871800,
+    "published_at": "2026-11-16T23:30:00Z",
+    "published_th": "17 พ.ย. 2026 • 06:30 น.",
+    "category_hint": "Gadgets"
+  },
+  {
     "id": 1794871219459,
     "guid": "https://www.engadget.com/2318613/united-airlines-is-experiencing-a-widespread-system-outage",
     "original_title": "United Airlines is experiencing a 'widespread system outage'",
@@ -2323,7 +2358,7 @@
     ],
     "link": "https://www.engadget.com/2318613/united-airlines-is-experiencing-a-widespread-system-outage/",
     "canonical_link": "https://www.engadget.com/2318613/united-airlines-is-experiencing-a-widespread-system-outage",
-    "cover_image_url": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80&sig=gadgets-0",
+    "cover_image_url": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80&sig=gadgets-1",
     "gallery_images": [],
     "videos": [],
     "review_score": "",
@@ -2353,7 +2388,7 @@
     ],
     "link": "https://9to5mac.com/2026/11/16/schmigadoon-and-widows-bay-land-apple-tv-two-grammy-nominations/",
     "canonical_link": "https://9to5mac.com/2026/11/16/schmigadoon-and-widows-bay-land-apple-tv-two-grammy-nominations",
-    "cover_image_url": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80&sig=gadgets-1",
+    "cover_image_url": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80&sig=gadgets-2",
     "gallery_images": [],
     "videos": [],
     "review_score": "",
@@ -2972,36 +3007,6 @@
     "category_hint": "Gadgets"
   },
   {
-    "id": 1794868337134,
-    "guid": "https://gizmodo.com/?p=2000840590",
-    "original_title": "The iPhone Duo Is Getting Face Unlock, but It’s Not as Secure as Face ID",
-    "thai_title": "iPhone รุ่นคู่หูเตรียมรองรับ Face Unlock แต่ความปลอดภัยยังเทียบไม่ได้กับ Face ID",
-    "tag": "Gadgets",
-    "sub_tag": "MOBILE",
-    "bullet_points": [
-      "iPhone รุ่นใหม่ในกลุ่ม Duo กำลังจะได้รับฟีเจอร์ปลดล็อกด้วยใบหน้า (Face Unlock) เพิ่มเข้ามา",
-      "ระบบ Face Unlock ใหม่นี้มีความแตกต่างจากเทคโนโลยี Face ID เดิมของ Apple อย่างชัดเจน",
-      "ความปลอดภัยของระบบ Face Unlock ใหม่นี้ถูกประเมินว่าอยู่ในระดับที่ต่ำกว่ามาตรฐานของ Face ID",
-      "แม้จะเป็นฟีเจอร์ที่เพิ่มเข้ามา แต่ผู้เชี่ยวชาญมองว่าเป็นเพียงทางเลือกเสริมที่ 'ดีกว่าไม่มีอะไรเลย'"
-    ],
-    "full_paragraphs": [
-      "ดูเหมือนว่าผู้ใช้งาน iPhone รุ่นที่เป็นแบบ Duo กำลังจะได้รับฟีเจอร์ใหม่ในการปลดล็อกหน้าจอด้วยใบหน้า หรือที่เรียกกันว่า Face Unlock ซึ่งถือเป็นการเปลี่ยนแปลงที่น่าสนใจสำหรับผู้ที่ต้องการความสะดวกสบายในการเข้าถึงอุปกรณ์",
-      "อย่างไรก็ตาม มีข้อควรระวังที่สำคัญเกี่ยวกับฟีเจอร์นี้ โดยมีการยืนยันว่าระบบ Face Unlock ที่กำลังจะนำมาใช้นั้น ไม่ได้มีความปลอดภัยในระดับเดียวกับเทคโนโลยี Face ID ที่เป็นเอกลักษณ์ของ Apple ซึ่งใช้เซนเซอร์ขั้นสูงในการสแกนใบหน้าแบบ 3 มิติ",
-      "ในแง่ของประสิทธิภาพและความปลอดภัย ระบบใหม่นี้อาจถูกมองว่าเป็นเพียงทางเลือกเสริมเท่านั้น โดยผู้เชี่ยวชาญและแหล่งข่าวในอุตสาหกรรมต่างให้ความเห็นในเชิงเปรียบเทียบว่า ฟีเจอร์นี้อาจจะไม่ได้ให้ความมั่นใจในระดับสูงสุดเหมือนกับระบบสแกนใบหน้าแบบเดิมที่ Apple เคยทำไว้",
-      "ท้ายที่สุดแล้ว แม้จะเป็นฟีเจอร์ที่เพิ่มเข้ามาเพื่ออำนวยความสะดวกให้กับผู้ใช้งาน แต่หากมองในมุมของความปลอดภัยที่เข้มงวด หลายฝ่ายต่างสรุปตรงกันว่า 'มีให้ใช้ก็ยังดีกว่าไม่มีอะไรเลย' ซึ่งสะท้อนให้เห็นว่าผู้ใช้ควรพิจารณาถึงความเหมาะสมในการใช้งานฟีเจอร์นี้ให้ดี"
-    ],
-    "link": "https://gizmodo.com/iphone-duo-face-recognition-face-id-2000840590",
-    "canonical_link": "https://gizmodo.com/iphone-duo-face-recognition-face-id-2000840590",
-    "cover_image_url": "https://gizmodo.com/app/uploads/2026/10/iPhone-Duo-Review-37.jpg",
-    "gallery_images": [],
-    "videos": [],
-    "review_score": "",
-    "published_ts": 1794858642,
-    "published_at": "2026-11-16T19:50:42Z",
-    "published_th": "17 พ.ย. 2026 • 02:50 น.",
-    "category_hint": "Gadgets"
-  },
-  {
     "id": 1794858339403,
     "guid": "https://9to5mac.com/?p=1076220",
     "original_title": "MagSafe Monday: MOFT’s Trackable Field Wallet holds eight cards, cash, and supports Find My",
@@ -3165,7 +3170,7 @@
     ],
     "link": "https://9to5mac.com/2026/11/16/ios-27-3-brings-vertical-video-and-video-podcasts-to-apple-tv-app/",
     "canonical_link": "https://9to5mac.com/2026/11/16/ios-27-3-brings-vertical-video-and-video-podcasts-to-apple-tv-app",
-    "cover_image_url": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80&sig=gadgets-2",
+    "cover_image_url": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80&sig=gadgets-25",
     "gallery_images": [],
     "videos": [],
     "review_score": "",
