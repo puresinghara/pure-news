@@ -2302,6 +2302,37 @@
     "category_hint": "Technology"
   },
   {
+    "id": 1794871219459,
+    "guid": "https://www.engadget.com/2318613/united-airlines-is-experiencing-a-widespread-system-outage",
+    "original_title": "United Airlines is experiencing a 'widespread system outage'",
+    "thai_title": "United Airlines เผชิญปัญหา 'ระบบล่มเป็นวงกว้าง' กระทบเที่ยวบินขาออก",
+    "tag": "Gadgets",
+    "sub_tag": "GADGETS",
+    "bullet_points": [
+      "United Airlines ยืนยันว่ากำลังเผชิญกับปัญหา 'ระบบล่มเป็นวงกว้าง' ซึ่งส่งผลกระทบต่อเที่ยวบินขาออก",
+      "โฆษกของสายการบินระบุว่าปัญหาดังกล่าวไม่ส่งผลกระทบต่อเที่ยวบินที่กำลังอยู่ระหว่างการเดินทางหรือเที่ยวบินของ United Express",
+      "เบื้องต้นยังไม่มีข้อบ่งชี้ว่าเหตุการณ์นี้เกี่ยวข้องกับปัญหาด้านความปลอดภัยทางไซเบอร์ (Cybersecurity)",
+      "ผู้โดยสารรายงานว่าได้รับแจ้งจากนักบินว่าปัญหาเกิดจากระบบคำนวณน้ำหนักและมาตรวัด (Weights and Measures) ขัดข้อง",
+      "สายการบินยืนยันว่าปัญหาครั้งนี้ไม่เกี่ยวข้องกับการสั่งระงับเที่ยวบินทั่วประเทศของ FAA เมื่อช่วงปลายสัปดาห์ที่ผ่านมา"
+    ],
+    "full_paragraphs": [
+      "ผู้โดยสารสายการบินอาจต้องเผชิญกับความล่าช้าในการเดินทางอีกครั้งในวันนี้ โดยปัญหาที่เกิดขึ้นดูเหมือนจะจำกัดอยู่เพียงแค่บริษัทเดียวเท่านั้น ทางด้าน United Airlines ได้ตอบกลับโพสต์ของผู้โดยสารหลายรายบนแพลตฟอร์ม X โดยระบุว่าทางสายการบินรับทราบถึงปัญหา 'ระบบล่มเป็นวงกว้าง' (widespread system outage) ที่กำลังเกิดขึ้น อย่างไรก็ตาม ในขณะนี้ยังไม่มีการประกาศอย่างเป็นทางการผ่านบัญชีหลักของ United Airlines บน X แต่อย่างใด",
+      "โฆษกของ United Airlines ได้ให้ข้อมูลกับ Engadget ว่า 'เรากำลังดำเนินการแก้ไขปัญหาทางเทคโนโลยีที่ส่งผลกระทบต่อเที่ยวบินขาออก' พร้อมทั้งระบุเพิ่มเติมว่า 'ไม่มีผลกระทบต่อเที่ยวบินที่กำลังอยู่ระหว่างการเดินทาง หรือเที่ยวบินของ United Express แต่อย่างใด และไม่มีข้อบ่งชี้ว่านี่เป็นปัญหาที่เกี่ยวข้องกับความปลอดภัยทางไซเบอร์'",
+      "ในขณะเดียวกัน โพสต์จากผู้โดยสารของ United Airlines บนโซเชียลมีเดียต่างระบุตรงกันว่า พวกเขาได้รับแจ้งจากเจ้าหน้าที่ว่าระบบคอมพิวเตอร์ที่ใช้สำหรับคำนวณน้ำหนักและมาตรวัด (weights and measures) เกิดการขัดข้อง โดยมีผู้โดยสารรายหนึ่งรายงานว่านักบินของเที่ยวบินดังกล่าวได้แจ้งว่า ปัญหาที่เกิดขึ้นนี้ไม่เกี่ยวข้องกับการสั่งระงับเที่ยวบินทั่วประเทศ (ground stop) โดยสำนักงานบริหารการบินแห่งชาติสหรัฐฯ หรือ FAA ที่เกิดขึ้นเมื่อช่วงปลายสัปดาห์ที่ผ่านมา",
+      "ข้อมูลล่าสุด ณ วันที่ 16 พฤศจิกายน 2026 เวลา 17:46 น. ตามเวลาฝั่งตะวันออกของสหรัฐฯ (ET) ได้มีการเพิ่มความคิดเห็นจากทาง United Airlines เข้าไปในรายงานฉบับนี้แล้ว"
+    ],
+    "link": "https://www.engadget.com/2318613/united-airlines-is-experiencing-a-widespread-system-outage/",
+    "canonical_link": "https://www.engadget.com/2318613/united-airlines-is-experiencing-a-widespread-system-outage",
+    "cover_image_url": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80&sig=gadgets-0",
+    "gallery_images": [],
+    "videos": [],
+    "review_score": "",
+    "published_ts": 1794868723,
+    "published_at": "2026-11-16T22:38:43Z",
+    "published_th": "17 พ.ย. 2026 • 05:38 น.",
+    "category_hint": "Gadgets"
+  },
+  {
     "id": 1794868337124,
     "guid": "https://9to5mac.com/?p=1080587",
     "original_title": "‘Schmigadoon!’ and ‘Widow’s Bay’ land Apple TV two Grammy nominations",
@@ -2322,7 +2353,7 @@
     ],
     "link": "https://9to5mac.com/2026/11/16/schmigadoon-and-widows-bay-land-apple-tv-two-grammy-nominations/",
     "canonical_link": "https://9to5mac.com/2026/11/16/schmigadoon-and-widows-bay-land-apple-tv-two-grammy-nominations",
-    "cover_image_url": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80&sig=gadgets-0",
+    "cover_image_url": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80&sig=gadgets-1",
     "gallery_images": [],
     "videos": [],
     "review_score": "",
@@ -2599,7 +2630,7 @@
     ],
     "link": "https://9to5toys.com/2026/11/16/today-highlight-google-play-deals-final-fantasy/",
     "canonical_link": "https://9to5toys.com/2026/11/16/today-highlight-google-play-deals-final-fantasy",
-    "cover_image_url": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80&sig=gadgets-1",
+    "cover_image_url": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80&sig=gadgets-9",
     "gallery_images": [],
     "videos": [],
     "review_score": "",
@@ -3281,37 +3312,6 @@
     "published_ts": 1794855662,
     "published_at": "2026-11-16T19:01:02Z",
     "published_th": "17 พ.ย. 2026 • 02:01 น.",
-    "category_hint": "Gadgets"
-  },
-  {
-    "id": 1794869875644,
-    "guid": "https://9to5mac.com/?p=1080307",
-    "original_title": "Apple․com now available in Spanish for US users",
-    "thai_title": "Apple อัปเดตเว็บไซต์ Apple.com รองรับภาษาสเปนสำหรับผู้ใช้งานในสหรัฐอเมริกาแล้ว",
-    "tag": "Gadgets",
-    "sub_tag": "APPLE",
-    "bullet_points": [
-      "Apple เปิดตัวเว็บไซต์ Apple.com เวอร์ชันภาษาสเปนสำหรับผู้ใช้งานในสหรัฐอเมริกาอย่างเป็นทางการ",
-      "ผู้ใช้งานสามารถเข้าถึงได้ผ่าน URL apple.com/us-es หรือเลือกเปลี่ยนภาษาได้ที่เมนูท้ายหน้าเว็บไซต์",
-      "ระบบจะแสดงข้อความแจ้งเตือนให้เปลี่ยนภาษาโดยอัตโนมัติหากอุปกรณ์ของผู้ใช้ตั้งค่าเป็นภาษาสเปน",
-      "ในส่วนของ Apple Online Store และบริการทางการเงินยังคงรองรับเฉพาะภาษาอังกฤษเท่านั้นในขณะนี้",
-      "ผู้ที่ต้องการซื้อสินค้าเป็นภาษาสเปนสามารถติดต่อขอรับความช่วยเหลือจากเจ้าหน้าที่ผ่านทางโทรศัพท์ได้"
-    ],
-    "full_paragraphs": [
-      "Apple ได้ทำการเปลี่ยนแปลงครั้งสำคัญบนเว็บไซต์ Apple.com โดยตั้งแต่วันนี้เป็นต้นไป ผู้ใช้งานในสหรัฐอเมริกาสามารถเลือกเรียกดูเนื้อหาบนเว็บไซต์ของ Apple ในรูปแบบภาษาสเปนได้แล้ว",
-      "เว็บไซต์ Apple เวอร์ชันภาษาสเปนใหม่นี้เปิดให้เข้าใช้งานได้ที่ apple.com/us-es โดยสำหรับผู้ใช้งานที่ตั้งค่าภาษาบนอุปกรณ์ของตนเป็นภาษาสเปน ระบบจะแสดงข้อความแจ้งเตือนเพื่อให้ผู้ใช้สามารถเลือกเปลี่ยนภาษาได้ทันที นอกจากนี้ ผู้ใช้ยังสามารถเข้าถึงเวอร์ชันภาษาสเปนได้ด้วยตนเองผ่านการเลือกเมนูภาษาและประเทศที่บริเวณด้านล่างของหน้าเว็บไซต์",
-      "อย่างไรก็ตาม ในส่วนของ Apple Online Store และบริการด้านการเงิน (Financial Services) ยังคงรองรับเฉพาะภาษาอังกฤษเท่านั้น โดยเมื่อผู้ใช้งานคลิกเข้าไปยังหน้า Apple Online Store ระบบจะแสดงข้อความแจ้งเตือนระบุว่า (แปลเป็นไทย): 'ขณะนี้ หน้าที่คุณต้องการเข้าชมมีให้บริการเฉพาะภาษาอังกฤษเท่านั้น หากคุณต้องการซื้อสินค้าในภาษาสเปน โปรดโทร 1-800-692-7753 เพื่อรับความช่วยเหลือส่วนบุคคลจากผู้เชี่ยวชาญ'",
-      "การอัปเดตในครั้งนี้ถือเป็นการเปลี่ยนแปลงที่ยอดเยี่ยมและเป็นประโยชน์อย่างมากสำหรับกลุ่มผู้ใช้งานที่พูดภาษาสเปนในสหรัฐอเมริกา ซึ่งช่วยให้การเข้าถึงข้อมูลผลิตภัณฑ์และบริการของ Apple สะดวกสบายและครอบคลุมความต้องการของผู้ใช้งานได้ดียิ่งขึ้น"
-    ],
-    "link": "https://9to5mac.com/2026/11/16/apple-website-now-available-in-spanish-for-us-users/",
-    "canonical_link": "https://9to5mac.com/2026/11/16/apple-website-now-available-in-spanish-for-us-users",
-    "cover_image_url": "https://9to5mac.com/wp-content/uploads/sites/6/2026/11/CleanShot-2026-11-16-at-1.08.06-PM@2x.png?w=1600",
-    "gallery_images": [],
-    "videos": [],
-    "review_score": "",
-    "published_ts": 1794853272,
-    "published_at": "2026-11-16T18:21:12Z",
-    "published_th": "17 พ.ย. 2026 • 01:21 น.",
     "category_hint": "Gadgets"
   },
   {
