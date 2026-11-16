@@ -950,13 +950,11 @@ def update_ui_files(news_list: list[dict]):
     <div class="w-full max-w-3xl bg-[#0c0c0e] sm:border sm:border-zinc-800 sm:rounded-lg shadow-2xl overflow-hidden my-0 sm:my-auto max-h-screen sm:max-h-[92vh] flex flex-col">
       
       <!-- Modal Header (Sticky) -->
-      <div class="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-[#0e0e11] sticky top-0 z-10 gap-3">
+      <div class="flex items-center justify-between px-3.5 sm:px-6 py-3 border-b border-zinc-800 bg-[#0e0e11] sticky top-0 z-10 gap-2">
         <div class="flex items-center gap-2 min-w-0">
-          <span id="modalTag" class="px-2.5 py-0.5 rounded text-xs font-mono font-bold uppercase tracking-wider bg-[#ff3366]/15 text-[#ff3366] border border-[#ff3366]/30 shrink-0"></span>
-          <span id="modalSubTag" class="hidden px-2 py-0.5 rounded text-xs font-mono font-semibold uppercase tracking-wider bg-zinc-800 text-zinc-200 border border-zinc-700 shrink-0"></span>
-          <span id="modalDate" class="text-xs font-mono text-zinc-400 truncate"></span>
+          <span id="modalTag" class="px-2 py-0.5 rounded text-[11px] sm:text-xs font-mono font-bold uppercase tracking-wider bg-[#ff3366]/15 text-[#ff3366] border border-[#ff3366]/30 truncate"></span>
         </div>
-        <div class="flex items-center gap-2 shrink-0">
+        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <div id="ttsControls" class="flex items-center bg-zinc-900 border border-zinc-800 rounded-full p-0.5">
             <button id="ttsBtn" onclick="toggleSpeech()" title="ฟังเสียงอ่านข่าว" class="px-2.5 py-1 text-xs font-mono font-bold text-emerald-400 hover:text-white hover:bg-zinc-800 rounded-full transition flex items-center gap-1">
               <span id="ttsIcon">🔊</span>
@@ -965,20 +963,26 @@ def update_ui_files(news_list: list[dict]):
             <button id="ttsRateBtn" onclick="cycleSpeechRate()" title="ความเร็วเสียงอ่าน" class="px-2 py-1 text-[11px] font-mono text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-full transition">1x</button>
           </div>
           <div class="flex items-center bg-zinc-900 border border-zinc-800 rounded-full p-0.5">
-            <button onclick="changeFontSize(-1)" title="ลดขนาดตัวอักษร" class="px-2.5 py-1 text-xs font-mono font-bold text-zinc-300 hover:text-white hover:bg-zinc-800 rounded-full transition">A-</button>
-            <span id="fontSizeLabel" class="text-[11px] font-mono text-zinc-500 px-1.5 select-none">100%</span>
-            <button onclick="changeFontSize(1)" title="เพิ่มขนาดตัวอักษร" class="px-2.5 py-1 text-xs font-mono font-bold text-zinc-300 hover:text-white hover:bg-zinc-800 rounded-full transition">A+</button>
+            <button onclick="changeFontSize(-1)" title="ลดขนาดตัวอักษร" class="px-2 sm:px-2.5 py-1 text-xs font-mono font-bold text-zinc-300 hover:text-white hover:bg-zinc-800 rounded-full transition">A-</button>
+            <span id="fontSizeLabel" class="hidden sm:inline text-[11px] font-mono text-zinc-500 px-1.5 select-none">100%</span>
+            <button onclick="changeFontSize(1)" title="เพิ่มขนาดตัวอักษร" class="px-2 sm:px-2.5 py-1 text-xs font-mono font-bold text-zinc-300 hover:text-white hover:bg-zinc-800 rounded-full transition">A+</button>
           </div>
           <button onclick="closeModal()" aria-label="Close" class="w-8 h-8 rounded-full bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center text-xl transition leading-none">&times;</button>
         </div>
       </div>
 
       <!-- Modal Body (Always resets to scrollTop = 0) -->
-      <div id="modalBody" class="p-6 md:p-8 overflow-y-auto space-y-6">
+      <div id="modalBody" class="p-5 sm:p-6 md:p-8 overflow-y-auto space-y-5 sm:space-y-6">
         <!-- HD Cover Image (16:9 aspect-video so cover never gets awkwardly cropped) -->
         <div class="w-full aspect-video overflow-hidden rounded-md border border-zinc-800 bg-zinc-950 relative">
           <img id="modalImg" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" referrerpolicy="no-referrer" alt="" class="w-full h-full object-cover">
           <div id="modalScoreBadge" class="hidden absolute top-3 right-3 bg-[#ff3366] text-white font-mono font-extrabold text-sm px-3 py-1.5 rounded shadow-xl border border-white/20"></div>
+        </div>
+
+        <!-- Sub-Tag & Publish Date Row -->
+        <div class="flex items-center flex-wrap gap-2 text-xs font-mono text-zinc-400">
+          <span id="modalSubTag" class="hidden px-2 py-0.5 rounded text-[11px] font-mono font-semibold uppercase tracking-wider bg-zinc-800 text-zinc-200 border border-zinc-700"></span>
+          <span id="modalDate" class="text-xs font-mono text-zinc-400"></span>
         </div>
 
         <!-- Title -->
@@ -1385,7 +1389,7 @@ def update_ui_files(news_list: list[dict]):
       isModalOpen = true;
       history.pushState({{ modalOpen: true, newsId: item.id }}, '', '#news-' + item.id);
 
-      document.getElementById('modalTag').textContent = `// ${{item.tag}}`;
+      document.getElementById('modalTag').textContent = item.tag || '';
       const modalSubTag = document.getElementById('modalSubTag');
       if (modalSubTag) {{
         if (item.sub_tag) {{
