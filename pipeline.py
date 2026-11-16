@@ -146,14 +146,17 @@ CATEGORIES_CONFIG = {
     ],
     "Gaming": [
         "https://jp.ign.com/games.xml",
-        "https://www.videogameschronicle.com/feed/",
+        "https://www.gamespot.com/feeds/game-news/",
+        "https://feeds.feedburner.com/ign/games-all",
         "https://www.pcgamer.com/rss/",
-        "https://www.gematsu.com/feed",
+        "https://www.polygon.com/rss/index.xml",
+        "https://www.rockpapershotgun.com/feed",
     ],
     "Review": [
         "https://jp.ign.com/review.xml",
+        "https://www.gamespot.com/feeds/reviews/",
+        "https://feeds.feedburner.com/ign/reviews",
         "https://www.eurogamer.net/feed/reviews",
-        "https://www.videogameschronicle.com/category/review/feed/",
     ],
 }
 
@@ -334,11 +337,11 @@ CATEGORY_PROMPTS = {
 - คุณคือบรรณาธิการข่าวแกดเจ็ต สมาร์ตโฟน และอุปกรณ์อิเล็กทรอนิกส์มืออาชีพ
 - ใช้ภาษาที่อ่านสนุก ทันสมัย เข้าใจง่าย คงชื่อแบรนด์และชื่อรุ่นสินค้าภาษาอังกฤษไว้เสมอ (เช่น Apple, iPhone, Samsung, Google Pixel, Sennheiser, Sony, Garmin)
 - เก็บรายละเอียดฟีเจอร์เด่น สเปกการใช้งาน ผลทดสอบ ราคา วันวางจำหน่าย และความน่าสนใจของอุปกรณ์อย่างครบถ้วน""",
-    "Gaming": """บทบาทเฉพาะหมวดหมู่ (Gaming News - IGN Japan / VGC / PC Gamer / Gematsu):
+    "Gaming": """บทบาทเฉพาะหมวดหมู่ (Gaming News - IGN Japan / GameSpot / IGN US / PC Gamer / Polygon / Rock Paper Shotgun):
 - คุณคือบรรณาธิการสื่อเกมมืออาชีพ แปลข่าวเกมจากต้นฉบับ (ภาษาญี่ปุ่น หรือ ภาษาอังกฤษ) เป็นภาษาไทย
 - แปลงชื่อเกมเป็นชื่อภาษาอังกฤษสากลที่เกมเมอร์ไทยคุ้นเคย (เช่น 『ゼルダの伝説 時のオカリナ』 -> The Legend of Zelda: Ocarina of Time) ห้ามแปลชื่อเกมเป็นภาษาไทยแบบตรงตัว
 - คงชื่อแพลตฟอร์ม (PS5, Xbox Series X|S, Switch, Switch 2, PC, Steam) ชื่อค่ายพัฒนา/ผู้จัดจำหน่าย (เช่น Nintendo, Sony, Capcom, Square Enix, Konami, Kojima Productions) และใช้คำศัพท์เกมเมอร์สากลอย่างเป็นธรรมชาติ""",
-    "Review": """บทบาทเฉพาะหมวดหมู่ (Game Reviews - IGN Japan / Eurogamer / VGC):
+    "Review": """บทบาทเฉพาะหมวดหมู่ (Game Reviews - IGN Japan / GameSpot / IGN US / Eurogamer):
 - คุณคือบรรณาธิการและนักวิจารณ์เกมมืออาชีพ แปลบทความรีวิวเกมจากต้นฉบับ (ภาษาญี่ปุ่น หรือ ภาษาอังกฤษ) เป็นภาษาไทยเชิงลึก
 - แปลงชื่อเกมเป็นชื่อภาษาอังกฤษสากลเสมอ
 - ถ่ายทอดรายละเอียดการรีวิวอย่างครบถ้วน ทั้งระบบเกมเพลย์ (Gameplay), การออกแบบด่าน, เนื้อเรื่อง, กราฟิก/เฟรมเรต, จุดเด่น, จุดสังเกต และบทสรุปคำตัดสิน (Verdict) ด้วยสำนวนรีวิวเกมที่อ่านสนุก น่าติดตาม และได้อารมณ์เหมือนอ่านนิตยสารเกมชั้นนำ"""
@@ -1766,6 +1769,8 @@ def load_existing_database(now_utc: datetime.datetime) -> tuple[list[dict], dict
             continue
         cat = it.get("tag", "")
         if cat == "Technology" and "theverge.com" not in it["link"].lower():
+            continue
+        if cat in ("Gaming", "Review") and any(bad_dom in it["link"].lower() for bad_dom in ("gematsu.com", "videogameschronicle.com")):
             continue
         normalized_items.append(it)
         existing_by_guid[it["guid"]] = it
