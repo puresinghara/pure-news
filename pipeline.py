@@ -957,6 +957,13 @@ def update_ui_files(news_list: list[dict]):
           <span id="modalDate" class="text-xs font-mono text-zinc-400 truncate"></span>
         </div>
         <div class="flex items-center gap-2 shrink-0">
+          <div id="ttsControls" class="flex items-center bg-zinc-900 border border-zinc-800 rounded-full p-0.5">
+            <button id="ttsBtn" onclick="toggleSpeech()" title="ฟังเสียงอ่านข่าว" class="px-2.5 py-1 text-xs font-mono font-bold text-emerald-400 hover:text-white hover:bg-zinc-800 rounded-full transition flex items-center gap-1">
+              <span id="ttsIcon">🔊</span>
+              <span id="ttsLabel" class="hidden sm:inline">ฟังข่าว</span>
+            </button>
+            <button id="ttsRateBtn" onclick="cycleSpeechRate()" title="ความเร็วเสียงอ่าน" class="px-2 py-1 text-[11px] font-mono text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-full transition">1x</button>
+          </div>
           <div class="flex items-center bg-zinc-900 border border-zinc-800 rounded-full p-0.5">
             <button onclick="changeFontSize(-1)" title="ลดขนาดตัวอักษร" class="px-2.5 py-1 text-xs font-mono font-bold text-zinc-300 hover:text-white hover:bg-zinc-800 rounded-full transition">A-</button>
             <span id="fontSizeLabel" class="text-[11px] font-mono text-zinc-500 px-1.5 select-none">100%</span>
@@ -1056,6 +1063,145 @@ def update_ui_files(news_list: list[dict]):
     let allNews = {json_data_str};
     let currentTag = 'ALL';
     let isModalOpen = false;
+
+    const SPEECH_RATES = [1.0, 1.25, 1.5];
+    let speechRateIdx = 0;
+    let isSpeaking = false;
+    let speechQueue = [];
+    let currentSpeechStep = 0;
+    let currentModalItem = null;
+    let speechSessionId = 0;
+
+    if ('speechSynthesis' in window) {{
+      window.speechSynthesis.onvoiceschanged = () => {{}};
+    }}
+
+    function getThaiVoice() {{
+      if (!('speechSynthesis' in window)) return null;
+      const voices = window.speechSynthesis.getVoices() || [];
+      const thaiVoices = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('th'));
+      if (thaiVoices.length === 0) return null;
+      const preferred = thaiVoices.find(v => {{
+        const n = (v.name || '').toLowerCase();
+        return n.includes('natural') || n.includes('premwadee') || n.includes('niwat') || n.includes('google') || n.includes('kanya');
+      }});
+      return preferred || thaiVoices[0];
+    }}
+
+    function highlightSpeakingParagraph(paraIdx) {{
+      const activeClasses = ['bg-zinc-800/60', 'border-l-2', 'border-[#ff3366]', 'pl-3', 'py-1', 'rounded-r', 'text-white'];
+      document.querySelectorAll('#modalFullContent p[data-para-idx]').forEach(p => {{
+        p.classList.remove(...activeClasses);
+      }});
+      if (paraIdx >= 0) {{
+        const target = document.querySelector(`#modalFullContent p[data-para-idx="${{paraIdx}}"]`);
+        if (target) {{
+          target.classList.add(...activeClasses);
+        }}
+      }}
+    }}
+
+    function updateTtsButtonUI() {{
+      const btn = document.getElementById('ttsBtn');
+      const icon = document.getElementById('ttsIcon');
+      const label = document.getElementById('ttsLabel');
+      if (!btn || !icon || !label) return;
+      if (isSpeaking) {{
+        icon.textContent = '⏹';
+        label.textContent = 'หยุด';
+        btn.className = 'px-2.5 py-1 text-xs font-mono font-bold text-[#ff3366] hover:text-white hover:bg-zinc-800 rounded-full transition flex items-center gap-1';
+      }} else {{
+        icon.textContent = '🔊';
+        label.textContent = 'ฟังข่าว';
+        btn.className = 'px-2.5 py-1 text-xs font-mono font-bold text-emerald-400 hover:text-white hover:bg-zinc-800 rounded-full transition flex items-center gap-1';
+      }}
+    }}
+
+    function stopSpeech() {{
+      speechSessionId++;
+      isSpeaking = false;
+      speechQueue = [];
+      currentSpeechStep = 0;
+      if ('speechSynthesis' in window) {{
+        window.speechSynthesis.cancel();
+      }}
+      highlightSpeakingParagraph(-1);
+      updateTtsButtonUI();
+    }}
+
+    function speakCurrentStep(sessionId) {{
+      if (!isSpeaking || sessionId !== speechSessionId || currentSpeechStep >= speechQueue.length) {{
+        if (sessionId === speechSessionId) stopSpeech();
+        return;
+      }}
+      const stepItem = speechQueue[currentSpeechStep];
+      highlightSpeakingParagraph(stepItem.paraIdx);
+
+      const u = new SpeechSynthesisUtterance(stepItem.text);
+      u.lang = 'th-TH';
+      u.rate = SPEECH_RATES[speechRateIdx] || 1.0;
+      const thVoice = getThaiVoice();
+      if (thVoice) u.voice = thVoice;
+
+      u.onend = () => {{
+        if (sessionId === speechSessionId && isSpeaking) {{
+          currentSpeechStep++;
+          speakCurrentStep(sessionId);
+        }}
+      }};
+      u.onerror = (e) => {{
+        if (e && e.error === 'interrupted') return;
+        if (sessionId === speechSessionId && isSpeaking) {{
+          currentSpeechStep++;
+          speakCurrentStep(sessionId);
+        }}
+      }};
+      window.speechSynthesis.speak(u);
+    }}
+
+    function startSpeech(resumeStep = 0) {{
+      if (!('speechSynthesis' in window) || !currentModalItem) return;
+      window.speechSynthesis.cancel();
+      speechSessionId++;
+      const sessionId = speechSessionId;
+
+      speechQueue = [];
+      const headline = (currentModalItem.thai_title || currentModalItem.original_title || '').trim();
+      if (headline) {{
+        speechQueue.push({{ text: headline, paraIdx: -1 }});
+      }}
+      const bodyParas = Array.isArray(currentModalItem.full_paragraphs) ? currentModalItem.full_paragraphs : [];
+      bodyParas.forEach((p, idx) => {{
+        if (p && String(p).trim()) {{
+          speechQueue.push({{ text: String(p).trim(), paraIdx: idx }});
+        }}
+      }});
+
+      if (speechQueue.length === 0) return;
+      currentSpeechStep = Math.max(0, Math.min(resumeStep, speechQueue.length - 1));
+      isSpeaking = true;
+      updateTtsButtonUI();
+      speakCurrentStep(sessionId);
+    }}
+
+    function toggleSpeech() {{
+      if (isSpeaking) {{
+        stopSpeech();
+      }} else {{
+        startSpeech(0);
+      }}
+    }}
+
+    function cycleSpeechRate() {{
+      speechRateIdx = (speechRateIdx + 1) % SPEECH_RATES.length;
+      const rateBtn = document.getElementById('ttsRateBtn');
+      if (rateBtn) rateBtn.textContent = SPEECH_RATES[speechRateIdx] + 'x';
+      if (isSpeaking) {{
+        startSpeech(currentSpeechStep);
+      }}
+    }}
+
+    window.addEventListener('beforeunload', () => stopSpeech());
 
     function applyFontSize() {{
       const step = FONT_STEPS[currentFontIdx] || FONT_STEPS[1];
@@ -1229,6 +1375,13 @@ def update_ui_files(news_list: list[dict]):
       const item = allNews[idx];
       if (!item) return;
 
+      stopSpeech();
+      currentModalItem = item;
+      const ttsWrap = document.getElementById('ttsControls');
+      if (ttsWrap && !('speechSynthesis' in window)) {{
+        ttsWrap.classList.add('hidden');
+      }}
+
       isModalOpen = true;
       history.pushState({{ modalOpen: true, newsId: item.id }}, '', '#news-' + item.id);
 
@@ -1300,6 +1453,8 @@ def update_ui_files(news_list: list[dict]):
 
       paras.forEach((p, pIdx) => {{
         const pElem = document.createElement('p');
+        pElem.setAttribute('data-para-idx', String(pIdx));
+        pElem.className = 'transition-all duration-200';
         pElem.textContent = p;
         fullContentDiv.appendChild(pElem);
 
@@ -1352,6 +1507,8 @@ def update_ui_files(news_list: list[dict]):
     function closeModal(fromHistory = false) {{
       if (!isModalOpen) return;
       isModalOpen = false;
+      stopSpeech();
+      currentModalItem = null;
       document.getElementById('modalVideoContainer').innerHTML = '';
       document.getElementById('modalOverlay').classList.add('hidden');
       document.body.style.overflow = '';
