@@ -3,16 +3,17 @@ Automated News Aggregator & Reader (GitHub Native)
 Feeds:
 1. Football: BBC Sport Football (https://feeds.bbci.co.uk/sport/football/rss.xml)
 2. Technology: The Verge ONLY (https://www.theverge.com/rss/...)
-3. Gaming: Eurogamer, PC Gamer, Gematsu (https://www.eurogamer.net/feed, https://www.pcgamer.com/rss, https://www.gematsu.com/feed)
+3. Gaming: IGN Japan Games (https://jp.ign.com/games.xml)
+4. Review: IGN Japan Game Reviews (https://jp.ign.com/review.xml)
 
 Production Features:
-- 30 Fresh Articles PER Category (Total 90 articles in database) with Database Backfill on feed outage.
+- 30 Fresh Articles PER Category (120 items total) with Database Backfill on feed outage.
 - Parallel Multi-Feed Fetching with per-feed fault isolation and strict HTTP timeouts.
 - GUID + Canonical URL Deduplication (prevents redundant Gemini re-translations).
-- Category-Specific Translation Prompts (BBC Football, The Verge Tech, Gaming News).
+- Category-Specific Translation Prompts (English & Japanese -> Thai across 4 categories).
 - Thread-safe Rate Limiter + Exponential Backoff with Random Jitter for Gemini API Free Tier.
 - Normalized UTC Timestamps (`published_ts`, `published_at`, `published_th`) and strict newest-first sorting.
-- High-performance single-load Frontend with lazy images, category-specific fallbacks, and XSS escaping.
+- High-performance Frontend with 16:9 covers, review scores, inline magazine screenshots, and YouTube embeds.
 """
 import calendar
 import concurrent.futures
@@ -76,9 +77,9 @@ HEADERS = {
 _rate_limit_lock = threading.Lock()
 _last_api_call_ts = 0.0
 try:
-    MIN_API_INTERVAL_SEC = float(_load_env_value("MIN_API_INTERVAL_SEC") or "4.0")
+    MIN_API_INTERVAL_SEC = float(_load_env_value("MIN_API_INTERVAL_SEC") or "1.5")
 except ValueError:
-    MIN_API_INTERVAL_SEC = 4.0
+    MIN_API_INTERVAL_SEC = 1.5
 
 THAI_MONTHS = [
     "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
@@ -92,7 +93,8 @@ TRACKING_QUERY_PARAMS = {
 BAD_IMG_KEYWORDS = [
     "flexiimages", ".svg", "nosize", "flags/", "logo", "avatar", "icon",
     "user-", "banner", "badge", "tracking", "sponsored", "pixel", "ad-",
-    "scorecardresearch", "placeholder", "author", "profile", "button", "1x1"
+    "scorecardresearch", "placeholder", "author", "profile", "button", "1x1",
+    "ign30-logo", "ign_kw_logo", "/user/", "/avatars/", "data:image"
 ]
 
 CURATED_GAMING_COVERS = [
@@ -112,7 +114,10 @@ CATEGORY_FALLBACK_COVERS = {
     "Football": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1200&q=80",
     "Technology": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80",
     "Gaming": "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&q=80",
+    "Review": "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&q=80",
 }
+
+CATEGORIES_ORDER = ["Football", "Technology", "Gaming", "Review"]
 
 CATEGORIES_CONFIG = {
     "Football": [
@@ -128,13 +133,14 @@ CATEGORIES_CONFIG = {
         "https://www.theverge.com/rss/creators/index.xml",
     ],
     "Gaming": [
-        "https://www.eurogamer.net/feed",
-        "https://www.pcgamer.com/rss",
-        "https://www.gematsu.com/feed",
+        "https://jp.ign.com/games.xml",
+    ],
+    "Review": [
+        "https://jp.ign.com/review.xml",
     ],
 }
 
-SYSTEM_PROMPT = """คุณคือนักข่าวและบรรณาธิการข่าวมืออาชีพ แปลและถ่ายทอดเนื้อหาข่าวจากภาษาอังกฤษเป็นภาษาไทยอย่างละเอียด ครบถ้วนสมบูรณ์ทุกมิติ และตรงตามข้อเท็จจริง (Fact-based) 100%
+SYSTEM_PROMPT = """คุณคือนักข่าวและบรรณาธิการข่าวมืออาชีพ แปลและถ่ายทอดเนื้อหาข่าวและบทความรีวิวจากภาษาต้นฉบับ (ภาษาอังกฤษ หรือ ภาษาญี่ปุ่น) เป็นภาษาไทยอย่างละเอียด ครบถ้วนสมบูรณ์ทุกมิติ และตรงตามข้อเท็จจริง (Fact-based) 100%
 กฎสำคัญที่สุด:
 1. การแปลเนื้อหาฉบับเต็ม ("full_paragraphs"):
    - ต้องแปลและถ่ายทอดเนื้อหาข่าวอย่างละเอียด ครบทุกประเด็น ทุกคำสัมภาษณ์ (Direct quotes), ตัวเลขสถิติ, ข้อมูลและบริบทเหตุการณ์, รวมถึงบทวิเคราะห์ทั้งหมดที่ปรากฏในต้นฉบับ
@@ -143,10 +149,10 @@ SYSTEM_PROMPT = """คุณคือนักข่าวและบรรณ�
 2. สรุปประเด็นสำคัญ ("bullet_points"):
    - สรุปสาระสำคัญหลัก 4-6 ข้ออย่างกระชับ ชัดเจน และครอบคลุมเป็นภาษาไทย
 3. พาดหัวข่าว ("thai_title"):
-   - แปลพาดหัวข่าวภาษาไทยให้กระชับ ดึงดูด ตรงประเด็น ทับศัพท์ถูกต้องตาม Fact ห้ามคืนค่าเป็นภาษาอังกฤษล้วน
-4. ทับศัพท์ชื่อเฉพาะ สโมสร นักกีฬา แบรนด์ ฮาร์ดแวร์ โมเดล AI และเกม ให้ถูกต้องตามหลักสากล
+   - แปลพาดหัวข่าวภาษาไทยให้กระชับ ดึงดูด ตรงประเด็น ทับศัพท์ถูกต้องตาม Fact ห้ามคืนค่าเป็นภาษาต้นฉบับล้วน
+4. ทับศัพท์ชื่อเฉพาะ สโมสร นักกีฬา แบรนด์ ฮาร์ดแวร์ โมเดล AI และชื่อเกมสากล ให้ถูกต้องตามหลักสากล
 
-กฎแท็ก (Tag): ให้ระบุเป็นหนึ่งในสามหมวดนี้เท่านั้น: "Football", "Technology", "Gaming"
+กฎแท็ก (Tag): ให้ระบุเป็นหนึ่งในสี่หมวดนี้เท่านั้น: "Football", "Technology", "Gaming", "Review"
 """
 
 CATEGORY_PROMPTS = {
@@ -158,10 +164,14 @@ CATEGORY_PROMPTS = {
 - คุณคือบรรณาธิการข่าวเทคโนโลยีและนวัตกรรมระดับแนวหน้า สไตล์ The Verge ภาษาไทย
 - ใช้ภาษาที่ทันสมัย คมชัด ลึกซึ้ง คงคำศัพท์เทคนิคที่วงการไอทีไทยนิยมใช้ทับศัพท์หรือคงรูปภาษาอังกฤษไว้ตามความเหมาะสม (เช่น AI, LLM, API, SDK, GPU, NPU, Chipset, Benchmark, Cloud, Open-source, Firmware, OS)
 - ระบุชื่อบริษัท รุ่นผลิตภัณฑ์ สเปก ราคา และบริบททางธุรกิจหรือนโยบายเทคโนโลยีอย่างแม่นยำ""",
-    "Gaming": """บทบาทเฉพาะหมวดหมู่ (Gaming News - Eurogamer / PC Gamer / Gematsu):
-- คุณคือบรรณาธิการสื่อเกมมืออาชีพ เชี่ยวชาญข่าวเกมคอนโซล PC และอุตสาหกรรมเกมระดับโลก
-- ห้ามแปลชื่อเกมเป็นภาษาไทยแบบตรงตัวเด็ดขาด ให้คงชื่อเกมเป็นภาษาอังกฤษตามต้นฉบับเสมอ
-- คงชื่อแพลตฟอร์ม (PS5, Xbox Series X|S, Switch, Switch 2, PC, Steam) ชื่อค่ายพัฒนา/ผู้จัดจำหน่าย และใช้คำศัพท์เกมเมอร์สากลอย่างเป็นธรรมชาติ (เช่น RPG, Action RPG, Roguelike, Soulslike, FPS, Open-world, DLC, Expansion, Patch, Frame Rate, Early Access, Gameplay, Trailer, Remake, Remaster)"""
+    "Gaming": """บทบาทเฉพาะหมวดหมู่ (IGN Japan - ข่าวเกม):
+- คุณคือบรรณาธิการสื่อเกมมืออาชีพ แปลข่าวเกมจาก IGN Japan (ภาษาญี่ปุ่น) เป็นภาษาไทย
+- แปลงชื่อเกมจากภาษาญี่ปุ่น/คาตาคานะ เป็นชื่อภาษาอังกฤษสากลที่เกมเมอร์ไทยคุ้นเคย (เช่น 『ゼルダの伝説 時のオカリナ』 -> The Legend of Zelda: Ocarina of Time, 『クレイジータクシー：ワールドツアー』 -> Crazy Taxi: World Tour) ห้ามแปลชื่อเกมเป็นภาษาไทยแบบตรงตัว
+- คงชื่อแพลตฟอร์ม (PS5, Xbox Series X|S, Switch, Switch 2, PC, Steam) ชื่อค่ายพัฒนา/ผู้จัดจำหน่าย (เช่น Nintendo, Sony, Capcom, Square Enix, Konami, Kojima Productions) และใช้คำศัพท์เกมเมอร์สากลอย่างเป็นธรรมชาติ""",
+    "Review": """บทบาทเฉพาะหมวดหมู่ (IGN Japan - รีวิวเกม):
+- คุณคือบรรณาธิการและนักวิจารณ์เกมมืออาชีพ แปลบทความรีวิวเกมจาก IGN Japan (ภาษาญี่ปุ่น) เป็นภาษาไทยเชิงลึก
+- แปลงชื่อเกมจากภาษาญี่ปุ่น/คาตาคานะ เป็นชื่อภาษาอังกฤษสากลเสมอ
+- ถ่ายทอดรายละเอียดการรีวิวอย่างครบถ้วน ทั้งระบบเกมเพลย์ (Gameplay), การออกแบบด่าน, เนื้อเรื่อง, กราฟิก/เฟรมเรต, จุดเด่น, จุดสังเกต และบทสรุปคำตัดสิน (Verdict) ด้วยสำนวนรีวิวเกมที่อ่านสนุก น่าติดตาม และได้อารมณ์เหมือนอ่านนิตยสารเกมชั้นนำ"""
 }
 
 
@@ -272,7 +282,7 @@ def parse_existing_timestamp(item: dict, fallback_utc: datetime.datetime) -> dat
 
 
 def is_valid_translation(existing_item: dict) -> bool:
-    """Return True if an article already has a valid Thai translation (do not reject short articles)."""
+    """Return True if an article already has a valid Thai translation."""
     if existing_item.get("_translation_failed"):
         return False
     thai_title = (existing_item.get("thai_title") or "").strip()
@@ -297,6 +307,9 @@ def make_hd_image_url(url: str) -> str:
     # Upgrade BBC thumbnails (/240/, /320/, /480/ -> /1200/)
     url = re.sub(r"/(standard|branded_sport|branded_news)/\d+/", r"/\1/1200/", url)
     url = re.sub(r"/ic/\d+x\d+/", r"/ic/1024x576/", url)
+    # Upgrade IGN Japan thumbnails (sm.ign.com/t/ign_jp/...280.jpg or .640.jpg -> .1200.jpg)
+    if "sm.ign.com/t/" in url:
+        url = re.sub(r"\.\d+\.(jpg|jpeg|png|webp)(\?.*)?$", r".1200.\1", url, flags=re.IGNORECASE)
     # Upgrade Eurogamer (assetsio.gnwcdn.com)
     if "assetsio.gnwcdn.com" in url:
         url = re.sub(r"width=\d+", "width=1200", url)
@@ -322,6 +335,15 @@ def _is_usable_image_url(url: str) -> bool:
         return False
     ul = u.lower()
     return not any(bad in ul for bad in BAD_IMG_KEYWORDS)
+
+
+def _image_stem(url: str) -> str:
+    """Return filename stem without size suffixes so cover images aren't duplicated in gallery."""
+    if not url:
+        return ""
+    base = os.path.basename(url.split("?")[0]).lower()
+    base = re.sub(r"\.\d+(\.\w+)$", r"\1", base)
+    return base
 
 
 def extract_entry_thumbnail(entry) -> str:
@@ -386,29 +408,66 @@ def _extract_meta_image(page_html: str) -> str:
 
 
 def scrape_article_details(item: dict) -> dict:
-    """Scrape article webpage to extract HD lead image, comprehensive paragraphs, and genuine screenshots."""
+    """Scrape article webpage for HD lead image, paragraphs, inline screenshots, YouTube videos, and review score."""
     link = item["link"]
     feed_img = item.get("feed_image", "")
-    lead_img = make_hd_image_url(feed_img) if feed_img else ""
+    lead_img = make_hd_image_url(feed_img) if _is_usable_image_url(feed_img) else ""
     gallery_images = []
+    videos = []
     clean_paras = []
+    review_score = item.get("review_score", "")
 
     try:
-        resp = requests.get(link, headers=HEADERS, timeout=12)
+        resp = requests.get(link, headers=HEADERS, timeout=15)
         resp.raise_for_status()
         resp.encoding = resp.encoding or "utf-8"
         content = resp.text
 
-        # 1. Lead / Cover Image (og:image / og:image:secure_url / twitter:image)
-        if not lead_img:
-            lead_img = _extract_meta_image(content)
+        # 1. Lead / Cover Image (prefer og:image if missing or non-IGN)
+        meta_img = _extract_meta_image(content)
+        if not lead_img or ("jp.ign.com" in link.lower() and meta_img):
+            if meta_img:
+                lead_img = meta_img
 
-        # 2. Extract article container (using <article> so we never cut off at inner <div>)
-        art_m = re.search(r"<article[^>]*>(.*?)</article>", content, re.DOTALL | re.IGNORECASE)
+        # 2. Extract review score & verdict box for IGN Japan reviews
+        if "jp.ign.com" in link.lower():
+            rev_block_m = re.search(
+                r'<div class=["\']article-review["\']>(.*?)<div class=["\']page-content["\']\s+id=["\']bottom-list-reviews["\']>',
+                content, re.S | re.I
+            )
+            rev_source = rev_block_m.group(1) if rev_block_m else content
+            score_m = re.search(
+                r'<span class=["\'][^"\']*hexagon-content["\']>\s*(?:<div>)?\s*([0-9]+(?:\.[0-9]+)?)\s*(?:</div>)?',
+                rev_source, re.I
+            )
+            if score_m:
+                review_score = score_m.group(1).strip()
+
+            score_text_m = re.search(r'<div class=["\']score-text["\']>([^<]+)</div>', rev_source, re.I)
+            blurb_m = re.search(r'<div class=["\']blurb["\'][^>]*>(.*?)</div>', rev_source, re.S | re.I)
+            verdict_text = clean_text(blurb_m.group(1)) if blurb_m else ""
+            score_label = clean_text(score_text_m.group(1)) if score_text_m else ""
+        else:
+            verdict_text = ""
+            score_label = ""
+
+        # 3. Extract article container (prioritize IGN Japan article-page, fallback to <article>)
+        art_m = (
+            re.search(r'<article[^>]+class=["\'][^"\']*article-page[^"\']*["\'][^>]*>(.*?)</article>', content, re.DOTALL | re.IGNORECASE)
+            or re.search(r"<article[^>]*>(.*?)</article>", content, re.DOTALL | re.IGNORECASE)
+        )
         article_html = art_m.group(1) if art_m else content
 
-        # 3. Clean and extract ALL paragraphs without truncation
-        raw_p = re.findall(r"<p[^>]*>(.*?)</p>", article_html, re.DOTALL | re.IGNORECASE)
+        # Remove related-article float boxes & script/style noise before parsing paragraphs/media
+        article_html = re.sub(r'<aside[^>]*class=["\'][^"\']*floatrecirc[^"\']*["\'][^>]*>.*?</aside>', "", article_html, flags=re.S | re.I)
+        article_html = re.sub(r'<div[^>]*class=["\'][^"\']*recirc-title[^"\']*["\'][^>]*>.*?</div>', "", article_html, flags=re.S | re.I)
+        article_html = re.sub(r"<(script|style)[^>]*>.*?</\1>", "", article_html, flags=re.S | re.I)
+
+        # 4. Extract ALL paragraphs (supports both closed </p> and IGN Japan's unclosed <p> tags)
+        raw_p = re.findall(
+            r"<p[^>]*>(.*?)(?=<p[>\s]|</p>|<div|<section|<article|<h[1-6]|<blockquote|$)",
+            article_html, re.DOTALL | re.IGNORECASE
+        )
         bad_phrases = [
             "terms of service", "privacy policy", "cookie", "sign up", "newsletter",
             "subscribe", "all rights reserved", "follow us", "comments", "please login",
@@ -425,23 +484,49 @@ def scrape_article_details(item: dict) -> dict:
         for p in raw_p:
             clean = re.sub(r"<[^>]+>", "", p).strip()
             clean = " ".join(html.unescape(clean).split())
-            if len(clean) > 25 and not any(bad in clean.lower() for bad in bad_phrases):
+            if len(clean) > 20 and not any(bad in clean.lower() for bad in bad_phrases):
                 if clean not in seen_p:
                     seen_p.add(clean)
                     clean_paras.append(clean)
 
-        # 4. Extract genuine screenshots from article body ONLY
-        img_tags = re.findall(r'<img[^>]+(?:src|data-src)=["\']([^"\']+)["\']', article_html, re.IGNORECASE)
-        seen_g = set()
-        lead_clean = lead_img.split("?")[0] if lead_img else ""
-        for g in img_tags:
-            g = html.unescape(g).strip()
-            g_clean = g.split("?")[0]
-            if any(ext in g_clean.lower() for ext in [".jpg", ".jpeg", ".png", ".webp"]):
-                if _is_usable_image_url(g):
-                    if g_clean != lead_clean and g_clean not in seen_g:
-                        seen_g.add(g_clean)
-                        gallery_images.append(make_hd_image_url(g))
+        if verdict_text:
+            verdict_prefix = f"บทสรุปคำตัดสิน (Verdict) [คะแนน {review_score}/10" + (f" - {score_label}" if score_label else "") + "]: "
+            verdict_line = verdict_prefix + verdict_text
+            if verdict_line not in seen_p:
+                clean_paras.append(verdict_line)
+
+        # 5. Extract genuine screenshots from article body ONLY (prioritize data-src over lazy placeholder src)
+        img_tags = re.findall(r"<img[^>]+>", article_html, re.IGNORECASE)
+        seen_stems = set()
+        lead_stem = _image_stem(lead_img)
+        if lead_stem:
+            seen_stems.add(lead_stem)
+
+        for tag_str in img_tags:
+            m_src = (
+                re.search(r'data-src=["\'](https?://[^"\']+)["\']', tag_str, re.IGNORECASE)
+                or re.search(r'src=["\'](https?://[^"\']+)["\']', tag_str, re.IGNORECASE)
+            )
+            if not m_src:
+                continue
+            g = html.unescape(m_src.group(1)).strip()
+            g_clean = g.split("?")[0].lower()
+            if any(ext in g_clean for ext in [".jpg", ".jpeg", ".png", ".webp"]) and _is_usable_image_url(g):
+                stem = _image_stem(g)
+                if stem and stem not in seen_stems:
+                    seen_stems.add(stem)
+                    gallery_images.append(make_hd_image_url(g))
+
+        # 6. Extract embedded YouTube videos from article body
+        yt_ids = re.findall(
+            r"(?:youtube\.com/embed/|youtube-nocookie\.com/embed/|youtu\.be/|youtube\.com/watch\?v=)([a-zA-Z0-9_-]{11})",
+            article_html, re.IGNORECASE
+        )
+        seen_vid = set()
+        for vid in yt_ids:
+            if vid not in seen_vid:
+                seen_vid.add(vid)
+                videos.append(f"https://www.youtube.com/embed/{vid}")
 
     except Exception as e:
         logger.debug(f"Direct scrape fallback for {link}: {e}")
@@ -464,7 +549,7 @@ def scrape_article_details(item: dict) -> dict:
                 if not line or line.startswith("!") or line.startswith("#"):
                     continue
                 line = re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", line)
-                if len(line) > 30 and not any(bad in line.lower() for bad in ["source:", "sign up", "cookie"]):
+                if len(line) > 25 and not any(bad in line.lower() for bad in ["source:", "sign up", "cookie"]):
                     clean_paras.append(line)
         except Exception:
             pass
@@ -472,6 +557,8 @@ def scrape_article_details(item: dict) -> dict:
     clean_paras = list(dict.fromkeys(clean_paras))
     item["cover_image_url"] = lead_img
     item["gallery_images"] = gallery_images[:8]
+    item["videos"] = videos[:3]
+    item["review_score"] = review_score
     item["raw_paragraphs"] = clean_paras[:45] if clean_paras else [item["description"]]
     return item
 
@@ -508,20 +595,20 @@ def call_gemini(item_info: dict) -> dict:
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
     system_instruction_text = f"{SYSTEM_PROMPT}\n\n{cat_prompt}"
 
-    user_prompt = f"""หัวข้อข่าวต้นฉบับ: {title}
+    user_prompt = f"""หัวข้อต้นฉบับ: {title}
 หมวดหมู่: {category_hint}
 
 {cat_prompt}
 
-เนื้อหาข่าวภาษาอังกฤษฉบับเต็ม:
+เนื้อหาต้นฉบับเต็ม:
 {paras_text}
 
 คำสั่งสำคัญอย่างยิ่ง:
-กรุณาแปลเนื้อหาข่าวนี้เป็นภาษาไทยอย่างละเอียด ลึกซึ้ง ครบถ้วนทุกประเด็น รวมถึงคำสัมภาษณ์ทั้งหมด (Direct quotes), ตัวเลข, สถิติ, และบริบทเหตุการณ์ทั้งหมด ห้ามตัดทอนหรือแต่งเติม โดยแบ่งเป็นย่อหน้าตามลำดับเนื้อหาจริง (4-15 ย่อหน้าขึ้นไปตามความยาวต้นฉบับ)
+กรุณาแปลเนื้อหานี้เป็นภาษาไทยอย่างละเอียด ลึกซึ้ง ครบถ้วนทุกประเด็น รวมถึงคำสัมภาษณ์ทั้งหมด (Direct quotes), ตัวเลข, สถิติ, และบริบทเหตุการณ์ทั้งหมด ห้ามตัดทอนหรือแต่งเติม โดยแบ่งเป็นย่อหน้าตามลำดับเนื้อหาจริง (4-15 ย่อหน้าขึ้นไปตามความยาวต้นฉบับ)
 
 ตอบกลับเป็น JSON:
 {{
-  "thai_title": "พาดหัวข่าวภาษาไทยที่กระชับ ตรงตาม Fact (ห้ามเป็นภาษาอังกฤษล้วน)",
+  "thai_title": "พาดหัวข่าวภาษาไทยที่กระชับ ตรงตาม Fact (ห้ามเป็นภาษาต้นฉบับล้วน)",
   "tag": "{category_hint}",
   "bullet_points": [
     "ประเด็นสำคัญที่ 1 (ภาษาไทย)...",
@@ -561,7 +648,9 @@ def call_gemini(item_info: dict) -> dict:
             parsed = json.loads(raw_text)
 
             tag = parsed.get("tag", "").strip()
-            if "game" in tag.lower():
+            if "rev" in tag.lower():
+                parsed["tag"] = "Review"
+            elif "game" in tag.lower():
                 parsed["tag"] = "Gaming"
             elif "tech" in tag.lower():
                 parsed["tag"] = "Technology"
@@ -606,32 +695,34 @@ def sanitize_article(item: dict) -> dict:
 
 
 def update_ui_files(news_list: list[dict]):
-    """Update README.md and index.html with clean Pure News branding, single-load data, and bulletproof fallbacks."""
+    """Update README.md and index.html with 4 tabs, 16:9 covers, inline screenshots, and video embeds."""
     clean_news = [sanitize_article(x) for x in news_list]
     now_th = to_thailand_time(datetime.datetime.now(datetime.timezone.utc))
 
     football_count = sum(1 for x in clean_news if x.get("tag") == "Football")
     tech_count = sum(1 for x in clean_news if x.get("tag") == "Technology")
     gaming_count = sum(1 for x in clean_news if x.get("tag") == "Gaming")
+    review_count = sum(1 for x in clean_news if x.get("tag") == "Review")
 
     # 1. README.md
     readme_lines = [
-        "# ⚡ Pure News — Automated News Aggregator (GitHub Native)",
+        "# ⚡ Pure News — Automated News & Game Reviews Aggregator",
         "",
-        "> **Live Automated News Reader:** Auto-scraped from BBC Sport Football, The Verge (100%), and Eurogamer/PC Gamer/Gematsu.",
-        f"> *อัปเดตล่าสุด: `{now_th}`* • *รวมทั้งหมด: `{len(clean_news)} ข่าว`* (`⚽ Football: {football_count}` | `⚡ Tech: {tech_count}` | `🎮 Gaming: {gaming_count}`)",
+        "> **Live Automated News Reader:** Auto-scraped from BBC Sport Football, The Verge (100%), IGN Japan Games, and IGN Japan Reviews.",
+        f"> *อัปเดตล่าสุด: `{now_th}`* • *รวมทั้งหมด: `{len(clean_news)} รายการ`* (`⚽ Football: {football_count}` | `⚡ Tech: {tech_count}` | `🎮 IGN Games: {gaming_count}` | `⭐ Reviews: {review_count}`)",
         "",
         "### 🌐 [กดที่นี่เพื่อเปิดหน้าเว็บอ่านข่าว (GitHub Pages)](https://puresinghara.github.io/pure-news/)",
         "",
         "---",
         "",
-        "### 📰 ตารางสรุปข่าวล่าสุด (90 ข่าวเด่น)",
+        f"### 📰 ตารางสรุปข่าวและรีวิวล่าสุด ({len(clean_news)} รายการ)",
         "",
         "| หมวดหมู่ | หัวข้อข่าว & ประเด็นสำคัญ | เวลาเผยแพร่ (เวลาไทย) | แหล่งข่าว |",
         "| :--- | :--- | :--- | :--- |",
     ]
     for item in clean_news:
-        tag_badge = f"`[{item['tag']}]`"
+        score_str = f" ⭐{item['review_score']}/10" if item.get("review_score") else ""
+        tag_badge = f"`[{item['tag']}{score_str}]`"
         bullets_md = "<br>".join([f"• {b}" for b in item.get("bullet_points", [])[:3]])
         headline = f"**{item['thai_title']}**<br>{bullets_md}"
         link = f"[อ่านต้นฉบับ]({item['link']})"
@@ -652,7 +743,7 @@ def update_ui_files(news_list: list[dict]):
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pure News // รวมข่าวเด่น 3 หมวดหมู่</title>
+  <title>Pure News // รวมข่าวเด่น &amp; รีวิวเกม 4 หมวดหมู่</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -668,7 +759,7 @@ def update_ui_files(news_list: list[dict]):
     <div class="flex items-center gap-2">
       <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
       <span class="text-zinc-200 font-semibold">// LIVE FEED:</span>
-      <span class="hidden sm:inline">BBC FOOTBALL ({football_count}) • THE VERGE ({tech_count}) • GAMING ({gaming_count})</span>
+      <span class="hidden sm:inline">BBC FOOTBALL ({football_count}) • THE VERGE ({tech_count}) • IGN GAMES ({gaming_count}) • REVIEWS ({review_count})</span>
       <span class="text-emerald-400 font-bold px-1.5 py-0.5 bg-emerald-500/10 rounded border border-emerald-500/30">ONLINE</span>
     </div>
     <div class="flex items-center gap-4 text-[11px]">
@@ -690,7 +781,7 @@ def update_ui_files(news_list: list[dict]):
           <h1 class="brand-title text-2xl md:text-3xl font-extrabold uppercase text-white tracking-wider flex items-center gap-2 leading-none">
             PURE NEWS
           </h1>
-          <p class="text-[11px] font-mono text-zinc-400 uppercase tracking-widest mt-0.5">30 ข่าวเด่นต่อหมวด • อัปเดตทุก 1 ชั่วโมง</p>
+          <p class="text-[11px] font-mono text-zinc-400 uppercase tracking-widest mt-0.5">ข่าวเด่น &amp; รีวิวเกม 4 หมวด • อัปเดตทุก 1 ชั่วโมง</p>
         </div>
       </div>
 
@@ -699,8 +790,9 @@ def update_ui_files(news_list: list[dict]):
         <button onclick="filterTag('ALL')" id="filterALL" class="px-3.5 py-1.5 bg-white text-black font-mono font-bold text-xs rounded transition whitespace-nowrap">ALL ({len(clean_news)})</button>
         <button onclick="filterTag('Football')" id="filterFootball" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-mono text-xs rounded transition whitespace-nowrap">⚽ BBC FOOTBALL ({football_count})</button>
         <button onclick="filterTag('Technology')" id="filterTechnology" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-cyan-400 font-mono text-xs rounded transition whitespace-nowrap">⚡ THE VERGE ({tech_count})</button>
-        <button onclick="filterTag('Gaming')" id="filterGaming" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-amber-400 font-mono text-xs rounded transition whitespace-nowrap">🎮 GAMING NEWS ({gaming_count})</button>
-        <button onclick="refreshLiveNews(this)" title="ดึงข้อมูลข่าวล่าสุด" class="p-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 rounded transition ml-1">
+        <button onclick="filterTag('Gaming')" id="filterGaming" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-amber-400 font-mono text-xs rounded transition whitespace-nowrap">🎮 IGN GAMES ({gaming_count})</button>
+        <button onclick="filterTag('Review')" id="filterReview" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-purple-400 font-mono text-xs rounded transition whitespace-nowrap">⭐ GAME REVIEWS ({review_count})</button>
+        <button onclick="refreshLiveNews(this)" title="ดึงข้อมูลข่าวล่าสุด" class="p-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 rounded transition ml-1 shrink-0">
           <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
         </button>
       </div>
@@ -715,7 +807,7 @@ def update_ui_files(news_list: list[dict]):
     </div>
   </main>
 
-  <!-- Top-Pinned Modal Dialog (Never auto-scrolls, shows cover image at the very top) -->
+  <!-- Top-Pinned Modal Dialog -->
   <div id="modalOverlay" onclick="if(event.target===this) closeModal()" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-start sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
     <div class="w-full max-w-3xl bg-[#0c0c0e] sm:border sm:border-zinc-800 sm:rounded-lg shadow-2xl overflow-hidden my-0 sm:my-auto max-h-screen sm:max-h-[92vh] flex flex-col">
       
@@ -730,9 +822,10 @@ def update_ui_files(news_list: list[dict]):
 
       <!-- Modal Body (Always resets to scrollTop = 0) -->
       <div id="modalBody" class="p-6 md:p-8 overflow-y-auto space-y-6">
-        <!-- HD Cover Image (Right at the top) -->
-        <div class="w-full h-64 sm:h-80 overflow-hidden rounded-md border border-zinc-800 bg-zinc-950">
+        <!-- HD Cover Image (16:9 aspect-video so cover never gets awkwardly cropped) -->
+        <div class="w-full aspect-video overflow-hidden rounded-md border border-zinc-800 bg-zinc-950 relative">
           <img id="modalImg" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" referrerpolicy="no-referrer" alt="" class="w-full h-full object-cover">
+          <div id="modalScoreBadge" class="hidden absolute top-3 right-3 bg-[#ff3366] text-white font-mono font-extrabold text-sm px-3 py-1.5 rounded shadow-xl border border-white/20"></div>
         </div>
 
         <!-- Title -->
@@ -744,16 +837,24 @@ def update_ui_files(news_list: list[dict]):
           <ul id="modalBullets" class="space-y-2 text-sm text-zinc-200"></ul>
         </div>
 
-        <!-- Full Multi-Paragraph Translation -->
-        <div class="space-y-4 pt-2">
-          <div class="text-xs font-mono text-zinc-500 uppercase tracking-widest">// เนื้อหาข่าวฉบับเต็ม :</div>
-          <div id="modalFullContent" class="space-y-3.5 text-zinc-300 text-sm md:text-base leading-relaxed font-light"></div>
+        <!-- Video Section (Shown when article has YouTube trailers/videos) -->
+        <div id="modalVideoSection" class="hidden space-y-3 pt-1">
+          <div class="text-xs font-mono text-red-400 uppercase tracking-widest flex items-center gap-1.5 font-bold">
+            <span>🎬 วิดีโอตัวอย่าง / TRAILER ในข่าว :</span>
+          </div>
+          <div id="modalVideoContainer" class="space-y-4"></div>
         </div>
 
-        <!-- Screenshots Gallery (Always clean & gracefully handled) -->
+        <!-- Full Multi-Paragraph Translation with Interleaved Magazine Screenshots -->
+        <div class="space-y-4 pt-2">
+          <div class="text-xs font-mono text-zinc-500 uppercase tracking-widest">// เนื้อหาฉบับเต็ม :</div>
+          <div id="modalFullContent" class="space-y-4 text-zinc-300 text-sm md:text-base leading-relaxed font-light"></div>
+        </div>
+
+        <!-- Remaining Screenshots Gallery -->
         <div id="modalGallerySection" class="hidden pt-4 border-t border-zinc-800/80">
           <div class="text-xs font-mono text-amber-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
-            <span>📸 ภาพประกอบและ SCREENSHOTS ในข่าว :</span>
+            <span>📸 ภาพประกอบเพิ่มเติม :</span>
           </div>
           <div id="modalGalleryGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5"></div>
         </div>
@@ -762,7 +863,7 @@ def update_ui_files(news_list: list[dict]):
       <!-- Modal Footer -->
       <div class="px-6 py-4 border-t border-zinc-800 bg-[#0e0e11] flex items-center justify-between">
         <a id="modalSource" href="#" target="_blank" rel="noopener noreferrer" class="px-4 py-2 bg-zinc-900 border border-zinc-700 text-xs font-mono text-white rounded-sm hover:bg-zinc-800 flex items-center gap-1.5 transition">
-          <span>อ่านข่าวต้นฉบับเต็ม</span>
+          <span>อ่านต้นฉบับเต็ม</span>
           <span>→</span>
         </a>
         <button onclick="closeModal()" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-xs font-mono text-zinc-300 rounded-sm transition">ปิด</button>
@@ -786,7 +887,8 @@ def update_ui_files(news_list: list[dict]):
     const CATEGORY_FALLBACKS = {{
       Football: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1200&q=80',
       Technology: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80',
-      Gaming: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&q=80'
+      Gaming: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&q=80',
+      Review: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&q=80'
     }};
 
     let allNews = {json_data_str};
@@ -829,14 +931,17 @@ def update_ui_files(news_list: list[dict]):
       const fb = allNews.filter(x => x.tag === 'Football').length;
       const tech = allNews.filter(x => x.tag === 'Technology').length;
       const gm = allNews.filter(x => x.tag === 'Gaming').length;
+      const rev = allNews.filter(x => x.tag === 'Review').length;
       const elAll = document.getElementById('filterALL');
       const elFb = document.getElementById('filterFootball');
       const elTech = document.getElementById('filterTechnology');
       const elGm = document.getElementById('filterGaming');
+      const elRev = document.getElementById('filterReview');
       if (elAll) elAll.textContent = `ALL (${{allNews.length}})`;
       if (elFb) elFb.textContent = `⚽ BBC FOOTBALL (${{fb}})`;
       if (elTech) elTech.textContent = `⚡ THE VERGE (${{tech}})`;
-      if (elGm) elGm.textContent = `🎮 GAMING NEWS (${{gm}})`;
+      if (elGm) elGm.textContent = `🎮 IGN GAMES (${{gm}})`;
+      if (elRev) elRev.textContent = `⭐ GAME REVIEWS (${{rev}})`;
     }}
 
     async function refreshLiveNews(btn) {{
@@ -861,7 +966,7 @@ def update_ui_files(news_list: list[dict]):
 
     function filterTag(tag) {{
       currentTag = tag;
-      ['ALL', 'Football', 'Technology', 'Gaming'].forEach(t => {{
+      ['ALL', 'Football', 'Technology', 'Gaming', 'Review'].forEach(t => {{
         const btn = document.getElementById('filter' + t);
         if (btn) {{
           if (t === tag) {{
@@ -870,6 +975,7 @@ def update_ui_files(news_list: list[dict]):
             let textColor = 'text-zinc-300';
             if (t === 'Gaming') textColor = 'text-amber-400';
             if (t === 'Technology') textColor = 'text-cyan-400';
+            if (t === 'Review') textColor = 'text-purple-400';
             btn.className = `px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 ${{textColor}} font-mono text-xs rounded transition whitespace-nowrap`;
           }}
         }}
@@ -904,9 +1010,13 @@ def update_ui_files(news_list: list[dict]):
         let tagColor = 'text-[#ff3366]';
         if (item.tag === 'Technology') tagColor = 'text-cyan-400';
         else if (item.tag === 'Gaming') tagColor = 'text-amber-400';
+        else if (item.tag === 'Review') tagColor = 'text-purple-400';
 
         const hasGallery = Array.isArray(item.gallery_images) && item.gallery_images.length > 0;
-        const galleryBadge = hasGallery ? `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-1.5 py-0.5 rounded text-[10px] font-mono">📸 ${{item.gallery_images.length}} รูป</span>` : '';
+        const galleryBadge = hasGallery ? `<span class="bg-black/75 text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded text-[10px] font-mono backdrop-blur-sm">📸 ${{item.gallery_images.length}} รูป</span>` : '';
+        const hasVideo = Array.isArray(item.videos) && item.videos.length > 0;
+        const videoBadge = hasVideo ? `<span class="bg-red-600/90 text-white border border-red-400/30 px-2 py-0.5 rounded text-[10px] font-mono font-bold flex items-center gap-1 shadow">▶ มีวิดีโอ</span>` : '';
+        const reviewBadge = item.review_score ? `<div class="absolute top-2.5 right-2.5 bg-[#ff3366] text-white font-mono font-extrabold text-xs px-2.5 py-1 rounded shadow-lg border border-white/20">⭐ ${{escapeHtml(item.review_score)}} / 10</div>` : '';
 
         const imgSrc = item.cover_image_url || CATEGORY_FALLBACKS[item.tag] || CATEGORY_FALLBACKS.Gaming;
         const loadingAttr = cardIdx < 6 ? 'eager' : 'lazy';
@@ -916,9 +1026,10 @@ def update_ui_files(news_list: list[dict]):
 
         div.innerHTML = `
           <div>
-            <div class="w-full h-44 overflow-hidden bg-zinc-950 relative">
+            <div class="w-full aspect-video overflow-hidden bg-zinc-950 relative">
               <img src="${{escapeHtml(imgSrc)}}" data-tag="${{safeTag}}" referrerpolicy="no-referrer" loading="${{loadingAttr}}" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="handleImgError(this, this.dataset.tag)">
-              <div class="absolute bottom-2 right-2 flex gap-1">${{galleryBadge}}</div>
+              ${{reviewBadge}}
+              <div class="absolute bottom-2 right-2 flex items-center gap-1.5">${{videoBadge}}${{galleryBadge}}</div>
             </div>
             <div class="p-5">
               <div class="flex items-center gap-2 text-[11px] font-mono mb-2">
@@ -958,6 +1069,17 @@ def update_ui_files(news_list: list[dict]):
       modalImg.onerror = () => handleImgError(modalImg, item.tag);
       modalImg.src = item.cover_image_url || CATEGORY_FALLBACKS[item.tag] || SVG_FALLBACK_URI;
 
+      const scoreBadge = document.getElementById('modalScoreBadge');
+      if (scoreBadge) {{
+        if (item.review_score) {{
+          scoreBadge.textContent = `⭐ ${{item.review_score}} / 10`;
+          scoreBadge.classList.remove('hidden');
+        }} else {{
+          scoreBadge.classList.add('hidden');
+          scoreBadge.textContent = '';
+        }}
+      }}
+
       document.getElementById('modalTitle').textContent = item.thai_title || item.original_title || '';
       document.getElementById('modalDate').textContent = item.published_th || item.published_at || '';
 
@@ -970,22 +1092,53 @@ def update_ui_files(news_list: list[dict]):
         bulletsList.appendChild(li);
       }});
 
+      // Embedded YouTube Video Section
+      const videoSec = document.getElementById('modalVideoSection');
+      const videoContainer = document.getElementById('modalVideoContainer');
+      videoContainer.innerHTML = '';
+      if (Array.isArray(item.videos) && item.videos.length > 0) {{
+        videoSec.classList.remove('hidden');
+        item.videos.forEach(vUrl => {{
+          const wrap = document.createElement('div');
+          wrap.className = 'w-full aspect-video rounded-md overflow-hidden border border-zinc-800 bg-black shadow-lg';
+          wrap.innerHTML = `<iframe src="${{escapeHtml(vUrl)}}?rel=0" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
+          videoContainer.appendChild(wrap);
+        }});
+      }} else {{
+        videoSec.classList.add('hidden');
+      }}
+
+      // Interleave up to 4 inline screenshots cleanly between paragraphs (Magazine layout)
       const fullContentDiv = document.getElementById('modalFullContent');
       fullContentDiv.innerHTML = '';
-      const paras = Array.isArray(item.full_paragraphs) && item.full_paragraphs.length > 0 ? item.full_paragraphs : item.bullet_points;
-      (paras || []).forEach(p => {{
+      const paras = Array.isArray(item.full_paragraphs) && item.full_paragraphs.length > 0 ? item.full_paragraphs : (item.bullet_points || []);
+      const images = Array.isArray(item.gallery_images) ? item.gallery_images.slice() : [];
+      const maxInline = Math.min(images.length, 4);
+      const step = maxInline > 0 ? Math.max(2, Math.floor(paras.length / (maxInline + 1))) : 0;
+      let inlineUsedCount = 0;
+
+      paras.forEach((p, pIdx) => {{
         const pElem = document.createElement('p');
         pElem.textContent = p;
         fullContentDiv.appendChild(pElem);
+
+        if (step > 0 && inlineUsedCount < maxInline && (pIdx + 1) % step === 0 && (pIdx + 1) < paras.length) {{
+          const imgUrl = images[inlineUsedCount++];
+          const fig = document.createElement('figure');
+          fig.className = 'my-5 rounded-md overflow-hidden border border-zinc-800 bg-zinc-950';
+          fig.innerHTML = `<a href="${{escapeHtml(imgUrl)}}" target="_blank" rel="noopener noreferrer" class="block aspect-video overflow-hidden group"><img src="${{escapeHtml(imgUrl)}}" referrerpolicy="no-referrer" loading="lazy" decoding="async" onerror="this.closest('figure').remove()" class="w-full h-full object-cover group-hover:scale-105 transition duration-500"></a>`;
+          fullContentDiv.appendChild(fig);
+        }}
       }});
 
-      // Screenshot Gallery
+      // Remaining Screenshots Gallery (only show images not already displayed inline)
       const gallerySec = document.getElementById('modalGallerySection');
       const galleryGrid = document.getElementById('modalGalleryGrid');
       galleryGrid.innerHTML = '';
-      if (Array.isArray(item.gallery_images) && item.gallery_images.length > 0) {{
+      const remainingImages = images.slice(inlineUsedCount);
+      if (remainingImages.length > 0) {{
         gallerySec.classList.remove('hidden');
-        item.gallery_images.forEach(imgUrl => {{
+        remainingImages.forEach(imgUrl => {{
           const a = document.createElement('a');
           a.href = imgUrl;
           a.target = '_blank';
@@ -1017,6 +1170,7 @@ def update_ui_files(news_list: list[dict]):
     function closeModal(fromHistory = false) {{
       if (!isModalOpen) return;
       isModalOpen = false;
+      document.getElementById('modalVideoContainer').innerHTML = '';
       document.getElementById('modalOverlay').classList.add('hidden');
       document.body.style.overflow = '';
 
@@ -1073,6 +1227,17 @@ def fetch_feed_entries(url: str, category: str, now_utc: datetime.datetime) -> l
             title = (getattr(entry, "title", "") or "").strip()
             if not link or any(x in title.lower() for x in ["who am i", "quiz", "football daily"]):
                 continue
+
+            entry_tags = [
+                t.get("term", "") for t in (getattr(entry, "tags", None) or [])
+                if isinstance(t, dict)
+            ]
+            if category == "Review":
+                if any(x in entry_tags for x in ["映画", "アニメ", "ドラマ", "エンタメ"]) or title.startswith("映画"):
+                    continue
+            elif category == "Gaming":
+                if "レビュー" in entry_tags or "レビュー" in title:
+                    continue
 
             raw_guid = getattr(entry, "id", "") or getattr(entry, "guid", "") or link
             canonical_link = normalize_url(link)
@@ -1146,6 +1311,8 @@ def normalize_existing_item(it: dict, now_utc: datetime.datetime) -> dict | None
         tag = "Football"
     elif "tech" in tag.lower():
         tag = "Technology"
+    elif "rev" in tag.lower():
+        tag = "Review"
     elif "game" in tag.lower() or "gaming" in tag.lower():
         tag = "Gaming"
     it["tag"] = tag
@@ -1166,6 +1333,10 @@ def normalize_existing_item(it: dict, now_utc: datetime.datetime) -> dict | None
             make_hd_image_url(g) for g in it["gallery_images"]
             if _is_usable_image_url(g)
         ]
+    if "videos" not in it or not isinstance(it["videos"], list):
+        it["videos"] = []
+    if "review_score" not in it:
+        it["review_score"] = ""
     it["cover_image_url"] = make_hd_image_url(it.get("cover_image_url", ""))
     return it
 
@@ -1182,7 +1353,7 @@ def _deduplicate_cover_images(articles: list[dict], cat: str, global_used_images
                     found_unique = True
                     break
             if not found_unique:
-                if cat == "Gaming":
+                if cat in ("Gaming", "Review"):
                     fallback_img = CURATED_GAMING_COVERS[idx_art % len(CURATED_GAMING_COVERS)]
                 else:
                     base_fb = CATEGORY_FALLBACK_COVERS.get(cat, CATEGORY_FALLBACK_COVERS["Gaming"])
@@ -1205,17 +1376,21 @@ def load_existing_database(now_utc: datetime.datetime) -> tuple[list[dict], dict
     normalized_items = []
     existing_by_guid = {}
     existing_by_link = {}
-    existing_by_cat = {"Football": [], "Technology": [], "Gaming": []}
+    existing_by_cat = {cat: [] for cat in CATEGORIES_ORDER}
 
     for raw in existing_news:
         it = normalize_existing_item(dict(raw), now_utc)
         if not it:
             continue
+        cat = it.get("tag", "")
+        if cat in ("Gaming", "Review") and "jp.ign.com" not in it["link"].lower():
+            continue
+        if cat == "Technology" and "theverge.com" not in it["link"].lower():
+            continue
         normalized_items.append(it)
         existing_by_guid[it["guid"]] = it
         existing_by_link[it["canonical_link"]] = it
         existing_by_link[it["link"].strip()] = it
-        cat = it.get("tag", "")
         if cat in existing_by_cat:
             existing_by_cat[cat].append(it)
 
@@ -1235,7 +1410,7 @@ def normalize_existing_database():
     combined_db = []
     global_used_images = set()
 
-    for cat in ["Football", "Technology", "Gaming"]:
+    for cat in CATEGORIES_ORDER:
         seen_keys = set()
         cat_items = []
         for it in existing_by_cat.get(cat, []):
@@ -1274,7 +1449,8 @@ def run():
     category_results = {}
     global_used_images = set()
 
-    for cat, feeds in CATEGORIES_CONFIG.items():
+    for cat in CATEGORIES_ORDER:
+        feeds = CATEGORIES_CONFIG[cat]
         logger.info(f"--- Processing Category: {cat} ---")
         candidates = fetch_category_feeds(cat, feeds, now_utc)
         candidates.sort(key=lambda x: x["published_ts"], reverse=True)
@@ -1303,6 +1479,8 @@ def run():
             link = item["link"]
             if cat == "Technology" and "theverge.com" not in link.lower():
                 continue
+            if cat in ("Gaming", "Review") and "jp.ign.com" not in link.lower():
+                continue
 
             existing_item = (
                 existing_by_guid.get(item["guid"])
@@ -1320,6 +1498,10 @@ def run():
                     existing_item["published_at"] = item["published_at"]
                     existing_item["published_th"] = item["published_th"]
                     existing_item["cover_image_url"] = make_hd_image_url(existing_item.get("cover_image_url", ""))
+                    if "videos" not in existing_item:
+                        existing_item["videos"] = []
+                    if "review_score" not in existing_item:
+                        existing_item["review_score"] = ""
                     final_category_articles.append(existing_item)
                 else:
                     logger.info(f"[{cat}] Existing article needs valid Thai translation: {item['title'][:45]}...")
@@ -1334,7 +1516,7 @@ def run():
 
         failed_fallback_entries = []
         if new_items_to_translate:
-            logger.info(f"[{cat}] Scraping full content and gallery for {len(new_items_to_translate)} articles...")
+            logger.info(f"[{cat}] Scraping full content, screenshots & videos for {len(new_items_to_translate)} articles...")
             with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
                 scraped_items = list(executor.map(scrape_article_details, new_items_to_translate))
 
@@ -1344,30 +1526,6 @@ def run():
 
             for idx_new, (item, trans) in enumerate(zip(scraped_items, translations)):
                 prev_existing = matched_existing_map.get(item["canonical_link"])
-                if trans.get("_translation_failed"):
-                    if prev_existing and is_valid_translation(prev_existing):
-                        final_category_articles.append(prev_existing)
-                        continue
-                    entry = {
-                        "id": int(time.time() * 1000) + len(final_category_articles) + idx_new,
-                        "guid": item["guid"],
-                        "original_title": item["title"],
-                        "thai_title": trans.get("thai_title", item["title"]),
-                        "tag": cat,
-                        "bullet_points": trans.get("bullet_points", []),
-                        "full_paragraphs": trans.get("full_paragraphs", item["raw_paragraphs"][:8]),
-                        "link": item["link"],
-                        "canonical_link": item["canonical_link"],
-                        "cover_image_url": item["cover_image_url"],
-                        "gallery_images": item.get("gallery_images", []),
-                        "published_ts": item["published_ts"],
-                        "published_at": item["published_at"],
-                        "published_th": item["published_th"],
-                        "category_hint": cat,
-                    }
-                    failed_fallback_entries.append(entry)
-                    continue
-
                 entry = {
                     "id": int(time.time() * 1000) + len(final_category_articles) + idx_new,
                     "guid": item["guid"],
@@ -1380,11 +1538,20 @@ def run():
                     "canonical_link": item["canonical_link"],
                     "cover_image_url": item["cover_image_url"],
                     "gallery_images": item.get("gallery_images", []),
+                    "videos": item.get("videos", []),
+                    "review_score": item.get("review_score", ""),
                     "published_ts": item["published_ts"],
                     "published_at": item["published_at"],
                     "published_th": item["published_th"],
                     "category_hint": cat,
                 }
+                if trans.get("_translation_failed"):
+                    if prev_existing and is_valid_translation(prev_existing):
+                        final_category_articles.append(prev_existing)
+                    else:
+                        failed_fallback_entries.append(entry)
+                    continue
+
                 final_category_articles.append(entry)
                 existing_by_guid[item["guid"]] = entry
                 existing_by_link[item["canonical_link"]] = entry
@@ -1419,7 +1586,7 @@ def run():
         logger.info(f"[{cat}] Completed! Total articles: {len(category_results[cat])}/{TARGET_PER_CATEGORY}")
 
     combined_db = []
-    for cat in ["Football", "Technology", "Gaming"]:
+    for cat in CATEGORIES_ORDER:
         combined_db.extend(category_results.get(cat, []))
 
     with open(DATA_FILE, "w", encoding="utf-8") as f:
