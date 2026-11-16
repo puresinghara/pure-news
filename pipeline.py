@@ -93,7 +93,7 @@ TRACKING_QUERY_PARAMS = {
 
 BAD_IMG_KEYWORDS = [
     "flexiimages", ".svg", "nosize", "flags/", "logo", "avatar", "icon",
-    "user-", "banner", "badge", "tracking", "sponsored", "pixel", "ad-",
+    "/users/", "banner", "badge", "tracking", "sponsored", "pixel", "ad-",
     "scorecardresearch", "placeholder", "author", "profile", "button", "1x1",
     "ign30-logo", "ign_kw_logo", "/user/", "/avatars/", "data:image"
 ]
@@ -124,6 +124,8 @@ CATEGORIES_ORDER = ["Football", "Technology", "Gadgets", "Gaming", "Review"]
 CATEGORIES_CONFIG = {
     "Football": [
         "https://feeds.bbci.co.uk/sport/football/premier-league/rss.xml",
+        "https://www.theguardian.com/football/premierleague/rss",
+        "https://www.skysports.com/rss/11095",
     ],
     "Technology": [
         "https://www.theverge.com/rss/index.xml",
@@ -136,12 +138,22 @@ CATEGORIES_CONFIG = {
     ],
     "Gadgets": [
         "https://sea.mashable.com/gadgets.xml",
+        "https://www.engadget.com/rss.xml",
+        "https://www.gsmarena.com/rss-news-reviews.php3",
+        "https://9to5mac.com/feed/",
+        "https://9to5google.com/feed/",
+        "https://gizmodo.com/tech/feed",
     ],
     "Gaming": [
         "https://jp.ign.com/games.xml",
+        "https://www.videogameschronicle.com/feed/",
+        "https://www.pcgamer.com/rss/",
+        "https://www.gematsu.com/feed",
     ],
     "Review": [
         "https://jp.ign.com/review.xml",
+        "https://www.eurogamer.net/feed/reviews",
+        "https://www.videogameschronicle.com/category/review/feed/",
     ],
 }
 
@@ -257,6 +269,10 @@ def extract_sub_tag(item: dict) -> str:
             return "LAPTOPS"
         if any(k in body for k in ["tv", "home", "vacuum", "security", "wifi", "router"]):
             return "SMART HOME"
+        if "9to5mac.com" in link.lower():
+            return "APPLE"
+        if "9to5google.com" in link.lower():
+            return "GOOGLE"
         return "GADGETS"
 
     if cat == "Football":
@@ -267,11 +283,12 @@ def extract_sub_tag(item: dict) -> str:
         return "PREMIER LEAGUE"
 
     if cat in ("Gaming", "Review"):
-        body = f"{seg.replace('-', ' ')} {title}"
+        is_ign_jp = "jp.ign.com" in link.lower()
+        body = f"{seg.replace('-', ' ')} {title}" if is_ign_jp else title
         for pat, label in GAME_SUBTAG_PATTERNS:
             if re.search(pat, body, re.IGNORECASE):
                 return label
-        if seg and seg not in ("games", "article", "review"):
+        if is_ign_jp and seg and seg not in ("games", "article", "review"):
             clean_seg = re.sub(r"-\d+$", "", seg).replace("-", " ").upper().strip()
             if len(clean_seg) > 22:
                 clean_seg = " ".join(clean_seg.split()[:3])[:22].strip()
@@ -285,7 +302,7 @@ def extract_sub_tag(item: dict) -> str:
             return "XBOX"
         if "steam" in body or "pc" in body:
             return "PC GAMING"
-        return "IGN GAMES" if cat == "Gaming" else "GAME REVIEW"
+        return "GAMING" if cat == "Gaming" else "GAME REVIEW"
 
     return ""
 
@@ -305,7 +322,7 @@ SYSTEM_PROMPT = """คุณคือนักข่าวและบรรณ�
 """
 
 CATEGORY_PROMPTS = {
-    "Football": """บทบาทเฉพาะหมวดหมู่ (BBC Premier League):
+    "Football": """บทบาทเฉพาะหมวดหมู่ (Premier League - BBC Sport / The Guardian / Sky Sports):
 - คุณคือบรรณาธิการข่าวฟุตบอลพรีเมียร์ลีกอังกฤษมืออาชีพ เชี่ยวชาญข่าวสโมสร นักเตะ ตลาดซื้อขาย และสถิติฟุตบอลพรีเมียร์ลีก
 - ใช้สำนวนข่าวกีฬาฟุตบอลไทยที่เป็นธรรมชาติ แม่นยำ ไม่แปลตรงตัวแบบแข็งกระด้าง (เช่น clean sheet = คลีนชีต, transfer window = ตลาดซื้อขายนักเตะ, cap = การลงสนามรับใช้ทีมชาติ, draw = ผลเสมอ/เสมอกัน, manager/boss = กุนซือ/ผู้จัดการทีม)
 - ทับศัพท์ชื่อนักเตะ สโมสร ผู้จัดการทีม และสนามแข่งขันตามมาตรฐานสื่อกีฬาชั้นนำของไทย เก็บทุกคำพูดสัมภาษณ์ (Direct quotes) และสถิติตัวเลขครบถ้วน""",
@@ -313,17 +330,17 @@ CATEGORY_PROMPTS = {
 - คุณคือบรรณาธิการข่าวเทคโนโลยีและนวัตกรรมระดับแนวหน้า สไตล์ The Verge ภาษาไทย
 - ใช้ภาษาที่ทันสมัย คมชัด ลึกซึ้ง คงคำศัพท์เทคนิคที่วงการไอทีไทยนิยมใช้ทับศัพท์หรือคงรูปภาษาอังกฤษไว้ตามความเหมาะสม (เช่น AI, LLM, API, SDK, GPU, NPU, Chipset, Benchmark, Cloud, Open-source, Firmware, OS)
 - ระบุชื่อบริษัท รุ่นผลิตภัณฑ์ สเปก ราคา และบริบททางธุรกิจหรือนโยบายเทคโนโลยีอย่างแม่นยำ""",
-    "Gadgets": """บทบาทเฉพาะหมวดหมู่ (Mashable SEA - Gadgets & Consumer Tech):
-- คุณคือบรรณาธิการข่าวแกดเจ็ตและอุปกรณ์อิเล็กทรอนิกส์มืออาชีพ แปลข่าวจาก Mashable SEA เป็นภาษาไทย
-- ใช้ภาษาที่อ่านสนุก ทันสมัย เข้าใจง่าย คงชื่อแบรนด์และชื่อรุ่นสินค้าภาษาอังกฤษไว้เสมอ (เช่น Apple, iPhone, Samsung, Google, Sennheiser, Sony, Garmin)
-- เก็บรายละเอียดฟีเจอร์เด่น สเปกการใช้งาน ราคา วันวางจำหน่าย และความน่าสนใจของอุปกรณ์อย่างครบถ้วน""",
-    "Gaming": """บทบาทเฉพาะหมวดหมู่ (IGN Japan - ข่าวเกม):
-- คุณคือบรรณาธิการสื่อเกมมืออาชีพ แปลข่าวเกมจาก IGN Japan (ภาษาญี่ปุ่น) เป็นภาษาไทย
-- แปลงชื่อเกมจากภาษาญี่ปุ่น/คาตาคานะ เป็นชื่อภาษาอังกฤษสากลที่เกมเมอร์ไทยคุ้นเคย (เช่น 『ゼルダの伝説 時のオカリナ』 -> The Legend of Zelda: Ocarina of Time, 『クレイジータクシー：ワールドツアー』 -> Crazy Taxi: World Tour) ห้ามแปลชื่อเกมเป็นภาษาไทยแบบตรงตัว
+    "Gadgets": """บทบาทเฉพาะหมวดหมู่ (Gadgets - Mashable SEA / Engadget / GSMArena / 9to5Mac / 9to5Google / Gizmodo):
+- คุณคือบรรณาธิการข่าวแกดเจ็ต สมาร์ตโฟน และอุปกรณ์อิเล็กทรอนิกส์มืออาชีพ
+- ใช้ภาษาที่อ่านสนุก ทันสมัย เข้าใจง่าย คงชื่อแบรนด์และชื่อรุ่นสินค้าภาษาอังกฤษไว้เสมอ (เช่น Apple, iPhone, Samsung, Google Pixel, Sennheiser, Sony, Garmin)
+- เก็บรายละเอียดฟีเจอร์เด่น สเปกการใช้งาน ผลทดสอบ ราคา วันวางจำหน่าย และความน่าสนใจของอุปกรณ์อย่างครบถ้วน""",
+    "Gaming": """บทบาทเฉพาะหมวดหมู่ (Gaming News - IGN Japan / VGC / PC Gamer / Gematsu):
+- คุณคือบรรณาธิการสื่อเกมมืออาชีพ แปลข่าวเกมจากต้นฉบับ (ภาษาญี่ปุ่น หรือ ภาษาอังกฤษ) เป็นภาษาไทย
+- แปลงชื่อเกมเป็นชื่อภาษาอังกฤษสากลที่เกมเมอร์ไทยคุ้นเคย (เช่น 『ゼルダの伝説 時のオカリナ』 -> The Legend of Zelda: Ocarina of Time) ห้ามแปลชื่อเกมเป็นภาษาไทยแบบตรงตัว
 - คงชื่อแพลตฟอร์ม (PS5, Xbox Series X|S, Switch, Switch 2, PC, Steam) ชื่อค่ายพัฒนา/ผู้จัดจำหน่าย (เช่น Nintendo, Sony, Capcom, Square Enix, Konami, Kojima Productions) และใช้คำศัพท์เกมเมอร์สากลอย่างเป็นธรรมชาติ""",
-    "Review": """บทบาทเฉพาะหมวดหมู่ (IGN Japan - รีวิวเกม):
-- คุณคือบรรณาธิการและนักวิจารณ์เกมมืออาชีพ แปลบทความรีวิวเกมจาก IGN Japan (ภาษาญี่ปุ่น) เป็นภาษาไทยเชิงลึก
-- แปลงชื่อเกมจากภาษาญี่ปุ่น/คาตาคานะ เป็นชื่อภาษาอังกฤษสากลเสมอ
+    "Review": """บทบาทเฉพาะหมวดหมู่ (Game Reviews - IGN Japan / Eurogamer / VGC):
+- คุณคือบรรณาธิการและนักวิจารณ์เกมมืออาชีพ แปลบทความรีวิวเกมจากต้นฉบับ (ภาษาญี่ปุ่น หรือ ภาษาอังกฤษ) เป็นภาษาไทยเชิงลึก
+- แปลงชื่อเกมเป็นชื่อภาษาอังกฤษสากลเสมอ
 - ถ่ายทอดรายละเอียดการรีวิวอย่างครบถ้วน ทั้งระบบเกมเพลย์ (Gameplay), การออกแบบด่าน, เนื้อเรื่อง, กราฟิก/เฟรมเรต, จุดเด่น, จุดสังเกต และบทสรุปคำตัดสิน (Verdict) ด้วยสำนวนรีวิวเกมที่อ่านสนุก น่าติดตาม และได้อารมณ์เหมือนอ่านนิตยสารเกมชั้นนำ"""
 }
 
@@ -603,6 +620,20 @@ def scrape_article_details(item: dict) -> dict:
         else:
             verdict_text = ""
             score_label = ""
+            if not review_score:
+                rv_m = re.search(r'"ratingValue"\s*:\s*"?([0-9]+(?:\.[0-9]+)?)"?', content, re.I)
+                best_m = re.search(r'"bestRating"\s*:\s*"?([0-9]+(?:\.[0-9]+)?)"?', content, re.I)
+                if rv_m:
+                    try:
+                        val = float(rv_m.group(1))
+                        best = float(best_m.group(1)) if best_m else 10.0
+                        if best == 5.0:
+                            val = val * 2.0
+                        elif best == 100.0:
+                            val = round(val / 10.0, 1)
+                        review_score = str(int(val)) if val.is_integer() else f"{val:.1f}"
+                    except Exception:
+                        pass
 
         # 3. Extract article container (prioritize IGN Japan article-page, fallback to <article>)
         art_m = (
@@ -1579,7 +1610,8 @@ def fetch_feed_entries(url: str, category: str, now_utc: datetime.datetime) -> l
                 if any(x in entry_tags for x in ["映画", "アニメ", "ドラマ", "エンタメ"]) or title.startswith("映画"):
                     continue
             elif category == "Gaming":
-                if "レビュー" in entry_tags or "レビュー" in title:
+                tags_lower = [t.lower() for t in entry_tags]
+                if "レビュー" in entry_tags or "レビュー" in title or "review" in tags_lower or " review" in title.lower():
                     continue
 
             raw_guid = getattr(entry, "id", "") or getattr(entry, "guid", "") or link
@@ -1733,11 +1765,7 @@ def load_existing_database(now_utc: datetime.datetime) -> tuple[list[dict], dict
         if not it:
             continue
         cat = it.get("tag", "")
-        if cat in ("Gaming", "Review") and "jp.ign.com" not in it["link"].lower():
-            continue
         if cat == "Technology" and "theverge.com" not in it["link"].lower():
-            continue
-        if cat == "Gadgets" and "mashable.com" not in it["link"].lower():
             continue
         normalized_items.append(it)
         existing_by_guid[it["guid"]] = it
@@ -1830,10 +1858,6 @@ def run():
         for item in selected_candidates:
             link = item["link"]
             if cat == "Technology" and "theverge.com" not in link.lower():
-                continue
-            if cat == "Gadgets" and "mashable.com" not in link.lower():
-                continue
-            if cat in ("Gaming", "Review") and "jp.ign.com" not in link.lower():
                 continue
 
             existing_item = (
