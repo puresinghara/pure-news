@@ -1,7 +1,7 @@
 # ⚡ Pure News — Automated News & Game Reviews Aggregator
 
 > **Live Automated News Reader:** Auto-scraped from BBC Premier League, The Verge, Mashable SEA Gadgets, IGN Japan Games, and IGN Japan Reviews.
-> *อัปเดตล่าสุด: `16 พ.ย. 2026 • 16:37 น.`* • *รวมทั้งหมด: `150 รายการ`* (`⚽ Premier League: 30` | `⚡ Tech: 30` | `📱 Gadgets: 30` | `🎮 IGN Games: 30` | `⭐ Reviews: 30`)
+> *อัปเดตล่าสุด: `16 พ.ย. 2026 • 16:40 น.`* • *รวมทั้งหมด: `150 รายการ`* (`⚽ Premier League: 30` | `⚡ Tech: 30` | `📱 Gadgets: 30` | `🎮 IGN Games: 30` | `⭐ Reviews: 30`)
 
 ### 🌐 [กดที่นี่เพื่อเปิดหน้าเว็บอ่านข่าว (GitHub Pages)](https://puresinghara.github.io/pure-news/)
 
