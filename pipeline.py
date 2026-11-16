@@ -297,14 +297,18 @@ def extract_sub_tag(item: dict) -> str:
                 clean_seg = " ".join(clean_seg.split()[:3])[:22].strip()
             if clean_seg:
                 return clean_seg
-        if "switch 2" in body or "nintendo" in body:
+        if re.search(r"\b(?:switch\s*2|nintendo)\b", body):
             return "NINTENDO"
-        if "ps5" in body or "playstation" in body:
+        if re.search(r"\b(?:ps5|playstation)\b", body):
             return "PLAYSTATION"
-        if "xbox" in body:
+        if re.search(r"\bxbox\b", body):
             return "XBOX"
-        if "steam" in body or "pc" in body:
+        if re.search(r"\b(?:steam|pc)\b", body) or "pcgamer.com" in link.lower():
             return "PC GAMING"
+        if re.search(r"\b(?:sci-fi|science fiction|black mirror|doctor who|star trek|dune)\b", body) or "ไซไฟ" in title:
+            return "SCI-FI"
+        if re.search(r"\b(?:movie|movies|film|series|tv show|netflix|disney\+|hbo|amazon prime|cinema|box office|avengers|comic|peanuts)\b", body):
+            return "MOVIES & TV"
         return "GAMING" if cat == "Gaming" else "GAME REVIEW"
 
     return ""
