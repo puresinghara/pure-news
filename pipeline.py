@@ -95,7 +95,13 @@ BAD_IMG_KEYWORDS = [
     "flexiimages", ".svg", "nosize", "flags/", "logo", "avatar", "icon",
     "/users/", "banner", "badge", "tracking", "sponsored", "pixel", "ad-",
     "scorecardresearch", "placeholder", "author", "profile", "button", "1x1",
-    "ign30-logo", "ign_kw_logo", "/user/", "/avatars/", "data:image"
+    "ign30-logo", "ign_kw_logo", "/user/", "/avatars/", "data:image",
+    "adchoices", "ziffstatic.com/adchoices", "doubleclick", "googlesyndication",
+    "taboola", "outbrain", "amazon-adsystem", "skysports-now-new",
+    "skysports-super-6", "sky-bet", "skysports-football-premier-league_7314479",
+    "_blurple.", "/75x75/", "/100x100/", "/150x150/", "-200-80.",
+    "w=290", "h=145", "newsletter", "subscribe", "promo", "qrcode",
+    "qr-code", "app-store", "google-play"
 ]
 
 CURATED_GAMING_COVERS = [
@@ -117,10 +123,9 @@ CATEGORY_FALLBACK_COVERS = {
     "Gadgets": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80",
     "Gaming": "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&q=80",
     "Review": "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&q=80",
-    "Entertainment": "https://images.unsplash.com/photo-1536440136628-849c177e7621?w=1200&q=80",
 }
 
-CATEGORIES_ORDER = ["Football", "Technology", "Gadgets", "Gaming", "Review", "Entertainment"]
+CATEGORIES_ORDER = ["Football", "Technology", "Gadgets", "Gaming", "Review"]
 
 CATEGORIES_CONFIG = {
     "Football": [
@@ -158,12 +163,6 @@ CATEGORIES_CONFIG = {
         "https://www.gamespot.com/feeds/reviews/",
         "https://feeds.feedburner.com/ign/reviews",
         "https://www.eurogamer.net/feed/reviews",
-    ],
-    "Entertainment": [
-        "https://jp.ign.com/entertainment.xml",
-        "https://feeds.feedburner.com/ign/movies-articles",
-        "https://feeds.feedburner.com/ign/tv-articles",
-        "https://www.polygon.com/rss/index.xml",
     ],
 }
 
@@ -314,27 +313,7 @@ def extract_sub_tag(item: dict) -> str:
             return "PC GAMING"
         if re.search(r"\b(?:sci-fi|science fiction|black mirror|doctor who|star trek|dune)\b", body) or "ไซไฟ" in title:
             return "SCI-FI"
-        if re.search(r"\b(?:movie|movies|film|series|tv show|netflix|disney\+|hbo|amazon prime|cinema|box office|avengers|comic|peanuts)\b", body):
-            return "MOVIES & TV"
         return "GAMING" if cat == "Gaming" else "GAME REVIEW"
-
-    if cat == "Entertainment":
-        body = f"{seg.replace('-', ' ')} {title}"
-        if re.search(r"\b(?:sci-fi|science fiction|black mirror|doctor who|star trek|dune)\b", body) or "ไซไฟ" in title:
-            return "SCI-FI"
-        if re.search(r"\b(?:anime|manga|demon slayer|jujutsu|one piece|dragon ball|gundam|studio ghibli)\b", body) or "อนิเมะ" in title or "アニメ" in title:
-            return "ANIME"
-        if re.search(r"\b(?:marvel|avengers|spider-man|x-men|mcu|deadpool|batman|superman|dc)\b", body):
-            return "MARVEL / DC"
-        if re.search(r"\b(?:star wars|mandalorian|jedi|andor)\b", body):
-            return "STAR WARS"
-        if re.search(r"\b(?:netflix|disney\+|hbo|amazon prime|apple tv)\b", body):
-            return "STREAMING"
-        if re.search(r"\b(?:series|season|episode|tv show|sitcom|drama)\b", body) or "ซีรีส์" in title:
-            return "TV SERIES"
-        if re.search(r"\b(?:movie|movies|film|cinema|box office|oscar)\b", body) or "ภาพยนตร์" in title or "หนัง" in title:
-            return "MOVIES"
-        return "MOVIES & TV"
 
     return ""
 
@@ -365,7 +344,7 @@ SYSTEM_PROMPT = """คุณคือนักข่าวและบรรณ�
    - แปลพาดหัวข่าวภาษาไทยให้กระชับ ดึงดูด ตรงประเด็น ทับศัพท์ถูกต้องตาม Fact ห้ามคืนค่าเป็นภาษาต้นฉบับล้วน
 4. ทับศัพท์ชื่อเฉพาะ สโมสร นักกีฬา แบรนด์ ฮาร์ดแวร์ โมเดล AI และชื่อเกมสากล ให้ถูกต้องตามหลักสากล
 
-กฎแท็ก (Tag): ให้ระบุเป็นหนึ่งในหกหมวดนี้เท่านั้น: "Football", "Technology", "Gadgets", "Gaming", "Review", "Entertainment"
+กฎแท็ก (Tag): ให้ระบุเป็นหนึ่งในห้าหมวดนี้เท่านั้น: "Football", "Technology", "Gadgets", "Gaming", "Review"
 """
 
 CATEGORY_PROMPTS = {
@@ -388,11 +367,7 @@ CATEGORY_PROMPTS = {
     "Review": """บทบาทเฉพาะหมวดหมู่ (Game Reviews - IGN Japan / GameSpot / IGN US / Eurogamer):
 - คุณคือบรรณาธิการและนักวิจารณ์เกมมืออาชีพ แปลบทความรีวิวเกมจากต้นฉบับ (ภาษาญี่ปุ่น หรือ ภาษาอังกฤษ) เป็นภาษาไทยเชิงลึก
 - แปลงชื่อเกมเป็นชื่อภาษาอังกฤษสากลเสมอ
-- ถ่ายทอดรายละเอียดการรีวิวอย่างครบถ้วน ทั้งระบบเกมเพลย์ (Gameplay), การออกแบบด่าน, เนื้อเรื่อง, กราฟิก/เฟรมเรต, จุดเด่น, จุดสังเกต และบทสรุปคำตัดสิน (Verdict) ด้วยสำนวนรีวิวเกมที่อ่านสนุก น่าติดตาม และได้อารมณ์เหมือนอ่านนิตยสารเกมชั้นนำ""",
-    "Entertainment": """บทบาทเฉพาะหมวดหมู่ (Movies & TV - IGN / IGN Japan / Polygon):
-- คุณคือบรรณาธิการข่าวภาพยนตร์ ซีรีส์ อนิเมะ และป๊อปคัลเจอร์มืออาชีพ
-- คงชื่อภาพยนตร์ ซีรีส์ การ์ตูน ชื่อนักแสดง ผู้กำกับ และแพลตฟอร์มสตรีมมิง (Netflix, Disney+, HBO Max, Prime Video, Apple TV+) ตามชื่อสากลที่คนไทยคุ้นเคย
-- แปลรายละเอียดเรื่องย่อ เบื้องหลังงานสร้าง บทสัมภาษณ์ และวันเข้าฉายให้ครบถ้วนและอ่านสนุก"""
+- ถ่ายทอดรายละเอียดการรีวิวอย่างครบถ้วน ทั้งระบบเกมเพลย์ (Gameplay), การออกแบบด่าน, เนื้อเรื่อง, กราฟิก/เฟรมเรต, จุดเด่น, จุดสังเกต และบทสรุปคำตัดสิน (Verdict) ด้วยสำนวนรีวิวเกมที่อ่านสนุก น่าติดตาม และได้อารมณ์เหมือนอ่านนิตยสารเกมชั้นนำ"""
 }
 
 
@@ -693,9 +668,9 @@ def scrape_article_details(item: dict) -> dict:
         )
         article_html = art_m.group(1) if art_m else content
 
-        # Remove related-article float boxes & script/style noise before parsing paragraphs/media
-        article_html = re.sub(r'<aside[^>]*class=["\'][^"\']*floatrecirc[^"\']*["\'][^>]*>.*?</aside>', "", article_html, flags=re.S | re.I)
-        article_html = re.sub(r'<div[^>]*class=["\'][^"\']*recirc-title[^"\']*["\'][^>]*>.*?</div>', "", article_html, flags=re.S | re.I)
+        # Remove related-article float boxes, ad/promo containers & script/style noise before parsing paragraphs/media
+        article_html = re.sub(r"<(aside|nav|footer)[^>]*>.*?</\1>", "", article_html, flags=re.S | re.I)
+        article_html = re.sub(r'<div[^>]*class=["\'][^"\']*(?:recirc-title|advert|promo|newsletter|sidebar|ad-slot|ad-container|sponsored)[^"\']*["\'][^>]*>.*?</div>', "", article_html, flags=re.S | re.I)
         article_html = re.sub(r"<(script|style)[^>]*>.*?</\1>", "", article_html, flags=re.S | re.I)
 
         # 4. Extract ALL paragraphs (supports both closed </p> and IGN Japan's unclosed <p> tags)
@@ -883,9 +858,7 @@ def call_gemini(item_info: dict) -> dict:
             parsed = json.loads(raw_text)
 
             tag = parsed.get("tag", "").strip()
-            if "ent" in tag.lower() or "movie" in tag.lower():
-                parsed["tag"] = "Entertainment"
-            elif "rev" in tag.lower():
+            if "rev" in tag.lower():
                 parsed["tag"] = "Review"
             elif "gadget" in tag.lower():
                 parsed["tag"] = "Gadgets"
@@ -943,14 +916,13 @@ def update_ui_files(news_list: list[dict]):
     gadgets_count = sum(1 for x in clean_news if x.get("tag") == "Gadgets")
     gaming_count = sum(1 for x in clean_news if x.get("tag") == "Gaming")
     review_count = sum(1 for x in clean_news if x.get("tag") == "Review")
-    ent_count = sum(1 for x in clean_news if x.get("tag") == "Entertainment")
 
     # 1. README.md
     readme_lines = [
         "# ⚡ Pure News — Automated News & Game Reviews Aggregator",
         "",
-        "> **Live Automated News Reader:** Auto-scraped from BBC/Guardian/Sky Premier League, The Verge, Mashable/Engadget/GSMArena/9to5/Gizmodo Gadgets, IGN/GameSpot/PCGamer/Polygon/RPS Gaming, Game Reviews, and Movies & TV.",
-        f"> *อัปเดตล่าสุด: `{now_th}`* • *รวมทั้งหมด: `{len(clean_news)} รายการ`* (`⚽ Premier League: {football_count}` | `⚡ Tech: {tech_count}` | `📱 Gadgets: {gadgets_count}` | `🎮 Gaming: {gaming_count}` | `⭐ Reviews: {review_count}` | `🎬 Movies & TV: {ent_count}`)",
+        "> **Live Automated News Reader:** Auto-scraped from BBC/Guardian/Sky Premier League, The Verge, Mashable/Engadget/GSMArena/9to5/Gizmodo Gadgets, IGN/GameSpot/PCGamer/Polygon/RPS Gaming, and Game Reviews.",
+        f"> *อัปเดตล่าสุด: `{now_th}`* • *รวมทั้งหมด: `{len(clean_news)} รายการ`* (`⚽ Premier League: {football_count}` | `⚡ Tech: {tech_count}` | `📱 Gadgets: {gadgets_count}` | `🎮 Gaming: {gaming_count}` | `⭐ Reviews: {review_count}`)",
         "",
         "### 🌐 [กดที่นี่เพื่อเปิดหน้าเว็บอ่านข่าว (GitHub Pages)](https://puresinghara.github.io/pure-news/)",
         "",
@@ -1015,7 +987,6 @@ def update_ui_files(news_list: list[dict]):
         <button onclick="filterTag('Gadgets')" id="filterGadgets" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-emerald-400 font-mono text-xs rounded transition whitespace-nowrap">GADGETS</button>
         <button onclick="filterTag('Gaming')" id="filterGaming" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-amber-400 font-mono text-xs rounded transition whitespace-nowrap">GAMING</button>
         <button onclick="filterTag('Review')" id="filterReview" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-purple-400 font-mono text-xs rounded transition whitespace-nowrap">GAME REVIEWS</button>
-        <button onclick="filterTag('Entertainment')" id="filterEntertainment" class="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-rose-400 font-mono text-xs rounded transition whitespace-nowrap">MOVIES &amp; TV</button>
         <button onclick="refreshLiveNews(this)" title="ดึงข้อมูลข่าวล่าสุด" class="p-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 rounded transition ml-1 shrink-0">
           <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
         </button>
@@ -1132,8 +1103,7 @@ def update_ui_files(news_list: list[dict]):
       Technology: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80',
       Gadgets: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80',
       Gaming: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&q=80',
-      Review: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&q=80',
-      Entertainment: 'https://images.unsplash.com/photo-1536440136628-849c177e7621?w=1200&q=80'
+      Review: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&q=80'
     }};
 
     const FONT_STEPS = [
@@ -1368,7 +1338,7 @@ def update_ui_files(news_list: list[dict]):
 
     function filterTag(tag) {{
       currentTag = tag;
-      ['ALL', 'Football', 'Technology', 'Gadgets', 'Gaming', 'Review', 'Entertainment'].forEach(t => {{
+      ['ALL', 'Football', 'Technology', 'Gadgets', 'Gaming', 'Review'].forEach(t => {{
         const btn = document.getElementById('filter' + t);
         if (btn) {{
           if (t === tag) {{
@@ -1379,7 +1349,6 @@ def update_ui_files(news_list: list[dict]):
             if (t === 'Technology') textColor = 'text-cyan-400';
             if (t === 'Gadgets') textColor = 'text-emerald-400';
             if (t === 'Review') textColor = 'text-purple-400';
-            if (t === 'Entertainment') textColor = 'text-rose-400';
             btn.className = `px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 ${{textColor}} font-mono text-xs rounded transition whitespace-nowrap`;
           }}
         }}
@@ -1422,14 +1391,12 @@ def update_ui_files(news_list: list[dict]):
         else if (item.tag === 'Gadgets') tagColor = 'text-emerald-400';
         else if (item.tag === 'Gaming') tagColor = 'text-amber-400';
         else if (item.tag === 'Review') tagColor = 'text-purple-400';
-        else if (item.tag === 'Entertainment') tagColor = 'text-rose-400';
 
         const reviewBadge = item.review_score ? `<div class="absolute top-2.5 right-2.5 bg-[#ff3366] text-white font-mono font-extrabold text-xs px-2.5 py-1 rounded shadow-lg border border-white/20">⭐ ${{escapeHtml(item.review_score)}} / 10</div>` : '';
 
         const imgSrc = item.cover_image_url || CATEGORY_FALLBACKS[item.tag] || CATEGORY_FALLBACKS.Gaming;
         const loadingAttr = cardIdx < 6 ? 'eager' : 'lazy';
-        const displayTag = item.tag === 'Entertainment' ? 'MOVIES & TV' : (item.tag || '');
-        const safeTag = escapeHtml(displayTag);
+        const safeTag = escapeHtml(item.tag || '');
         const safeSubTag = escapeHtml(item.sub_tag || '');
         const subTagBadge = safeSubTag ? `<span class="px-1.5 py-0.5 rounded bg-zinc-800/90 text-zinc-200 border border-zinc-700/80 text-[10px] font-mono font-semibold tracking-wide uppercase">${{safeSubTag}}</span>` : '';
         const safeDate = escapeHtml(item.published_th || item.published_at || '');
@@ -1479,7 +1446,7 @@ def update_ui_files(news_list: list[dict]):
       isModalOpen = true;
       history.pushState({{ modalOpen: true, newsId: item.id }}, '', '#news-' + item.id);
 
-      document.getElementById('modalTag').textContent = item.tag === 'Entertainment' ? 'MOVIES & TV' : (item.tag || '');
+      document.getElementById('modalTag').textContent = item.tag || '';
       const modalSubTag = document.getElementById('modalSubTag');
       if (modalSubTag) {{
         if (item.sub_tag) {{
@@ -1666,16 +1633,13 @@ def fetch_feed_entries(url: str, category: str, now_utc: datetime.datetime) -> l
                 if isinstance(t, dict)
             ]
             if category == "Review":
-                if any(x in entry_tags for x in ["映画", "アニメ", "ドラマ", "エンタメ"]) or title.startswith("映画"):
+                if any(x in entry_tags for x in ["映画", "アニメ", "ドラマ", "エンタメ"]) or title.startswith("映画") or _is_movies_tv_entry(title, entry_tags, link):
                     continue
             elif category == "Gaming":
                 tags_lower = [t.lower() for t in entry_tags]
                 if "レビュー" in entry_tags or "レビュー" in title or "review" in tags_lower or " review" in title.lower():
                     continue
                 if _is_movies_tv_entry(title, entry_tags, link):
-                    continue
-            elif category == "Entertainment":
-                if "polygon.com" in link.lower() and not _is_movies_tv_entry(title, entry_tags, link):
                     continue
 
             raw_guid = getattr(entry, "id", "") or getattr(entry, "guid", "") or link
@@ -1757,14 +1721,15 @@ def normalize_existing_item(it: dict, now_utc: datetime.datetime) -> dict | None
     elif "gadget" in tag.lower():
         tag = "Gadgets"
     elif "ent" in tag.lower() or "movie" in tag.lower():
-        tag = "Entertainment"
+        return None
     elif "rev" in tag.lower():
+        if _is_movies_tv_entry(it.get("original_title", ""), [], link):
+            return None
         tag = "Review"
     elif "game" in tag.lower() or "gaming" in tag.lower():
         if _is_movies_tv_entry(it.get("original_title", ""), [], link):
-            tag = "Entertainment"
-        else:
-            tag = "Gaming"
+            return None
+        tag = "Gaming"
     it["tag"] = tag
     it["category_hint"] = tag
 
@@ -1788,7 +1753,8 @@ def normalize_existing_item(it: dict, now_utc: datetime.datetime) -> dict | None
     if "review_score" not in it:
         it["review_score"] = ""
     it["sub_tag"] = extract_sub_tag(it)
-    it["cover_image_url"] = make_hd_image_url(it.get("cover_image_url", ""))
+    raw_cover = it.get("cover_image_url", "")
+    it["cover_image_url"] = make_hd_image_url(raw_cover) if _is_usable_image_url(raw_cover) else ""
     return it
 
 
@@ -1836,13 +1802,13 @@ def load_existing_database(now_utc: datetime.datetime) -> tuple[list[dict], dict
         cat = it.get("tag", "")
         if cat == "Technology" and "theverge.com" not in it["link"].lower():
             continue
-        if cat in ("Gaming", "Review") and any(bad_dom in it["link"].lower() for bad_dom in ("gematsu.com", "videogameschronicle.com")):
+        if cat in ("Gaming", "Review") and (
+            any(bad_dom in it["link"].lower() for bad_dom in ("gematsu.com", "videogameschronicle.com"))
+            or _is_movies_tv_entry(it.get("original_title", ""), [], it["link"])
+        ):
             continue
-        if cat == "Gaming" and _is_movies_tv_entry(it.get("original_title", ""), [], it["link"]):
-            it["tag"] = "Entertainment"
-            it["category_hint"] = "Entertainment"
-            it["sub_tag"] = extract_sub_tag(it)
-            cat = "Entertainment"
+        if cat not in existing_by_cat:
+            continue
         normalized_items.append(it)
         existing_by_guid[it["guid"]] = it
         existing_by_link[it["canonical_link"]] = it
