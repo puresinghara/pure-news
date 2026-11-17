@@ -92,16 +92,23 @@ TRACKING_QUERY_PARAMS = {
 }
 
 BAD_IMG_KEYWORDS = [
-    "flexiimages", ".svg", "nosize", "flags/", "logo", "avatar", "icon",
-    "/users/", "banner", "badge", "tracking", "sponsored", "pixel", "ad-",
-    "scorecardresearch", "placeholder", "author", "profile", "button", "1x1",
-    "ign30-logo", "ign_kw_logo", "/user/", "/avatars/", "data:image",
-    "adchoices", "ziffstatic.com/adchoices", "doubleclick", "googlesyndication",
-    "taboola", "outbrain", "amazon-adsystem", "skysports-now-new",
-    "skysports-super-6", "sky-bet", "skysports-football-premier-league_7314479",
-    "_blurple.", "/75x75/", "/100x100/", "/150x150/", "-200-80.",
-    "w=290", "h=145", "newsletter", "subscribe", "promo", "qrcode",
-    "qr-code", "app-store", "google-play"
+    "flexiimages", ".svg", "nosize", "flags/", "avatar", "/users/",
+    "banner", "badge", "tracking", "sponsored", "scorecardresearch",
+    "placeholder", "profile", "1x1", "ign30-logo", "ign_kw_logo",
+    "/user/", "/avatars/", "data:image", "adchoices", "ziffstatic.com/adchoices",
+    "doubleclick", "googlesyndication", "taboola", "outbrain", "amazon-adsystem",
+    "skysports-now-new", "skysports-super-6", "sky-bet",
+    "skysports-football-premier-league_7314479", "_blurple.", "/75x75/",
+    "/100x100/", "/150x150/", "-200-80.", "w=290", "h=145", "newsletter",
+    "subscribe", "promo", "qrcode", "qr-code", "app-store", "google-play"
+]
+
+BAD_IMG_REGEXES = [
+    re.compile(r"(?:^|[/_])(?:ad|ads|adchoices)(?:[/_.-]|$)"),
+    re.compile(r"(?:^|[/_.-])(?:1x1|tracking[-_]?pixel)(?:[/_.-]|$)"),
+    re.compile(r"(?:^|[/_.-])(?:share|follow|subscribe|cta)[-_]?button|/buttons?/"),
+    re.compile(r"/logos?/|/icons?/|favicon|apple-touch-icon|(?:site|brand|header|footer)[-_]?(?:logo|icon)"),
+    re.compile(r"/authors?/"),
 ]
 
 CURATED_GAMING_COVERS = [
@@ -530,7 +537,9 @@ def _is_usable_image_url(url: str) -> bool:
     if not u.startswith(("http://", "https://")):
         return False
     ul = u.lower()
-    return not any(bad in ul for bad in BAD_IMG_KEYWORDS)
+    if any(bad in ul for bad in BAD_IMG_KEYWORDS):
+        return False
+    return not any(rx.search(ul) for rx in BAD_IMG_REGEXES)
 
 
 def _image_stem(url: str) -> str:
