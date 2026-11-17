@@ -339,6 +339,25 @@ def _is_movies_tv_entry(title: str, entry_tags: list[str] = None, link: str = ""
     ))
 
 
+def _is_non_game_review(title: str, entry_tags: list[str] = None, link: str = "", thai_title: str = "") -> bool:
+    """Return True if a Review entry is NOT a video game review (e.g. movie, TV episode, LEGO set, TTRPG, book)."""
+    if _is_movies_tv_entry(title, entry_tags, link):
+        return True
+    l_lower = (link or "").lower()
+    t_lower = (title or "").lower()
+    th_lower = (thai_title or "").lower()
+    if any(k in l_lower for k in [
+        "-ttrpg-", "board-game", "lego-", "we-build-", "-episode-", "recap-and-review",
+        "apple-tv", "netflix", "disney-plus", "hbo", "/movies/", "/tv/", "/comics/"
+    ]):
+        return True
+    if any(k in th_lower for k in ["รีวิวซีรีส์", "รีวิวภาพยนตร์", "รีวิวหนัง", "หนังปล้น", "ดราม่าอาชญากรรม", "ดราม่าวัยรุ่น", "ต่อจิ๊กซอว์", "lego "]):
+        return True
+    if re.search(r"\b(?:episode \d+|recap|ttrpg|board game|tabletop|lego|book review|comic review)\b", t_lower):
+        return True
+    return False
+
+
 SYSTEM_PROMPT = """คุณคือนักข่าวและบรรณาธิการข่าวมืออาชีพ แปลและถ่ายทอดเนื้อหาข่าวและบทความรีวิวจากภาษาต้นฉบับ (ภาษาอังกฤษ หรือ ภาษาญี่ปุ่น) เป็นภาษาไทยอย่างละเอียด ครบถ้วนสมบูรณ์ทุกมิติ และตรงตามข้อเท็จจริง (Fact-based) 100%
 กฎสำคัญที่สุด:
 1. การแปลเนื้อหาฉบับเต็ม ("full_paragraphs"):
@@ -621,12 +640,21 @@ def scrape_article_details(item: dict) -> dict:
     videos = []
     clean_paras = []
     review_score = item.get("review_score", "")
+    is_non_game_review = _is_non_game_review(item.get("title", ""), [], link)
 
     try:
         resp = requests.get(link, headers=HEADERS, timeout=15)
         resp.raise_for_status()
         resp.encoding = resp.encoding or "utf-8"
         content = resp.text
+
+        # Detect non-video-game reviews on IGN via JSON-LD itemReviewed
+        if "ign.com" in link.lower() and not is_non_game_review:
+            ir_m = re.search(r'"itemReviewed"\s*:\s*\{[^}]*"@type"\s*:\s*"([^"]+)"', content, re.I)
+            if ir_m and ir_m.group(1).lower() in ("movie", "tvseries", "tvepisode", "book", "comicseries", "product"):
+                is_non_game_review = True
+            elif re.search(r'"itemReviewed"\s*:\s*\{[^}]*"url"\s*:\s*"https?://[^"]*ign\.com/(?:movies|tv|comics|board-games|tech)/', content, re.I):
+                is_non_game_review = True
 
         # 1. Lead / Cover Image (prefer og:image if missing or non-IGN)
         meta_img = _extract_meta_image(content)
@@ -778,6 +806,7 @@ def scrape_article_details(item: dict) -> dict:
     item["gallery_images"] = gallery_images[:8]
     item["videos"] = videos[:3]
     item["review_score"] = review_score
+    item["is_non_game_review"] = is_non_game_review
     item["raw_paragraphs"] = clean_paras[:45] if clean_paras else [item["description"]]
     return item
 
@@ -1642,7 +1671,7 @@ def fetch_feed_entries(url: str, category: str, now_utc: datetime.datetime) -> l
                 if isinstance(t, dict)
             ]
             if category == "Review":
-                if any(x in entry_tags for x in ["映画", "アニメ", "ドラマ", "エンタメ"]) or title.startswith("映画") or _is_movies_tv_entry(title, entry_tags, link):
+                if any(x in entry_tags for x in ["映画", "アニメ", "ドラマ", "エンタメ"]) or title.startswith("映画") or _is_non_game_review(title, entry_tags, link):
                     continue
             elif category == "Gaming":
                 tags_lower = [t.lower() for t in entry_tags]
@@ -1732,7 +1761,7 @@ def normalize_existing_item(it: dict, now_utc: datetime.datetime) -> dict | None
     elif "ent" in tag.lower() or "movie" in tag.lower():
         return None
     elif "rev" in tag.lower():
-        if _is_movies_tv_entry(it.get("original_title", ""), [], link):
+        if _is_non_game_review(it.get("original_title", ""), [], link, it.get("thai_title", "")):
             return None
         tag = "Review"
     elif "game" in tag.lower() or "gaming" in tag.lower():
@@ -1949,6 +1978,8 @@ def run():
             logger.info(f"[{cat}] Scraping full content, screenshots & videos for {len(new_items_to_translate)} articles...")
             with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
                 scraped_items = list(executor.map(scrape_article_details, new_items_to_translate))
+            if cat == "Review":
+                scraped_items = [s for s in scraped_items if not s.get("is_non_game_review")]
 
             logger.info(f"[{cat}] Translating {len(scraped_items)} articles with {GEMINI_MODEL} (rate-limited)...")
             with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
