@@ -100,7 +100,8 @@ BAD_IMG_KEYWORDS = [
     "skysports-now-new", "skysports-super-6", "sky-bet",
     "skysports-football-premier-league_7314479", "_blurple.", "/75x75/",
     "/100x100/", "/150x150/", "-200-80.", "w=290", "h=145", "newsletter",
-    "subscribe", "promo", "qrcode", "qr-code", "app-store", "google-play"
+    "subscribe", "promo", "qrcode", "qr-code",
+    "/static/stores/", "logo-gsmarena", "playwire-logo", "tag-page-cover-art",
 ]
 
 BAD_IMG_REGEXES = [
@@ -109,6 +110,8 @@ BAD_IMG_REGEXES = [
     re.compile(r"(?:^|[/_.-])(?:share|follow|subscribe|cta)[-_]?button|/buttons?/"),
     re.compile(r"/logos?/|/icons?/|favicon|apple-touch-icon|(?:site|brand|header|footer)[-_]?(?:logo|icon)"),
     re.compile(r"/authors?/"),
+    re.compile(r"(?:download|get)[-_]?(?:on|it)[-_]?(?:the)?[-_]?(?:app[-_]?store|google[-_]?play)|(?:app[-_]?store|google[-_]?play)[-_]?(?:badge|btn|button|icon|logo)"),
+    re.compile(r"[?&](?:w|h)=(?:32|90)(?:&|$)"),
 ]
 
 CURATED_GAMING_COVERS = [
@@ -119,13 +122,12 @@ CURATED_GAMING_COVERS = [
     "https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?w=1200&q=80",
     "https://images.unsplash.com/photo-1563089145-599997674d42?w=1200&q=80",
     "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1200&q=80",
-    "https://images.unsplash.com/photo-1612287233207-6b4d32a90ca4?w=1200&q=80",
     "https://images.unsplash.com/photo-1580234811497-9df7fd2f357e?w=1200&q=80",
     "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=1200&q=80",
 ]
 
 CATEGORY_FALLBACK_COVERS = {
-    "Football": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1200&q=80",
+    "Football": "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200&q=80",
     "Technology": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80",
     "Gadgets": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80",
     "Gaming": "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&q=80",
@@ -529,9 +531,32 @@ def make_hd_image_url(url: str) -> str:
     # Upgrade BBC thumbnails (/240/, /320/, /480/ -> /1200/)
     url = re.sub(r"/(standard|branded_sport|branded_news)/\d+/", r"/\1/1200/", url)
     url = re.sub(r"/ic/\d+x\d+/", r"/ic/1024x576/", url)
+    # Upgrade Sky Sports (365dm.com) thumbnails (/768x432/ -> /1920x1080/)
+    if "365dm.com" in url:
+        url = re.sub(
+            r"/(\d+)x(\d+)/",
+            lambda m: "/1920x1080/" if int(m.group(1)) < 1200 else m.group(0),
+            url,
+        )
     # Upgrade IGN Japan & Mashable SEA thumbnails (sm.*/t/...280.jpg -> .1200.jpg)
     if "sm.ign.com/t/" in url or "sm.mashable.com/t/" in url:
         url = re.sub(r"\.\d+\.(jpg|jpeg|png|webp)(\?.*)?$", r".1200.\1", url, flags=re.IGNORECASE)
+    # Upgrade GSMArena thumbnails (/-184x111/, /-728x314/, /-952x498w6/ -> full-res original)
+    if "fdn.gsmarena.com" in url:
+        url = re.sub(r"/-\d+x\d+\w*/", "/", url)
+    # Upgrade GameSpot (?w=300 -> ?w=1200)
+    if "gamespot.com" in url:
+        url = re.sub(
+            r"([?&])w=(\d+)",
+            lambda m: f"{m.group(1)}w=1200" if int(m.group(2)) < 1200 else m.group(0),
+            url,
+        )
+    # Upgrade The Guardian (i.guim.co.uk) low-res signed widths to unsigned 1200px
+    if "i.guim.co.uk/img/media/" in url:
+        wm = re.search(r"[?&]width=(\d+)", url)
+        if wm and int(wm.group(1)) < 1000:
+            base_guim = url.split("?", 1)[0]
+            url = f"{base_guim}?width=1200&dpr=1&s=none&crop=none"
     # Upgrade Eurogamer (assetsio.gnwcdn.com)
     if "assetsio.gnwcdn.com" in url:
         url = re.sub(r"width=\d+", "width=1200", url)
@@ -555,10 +580,20 @@ def _is_usable_image_url(url: str) -> bool:
     u = url.strip()
     if not u.startswith(("http://", "https://")):
         return False
-    ul = u.lower()
+    ul = urllib.parse.unquote(u).lower()
     if any(bad in ul for bad in BAD_IMG_KEYWORDS):
         return False
     return not any(rx.search(ul) for rx in BAD_IMG_REGEXES)
+
+
+def _is_usable_gallery_image(url: str) -> bool:
+    if not _is_usable_image_url(url):
+        return False
+    ul = urllib.parse.unquote(url).lower()
+    # GSMArena WxH paths (/-184x111/, /-347x151/) in page HTML are sidebar related-article cards, not inline photos
+    if "fdn.gsmarena.com" in ul and re.search(r"/-\d+x\d+\w*/", ul):
+        return False
+    return True
 
 
 def _image_stem(url: str) -> str:
@@ -566,25 +601,47 @@ def _image_stem(url: str) -> str:
     if not url:
         return ""
     base = os.path.basename(url.split("?")[0]).lower()
+    base = re.sub(r"^l-(intro-\d+)", r"\1", base)
+    base = re.sub(r"-\d+-\d+(\.\w+)$", r"\1", base)
     base = re.sub(r"\.\d+(\.\w+)$", r"\1", base)
     return base
 
 
 def extract_entry_thumbnail(entry) -> str:
     """Extract best thumbnail URL across RSS/Atom standards: media:content, media:thumbnail, enclosure, HTML body."""
-    media_content = entry.get("media_content") or []
-    for mc in media_content:
+    best_mc_url = ""
+    best_mc_w = -1
+    for mc in (entry.get("media_content") or []):
         u = (mc.get("url") or "").strip()
         mtype = (mc.get("type") or "").lower()
         medium = (mc.get("medium") or "").lower()
         if u and (medium == "image" or mtype.startswith("image/") or (not mtype.startswith(("video/", "audio/")) and _is_usable_image_url(u))):
-            return make_hd_image_url(u)
+            if not _is_usable_image_url(u):
+                continue
+            try:
+                w_val = int(mc.get("width") or 0)
+            except (ValueError, TypeError):
+                w_val = 0
+            if w_val > best_mc_w:
+                best_mc_w = w_val
+                best_mc_url = u
+    if best_mc_url:
+        return make_hd_image_url(best_mc_url)
 
-    media_thumb = entry.get("media_thumbnail") or []
-    for mt in media_thumb:
+    best_mt_url = ""
+    best_mt_w = -1
+    for mt in (entry.get("media_thumbnail") or []):
         u = (mt.get("url") or "").strip()
         if _is_usable_image_url(u):
-            return make_hd_image_url(u)
+            try:
+                w_val = int(mt.get("width") or 0)
+            except (ValueError, TypeError):
+                w_val = 0
+            if w_val > best_mt_w:
+                best_mt_w = w_val
+                best_mt_url = u
+    if best_mt_url:
+        return make_hd_image_url(best_mt_url)
 
     enclosures = entry.get("enclosures") or []
     for enc in enclosures:
@@ -631,6 +688,27 @@ def _extract_meta_image(page_html: str) -> str:
     return ""
 
 
+def _extract_div_by_id(page_html: str, div_id: str) -> str:
+    """Extract inner HTML of a balanced <div> with the given id attribute."""
+    start_m = re.search(
+        rf'<div\b[^>]*\bid=["\']{re.escape(div_id)}["\'][^>]*>',
+        page_html,
+        re.IGNORECASE,
+    )
+    if not start_m:
+        return ""
+    pos = start_m.end()
+    depth = 1
+    for tag_m in re.finditer(r"<(/?)div\b[^>]*>", page_html[pos:], re.IGNORECASE):
+        if tag_m.group(1) == "/":
+            depth -= 1
+            if depth == 0:
+                return page_html[pos : pos + tag_m.start()]
+        else:
+            depth += 1
+    return page_html[pos:]
+
+
 def scrape_article_details(item: dict) -> dict:
     """Scrape article webpage for HD lead image, paragraphs, inline screenshots, YouTube videos, and review score."""
     link = item["link"]
@@ -656,9 +734,9 @@ def scrape_article_details(item: dict) -> dict:
             elif re.search(r'"itemReviewed"\s*:\s*\{[^}]*"url"\s*:\s*"https?://[^"]*ign\.com/(?:movies|tv|comics|board-games|tech)/', content, re.I):
                 is_non_game_review = True
 
-        # 1. Lead / Cover Image (prefer og:image if missing or non-IGN)
+        # 1. Lead / Cover Image (prefer og:image if missing, IGN Japan, or GSMArena)
         meta_img = _extract_meta_image(content)
-        if not lead_img or ("jp.ign.com" in link.lower() and meta_img):
+        if not lead_img or (("jp.ign.com" in link.lower() or "gsmarena.com" in link.lower()) and meta_img):
             if meta_img:
                 lead_img = meta_img
 
@@ -698,12 +776,16 @@ def scrape_article_details(item: dict) -> dict:
                     except Exception:
                         pass
 
-        # 3. Extract article container (prioritize IGN Japan article-page, fallback to <article>)
-        art_m = (
-            re.search(r'<article[^>]+class=["\'][^"\']*article-page[^"\']*["\'][^>]*>(.*?)</article>', content, re.DOTALL | re.IGNORECASE)
-            or re.search(r"<article[^>]*>(.*?)</article>", content, re.DOTALL | re.IGNORECASE)
-        )
-        article_html = art_m.group(1) if art_m else content
+        # 3. Extract article container (prioritize GSMArena #review-body / IGN Japan article-page, fallback to <article>)
+        article_html = ""
+        if "gsmarena.com" in link.lower():
+            article_html = _extract_div_by_id(content, "review-body")
+        if not article_html:
+            art_m = (
+                re.search(r'<article[^>]+class=["\'][^"\']*article-page[^"\']*["\'][^>]*>(.*?)</article>', content, re.DOTALL | re.IGNORECASE)
+                or re.search(r"<article[^>]*>(.*?)</article>", content, re.DOTALL | re.IGNORECASE)
+            )
+            article_html = art_m.group(1) if art_m else content
 
         # Remove related-article float boxes, ad/promo containers & script/style noise before parsing paragraphs/media
         article_html = re.sub(r"<(aside|nav|footer)[^>]*>.*?</\1>", "", article_html, flags=re.S | re.I)
@@ -758,7 +840,7 @@ def scrape_article_details(item: dict) -> dict:
                 continue
             g = html.unescape(m_src.group(1)).strip()
             g_clean = g.split("?")[0].lower()
-            if any(ext in g_clean for ext in [".jpg", ".jpeg", ".png", ".webp"]) and _is_usable_image_url(g):
+            if any(ext in g_clean for ext in [".jpg", ".jpeg", ".png", ".webp"]) and _is_usable_gallery_image(g):
                 stem = _image_stem(g)
                 if stem and stem not in seen_stems:
                     seen_stems.add(stem)
@@ -1137,7 +1219,7 @@ def update_ui_files(news_list: list[dict]):
       '</svg>'
     );
     const CATEGORY_FALLBACKS = {{
-      Football: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1200&q=80',
+      Football: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200&q=80',
       Technology: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80',
       Gadgets: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80',
       Gaming: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&q=80',
@@ -1781,18 +1863,32 @@ def normalize_existing_item(it: dict, now_utc: datetime.datetime) -> dict | None
     it["published_at"] = pub_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
     it["published_th"] = to_thailand_time(pub_dt)
 
+    raw_cover = it.get("cover_image_url", "")
+    dead_unsplash_ids = ("photo-1508098682722-e99c43a406b2", "photo-1612287233207-6b4d32a90ca4")
+    if any(dead_id in raw_cover for dead_id in dead_unsplash_ids):
+        raw_cover = ""
+    it["cover_image_url"] = make_hd_image_url(raw_cover) if _is_usable_image_url(raw_cover) else ""
+    cover_stem = _image_stem(it["cover_image_url"])
+
     if it.get("gallery_images"):
-        it["gallery_images"] = [
-            make_hd_image_url(g) for g in it["gallery_images"]
-            if _is_usable_image_url(g)
-        ]
+        seen_gallery_stems = {cover_stem} if cover_stem else set()
+        cleaned_gallery = []
+        for g in it["gallery_images"]:
+            if not _is_usable_gallery_image(g):
+                continue
+            hd_g = make_hd_image_url(g)
+            stem = _image_stem(hd_g)
+            if stem and stem in seen_gallery_stems:
+                continue
+            if stem:
+                seen_gallery_stems.add(stem)
+            cleaned_gallery.append(hd_g)
+        it["gallery_images"] = cleaned_gallery
     if "videos" not in it or not isinstance(it["videos"], list):
         it["videos"] = []
     if "review_score" not in it:
         it["review_score"] = ""
     it["sub_tag"] = extract_sub_tag(it)
-    raw_cover = it.get("cover_image_url", "")
-    it["cover_image_url"] = make_hd_image_url(raw_cover) if _is_usable_image_url(raw_cover) else ""
     return it
 
 
