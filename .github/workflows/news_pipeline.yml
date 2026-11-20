@@ -1,9 +1,9 @@
 name: Automated News Pipeline (GitHub Native)
 
 on:
-  # Schedule: Runs automatically EVERY 15 MINUTES
-  schedule:
-    - cron: '*/15 * * * *'
+  # Schedule: Paused to free up Gemini API quota
+  # schedule:
+  #   - cron: '*/15 * * * *'
   
   # Manual trigger: 1-click test directly from GitHub Actions UI
   workflow_dispatch:
@@ -17,6 +17,7 @@ concurrency:
 
 jobs:
   scrape-and-update:
+    if: false # Paused to free up Gemini API quota (also blocks external cron-job.org triggers)
     name: Run Scraper, Gemini AI & GitHub Sync
     runs-on: ubuntu-latest
     timeout-minutes: 25
