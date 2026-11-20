@@ -1,9 +1,10 @@
 name: Automated News Pipeline (GitHub Native)
 
 on:
-  # Schedule: Paused to free up Gemini API quota
+  # Schedule: Paused to free up Gemini API quota (pre-tuned to run every 2 hours when re-enabled)
+  # Note: Also remember to set cron-job.org interval to 2 hours when re-enabling.
   # schedule:
-  #   - cron: '*/15 * * * *'
+  #   - cron: '0 */2 * * *'
   
   # Manual trigger: 1-click test directly from GitHub Actions UI
   workflow_dispatch:
@@ -43,6 +44,7 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_MODEL: ${{ secrets.GEMINI_MODEL || 'gemini-3.1-flash-lite' }}
+          MIN_API_INTERVAL_SEC: '4.5'
           MAX_ARTICLES: '30'
         run: |
           python pipeline.py
